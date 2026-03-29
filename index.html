@@ -967,6 +967,26 @@
           <label>Looptijd (jaar)</label>
           <input type="number" id="m5_years" value="5" min="1" max="15" step="1">
         </div>
+
+        <div class="input-section-title">Kilometervergoeding werk</div>
+
+        <div class="toggle-section">
+          <div class="toggle-row">
+            <label for="m5_vergoeding_on">Km vergoeding van werkgever</label>
+            <label class="switch">
+              <input type="checkbox" id="m5_vergoeding_on" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Woon-werk % van totale km</label>
+          <input type="number" id="m5_werk_pct" value="50" min="0" max="100" step="5">
+        </div>
+        <div class="input-group">
+          <label>Vergoeding (€/km) <span class="info-tag">2026: €0,23</span></label>
+          <input type="number" id="m5_vergoeding_km" value="0.23" min="0" step="0.01">
+        </div>
         <div class="input-group">
           <label>Brandstofprijs (€/liter)</label>
           <input type="number" id="m5_fuel_price" value="1.85" min="0" step="0.01">
@@ -1799,10 +1819,15 @@ function calcMod5() {
   const evCons     = val('m5_ev_cons');
   const evResale   = val('m5_ev_resale') / 100;
   const evMRBBase  = val('m5_ev_mrb_base');
-  const km         = val('m5_km');
-  const years      = Math.max(1, Math.round(val('m5_years')));
-  const fuelPrice  = val('m5_fuel_price');
-  const elPrice    = val('m5_el_price');
+  const km            = val('m5_km');
+  const years         = Math.max(1, Math.round(val('m5_years')));
+  const fuelPrice     = val('m5_fuel_price');
+  const elPrice       = val('m5_el_price');
+  const vergoedingOn  = document.getElementById('m5_vergoeding_on').checked;
+  const werkPct       = val('m5_werk_pct') / 100;
+  const vergoedingKm  = val('m5_vergoeding_km');
+  const werkKm        = km * werkPct;
+  const vergoedingJaar = vergoedingOn ? werkKm * vergoedingKm : 0;
 
   const baseYear = new Date().getFullYear();
 
@@ -1825,11 +1850,15 @@ function calcMod5() {
   const occResidualVal = occVal * occResale;
   const evResidualVal  = evPrice * evResale;
 
+  // Km vergoeding reduces net energy cost per scenario
+  const vergoedingTotal = vergoedingJaar * years;
+
   // Scenario A: houd huidige auto (opportunity cost = curVal, forfeit sale)
   const aTCO = curVal
     + curFuelYear * years
     + curMRB      * years
-    - curResidualVal;
+    - curResidualVal
+    - vergoedingTotal;
 
   // Scenario B: inruil huidige auto → EV
   // Net purchase = evPrice - curVal (trade-in) - subsidy
@@ -1837,27 +1866,27 @@ function calcMod5() {
   const bTCO = evNetPurchase
     + evElYear * years
     + cumEvMRB
-    - evResidualVal;
+    - evResidualVal
+    - vergoedingTotal;
 
   // Scenario C: huidige auto verkopen (pocket curVal) + occasion houden
-  // Opportunity cost of occasion = occVal (already owned)
-  // Gain from selling current = curVal → offset
-  const cNetInvestment = occVal - curVal; // negative = you gained money
+  const cNetInvestment = occVal - curVal;
   const cTCO = cNetInvestment
     + occFuelYear * years
     + occMRB      * years
-    - occResidualVal;
+    - occResidualVal
+    - vergoedingTotal;
 
   const scenarios = [
     { label: 'Huidige auto houden', icon: '🔵', tco: aTCO,
       fuel: curFuelYear * years, mrb: curMRB * years,
-      purchase: curVal, residual: curResidualVal, color: 'blue' },
+      purchase: curVal, residual: curResidualVal, vergoeding: vergoedingTotal, color: 'blue' },
     { label: 'Inruilen → EV', icon: '⚡', tco: bTCO,
       fuel: evElYear * years, mrb: cumEvMRB,
-      purchase: evNetPurchase, residual: evResidualVal, color: 'green' },
+      purchase: evNetPurchase, residual: evResidualVal, vergoeding: vergoedingTotal, color: 'green' },
     { label: 'Occasion (+ verkoop huidig)', icon: '♻️', tco: cTCO,
       fuel: occFuelYear * years, mrb: occMRB * years,
-      purchase: cNetInvestment, residual: occResidualVal, color: 'yellow' },
+      purchase: cNetInvestment, residual: occResidualVal, vergoeding: vergoedingTotal, color: 'yellow' },
   ];
 
   const winner = scenarios.reduce((a, b) => a.tco < b.tco ? a : b);
@@ -1898,6 +1927,10 @@ function calcMod5() {
           <div class="bar-label">Restwaarde</div>
           <div class="bar-track"><div class="bar-fill ev" style="width:${Math.min(100,s.residual/maxBar*100)}%; background: var(--green); opacity:0.5">-${fmtEur(s.residual)}</div></div>
         </div>
+        ${s.vergoeding > 0 ? `<div class="bar-row">
+          <div class="bar-label">Km vergoed.</div>
+          <div class="bar-track"><div class="bar-fill ev" style="width:${Math.min(100,s.vergoeding/maxBar*100)}%; background: var(--green)">-${fmtEur(s.vergoeding)}</div></div>
+        </div>` : ''}
       </div>`;
     }).join('')}`;
 
@@ -1915,9 +1948,10 @@ function calcMod5() {
   let cumEvMRBSoFar = 0;
   for (let y = 1; y <= years; y++) {
     cumEvMRBSoFar += evMRBPerYear[y - 1];
-    cumA = curVal     + curFuelYear * y + curMRB  * y - (y === years ? curResidualVal : 0);
-    cumB = evNetPurchase + evElYear * y + cumEvMRBSoFar - (y === years ? evResidualVal : 0);
-    cumC = cNetInvestment + occFuelYear * y + occMRB * y - (y === years ? occResidualVal : 0);
+    const cumVerg = vergoedingJaar * y;
+    cumA = curVal        + curFuelYear * y + curMRB  * y - (y === years ? curResidualVal : 0) - cumVerg;
+    cumB = evNetPurchase + evElYear   * y + cumEvMRBSoFar - (y === years ? evResidualVal : 0) - cumVerg;
+    cumC = cNetInvestment + occFuelYear * y + occMRB * y - (y === years ? occResidualVal : 0) - cumVerg;
     const diff = cumA - cumB; // positive = EV cheaper vs huidig
     html += `<tr>
       <td>Jaar ${y}${y === years ? ' ✱' : ''}</td>
@@ -1978,6 +2012,8 @@ document.getElementById('m1_zakelijk').addEventListener('change', function() {
   recalcAll();
 });
 
+document.getElementById('m5_vergoeding_on').addEventListener('change', recalcAll);
+
 // ============================================================
 // WIRE ALL INPUTS
 // ============================================================
@@ -1994,6 +2030,7 @@ const allInputIds = [
   'm5_occ_val','m5_occ_cons','m5_occ_mrb','m5_occ_resale',
   'm5_ev_price','m5_ev_subsidy','m5_ev_cons','m5_ev_resale','m5_ev_mrb_base',
   'm5_km','m5_years','m5_fuel_price','m5_el_price',
+  'm5_werk_pct','m5_vergoeding_km',
 ];
 
 allInputIds.forEach(id => {
