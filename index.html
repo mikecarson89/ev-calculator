@@ -720,6 +720,10 @@
         <div class="input-section-title">Installatie</div>
 
         <div class="input-group">
+          <label>Aanschaf + installatie totaal (€)</label>
+          <input type="number" id="m2_install_cost" value="2100" min="0" step="100">
+        </div>
+        <div class="input-group">
           <label>Aantal panelen</label>
           <input type="number" id="m2_panels" value="6" min="1" max="100">
         </div>
@@ -802,6 +806,10 @@
         <div class="input-group">
           <label>Nuttig bruikbaar (%)</label>
           <input type="number" id="m3_usable" value="90" min="50" max="100">
+        </div>
+        <div class="input-group">
+          <label>Roundtrip rendement (%) <span class="info-tag">laad+ontlaad</span></label>
+          <input type="number" id="m3_roundtrip" value="92" min="70" max="100">
         </div>
         <div class="input-group">
           <label>Levensduur (cycli)</label>
@@ -932,6 +940,21 @@
         <div class="input-group">
           <label>Restwaarde occasion na looptijd (%)</label>
           <input type="number" id="m5_occ_resale" value="35" min="0" max="100">
+        </div>
+
+        <div class="input-section-title">Onderhoud (€/jaar per auto)</div>
+
+        <div class="input-group">
+          <label>Onderhoud EV (€/jaar)</label>
+          <input type="number" id="m5_maint_ev" value="300" min="0" step="50">
+        </div>
+        <div class="input-group">
+          <label>Onderhoud ICE (€/jaar)</label>
+          <input type="number" id="m5_maint_ice" value="700" min="0" step="50">
+        </div>
+        <div class="input-group">
+          <label>Laadpaal installatie thuis (€) <span class="info-tag">eenmalig</span></label>
+          <input type="number" id="m5_laadpaal" value="1000" min="0" step="100">
         </div>
 
         <div class="input-section-title">EV (na inruil huidige auto)</div>
@@ -1391,6 +1414,7 @@ function calcMod1() {
 // ============================================================
 
 function calcMod2() {
+  const installCost = val('m2_install_cost');
   const panels     = val('m2_panels');
   const wp         = val('m2_wp');
   const yieldKwp   = val('m2_yield');    // kWh per kWp per year
@@ -1458,6 +1482,14 @@ function calcMod2() {
       <div class="kpi-value green">${fmtEur(totalSaving)}</div>
       <div class="kpi-sub">direct ${fmtEur(savingDirect)} + export ${fmtEur(savingExport)}</div>
     </div>
+    ${installCost > 0 ? `
+    <div class="kpi">
+      <div class="kpi-label">Terugverdientijd</div>
+      <div class="kpi-value ${totalSaving > 0 && installCost/totalSaving <= 15 ? 'green' : 'yellow'}">
+        ${totalSaving > 0 ? fmt(installCost / totalSaving, 1) + ' jr' : '∞'}
+      </div>
+      <div class="kpi-sub">${fmtEur(installCost)} installatie</div>
+    </div>` : ''}
     <div class="kpi">
       <div class="kpi-label">Overschot/dag</div>
       <div class="kpi-value">${fmt(excessPerDay, 2)} kWh</div>
@@ -1529,6 +1561,7 @@ function calcMod3() {
   const price      = val('m3_price');
   const cap        = val('m3_cap');
   const usablePct  = val('m3_usable') / 100;
+  const roundtrip  = val('m3_roundtrip') / 100;
   const cycleLife  = val('m3_cycles');
   const cyclesDay  = val('m3_cycles_day');
   const elPrice    = val('m3_el_price');
@@ -1540,8 +1573,9 @@ function calcMod3() {
   // kWh stored per day: min of (available excess, usable cap * cycles per day)
   const storedPerDay = Math.min(solarExcess, usableCap * cyclesDay);
 
-  // Saving per kWh stored: instead of exporting at feedPrice, use at elPrice
-  const savingPerKwh = elPrice - feedPrice;
+  // Saving per kWh stored: you discharge roundtrip% back, avoiding grid import at elPrice
+  // vs exporting at feedPrice. Net saving = roundtrip * elPrice - feedPrice per kWh stored.
+  const savingPerKwh = roundtrip * elPrice - feedPrice;
   const annualStored = storedPerDay * 365;
   const annualSaving = annualStored * savingPerKwh;
 
@@ -1843,6 +1877,9 @@ function calcMod5() {
   const leonCons    = val('m5_occ_cons');
   const leonMRB     = val('m5_occ_mrb');
   const leonResale  = val('m5_occ_resale') / 100;
+  const maintEV     = val('m5_maint_ev');
+  const maintICE    = val('m5_maint_ice');
+  const laadpaal    = val('m5_laadpaal');
   const evPrice     = val('m5_ev_price');
   const evSubsidy   = val('m5_ev_subsidy');
   const evCons      = val('m5_ev_cons');
@@ -1894,21 +1931,27 @@ function calcMod5() {
   // Km vergoeding is the same in all scenarios (Tom's km × rate), offset equally
   const vergTotal = vergoedingJaar * years;
 
-  // A: Beide houden — Focus (jij, km) + Seat Leon (tweede, km2)
-  const aTCO = focusVal + focusFuelYr * years + focusMRB * years - focusResidual
-             + leonVal  + leonFuelYr  * years + leonMRB  * years - leonResidual
+  // Maintenance totals over looptijd
+  const maintICETotal = maintICE * years;
+  const maintEVTotal  = maintEV  * years;
+
+  // A: Beide houden — Focus (jij, km) + Seat Leon (tweede, km2) — beide ICE onderhoud
+  const aTCO = focusVal + focusFuelYr * years + focusMRB * years - focusResidual + maintICETotal
+             + leonVal  + leonFuelYr  * years + leonMRB  * years - leonResidual  + maintICETotal
              - vergTotal;
 
   // B: Focus inruilen → EV (jij rijdt EV, km) + Seat Leon blijft (km2)
-  const evNetB = Math.max(0, evPrice - focusVal - evSubsidy); // netto aankoop EV
-  const bTCO = evNetB + evElYr_prim * years + cumEvMRB - evResidual
-             + leonVal + leonFuelYr * years + leonMRB * years - leonResidual
+  // + laadpaal eenmalig, EV onderhoud voor de EV, ICE onderhoud voor Leon
+  const evNetB = Math.max(0, evPrice - focusVal - evSubsidy);
+  const bTCO = evNetB + laadpaal + evElYr_prim * years + cumEvMRB - evResidual + maintEVTotal
+             + leonVal + leonFuelYr * years + leonMRB * years - leonResidual + maintICETotal
              - vergTotal;
 
   // C: Seat Leon inruilen → EV (tweede auto, km2) + Focus blijft (jij, km)
-  const evNetC = Math.max(0, evPrice - leonVal - evSubsidy); // netto aankoop EV
-  const cTCO = focusVal + focusFuelYr * years + focusMRB * years - focusResidual
-             + evNetC  + evElYr_sec  * years + cumEvMRB - evResidual
+  // + laadpaal eenmalig, Focus onderhoud (ICE), EV onderhoud voor tweede auto
+  const evNetC = Math.max(0, evPrice - leonVal - evSubsidy);
+  const cTCO = focusVal + focusFuelYr * years + focusMRB * years - focusResidual + maintICETotal
+             + evNetC  + laadpaal + evElYr_sec  * years + cumEvMRB - evResidual + maintEVTotal
              - vergTotal;
 
   const scenarios = [
@@ -1916,6 +1959,7 @@ function calcMod5() {
       icon: '🔵', tco: aTCO,
       fuel: (focusFuelYr + leonFuelYr) * years,
       mrb: (focusMRB + leonMRB) * years,
+      maint: maintICETotal * 2,
       purchase: focusVal + leonVal,
       residual: focusResidual + leonResidual,
       vergoeding: vergTotal, color: 'blue' },
@@ -1923,14 +1967,16 @@ function calcMod5() {
       icon: '⚡', tco: bTCO,
       fuel: evElYr_prim * years + leonFuelYr * years,
       mrb: cumEvMRB + leonMRB * years,
-      purchase: evNetB + leonVal,
+      maint: maintEVTotal + maintICETotal,
+      purchase: evNetB + laadpaal + leonVal,
       residual: evResidual + leonResidual,
       vergoeding: vergTotal, color: 'green' },
     { label: 'Seat Leon → EV', sub: 'Focus (jij) + EV als tweede auto',
       icon: '🟡', tco: cTCO,
       fuel: focusFuelYr * years + evElYr_sec * years,
       mrb: focusMRB * years + cumEvMRB,
-      purchase: focusVal + evNetC,
+      maint: maintICETotal + maintEVTotal,
+      purchase: focusVal + evNetC + laadpaal,
       residual: focusResidual + evResidual,
       vergoeding: vergTotal, color: 'yellow' },
   ];
@@ -1946,7 +1992,7 @@ function calcMod5() {
     </div>`).join('');
 
   // === BARS ===
-  const maxBar = Math.max(...scenarios.map(s => s.fuel + s.mrb + s.purchase), 1);
+  const maxBar = Math.max(...scenarios.map(s => s.fuel + s.mrb + s.maint + s.purchase), 1);
   document.getElementById('m5_bars').innerHTML = `
     <div class="bar-compare-title">Huishouden kostenverdeling — ${years} jaar</div>
     ${scenarios.map(s => `
@@ -1958,6 +2004,8 @@ function calcMod5() {
           <div class="bar-track"><div class="bar-fill ${s.color === 'green' ? 'ev' : 'ice'}" style="width:${Math.min(100,s.fuel/maxBar*100)}%">${fmtEur(s.fuel)}</div></div></div>
         <div class="bar-row"><div class="bar-label">MRB</div>
           <div class="bar-track"><div class="bar-fill ${s.color === 'green' ? 'ev' : 'ice'}" style="width:${Math.min(100,s.mrb/maxBar*100)}%">${fmtEur(s.mrb)}</div></div></div>
+        <div class="bar-row"><div class="bar-label">Onderhoud</div>
+          <div class="bar-track"><div class="bar-fill ${s.color === 'green' ? 'ev' : 'ice'}" style="width:${Math.min(100,s.maint/maxBar*100)}%; opacity:0.7">${fmtEur(s.maint)}</div></div></div>
         <div class="bar-row"><div class="bar-label">Restwaarde</div>
           <div class="bar-track"><div class="bar-fill ev" style="width:${Math.min(100,s.residual/maxBar*100)}%; background:var(--green); opacity:0.5">-${fmtEur(s.residual)}</div></div></div>
         ${s.vergoeding > 0 ? `<div class="bar-row"><div class="bar-label">Km vergoed.</div>
@@ -1979,12 +2027,12 @@ function calcMod5() {
     cumEvMRBSoFar += evMRBPerYear[y - 1];
     const isLast = y === years;
     const verg = vergoedingJaar * y;
-    const rA = (focusVal + focusFuelYr*y + focusMRB*y - (isLast?focusResidual:0))
-             + (leonVal  + leonFuelYr*y  + leonMRB*y  - (isLast?leonResidual:0)) - verg;
-    const rB = (evNetB  + evElYr_prim*y + cumEvMRBSoFar - (isLast?evResidual:0))
-             + (leonVal + leonFuelYr*y   + leonMRB*y    - (isLast?leonResidual:0)) - verg;
-    const rC = (focusVal + focusFuelYr*y + focusMRB*y  - (isLast?focusResidual:0))
-             + (evNetC  + evElYr_sec*y   + cumEvMRBSoFar - (isLast?evResidual:0)) - verg;
+    const rA = (focusVal + focusFuelYr*y + focusMRB*y + maintICE*y - (isLast?focusResidual:0))
+             + (leonVal  + leonFuelYr*y  + leonMRB*y  + maintICE*y - (isLast?leonResidual:0)) - verg;
+    const rB = (evNetB  + laadpaal + evElYr_prim*y + cumEvMRBSoFar + maintEV*y - (isLast?evResidual:0))
+             + (leonVal + leonFuelYr*y   + leonMRB*y + maintICE*y  - (isLast?leonResidual:0)) - verg;
+    const rC = (focusVal + focusFuelYr*y + focusMRB*y + maintICE*y - (isLast?focusResidual:0))
+             + (evNetC  + laadpaal + evElYr_sec*y + cumEvMRBSoFar + maintEV*y - (isLast?evResidual:0)) - verg;
     const diff = rA - rB;
     html += `<tr>
       <td>Jaar ${y}${isLast?' ✱':''}</td>
@@ -2063,6 +2111,7 @@ const allInputIds = [
   'm5_km','m5_km2','m5_years','m5_fuel_price',
   'm5_pct_home','m5_price_home','m5_pct_ac','m5_price_ac','m5_pct_dc','m5_price_dc',
   'm5_werk_pct','m5_vergoeding_km',
+  'm2_install_cost','m3_roundtrip','m5_maint_ev','m5_maint_ice','m5_laadpaal',
 ];
 
 allInputIds.forEach(id => {
