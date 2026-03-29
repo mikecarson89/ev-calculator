@@ -995,10 +995,34 @@
           <label>Brandstofprijs (€/liter)</label>
           <input type="number" id="m5_fuel_price" value="1.85" min="0" step="0.01">
         </div>
+
+        <div class="input-section-title">Laadmix EV</div>
+
         <div class="input-group">
-          <label>Stroomprijs (€/kWh)</label>
-          <input type="number" id="m5_el_price" value="0.22" min="0" step="0.01">
+          <label>% thuis laden</label>
+          <input type="number" id="m5_pct_home" value="60" min="0" max="100" step="5">
         </div>
+        <div class="input-group">
+          <label>Thuisprijs (€/kWh)</label>
+          <input type="number" id="m5_price_home" value="0.22" min="0" step="0.01">
+        </div>
+        <div class="input-group">
+          <label>% publiek AC laden</label>
+          <input type="number" id="m5_pct_ac" value="25" min="0" max="100" step="5">
+        </div>
+        <div class="input-group">
+          <label>Publiek AC prijs (€/kWh)</label>
+          <input type="number" id="m5_price_ac" value="0.40" min="0" step="0.01">
+        </div>
+        <div class="input-group">
+          <label>% snelweg DC laden</label>
+          <input type="number" id="m5_pct_dc" value="15" min="0" max="100" step="5">
+        </div>
+        <div class="input-group">
+          <label>Snelweg DC prijs (€/kWh)</label>
+          <input type="number" id="m5_price_dc" value="0.65" min="0" step="0.01">
+        </div>
+        <div id="m5_el_effective" style="font-size:12px; color:var(--green); margin-top:-6px; margin-bottom:14px; padding-left:4px;"></div>
 
       </div><!-- end inputs-col -->
 
@@ -1828,7 +1852,17 @@ function calcMod5() {
   const km2         = val('m5_km2');  // tweede auto km/jr
   const years       = Math.max(1, Math.round(val('m5_years')));
   const fuelPrice   = val('m5_fuel_price');
-  const elPrice     = val('m5_el_price');
+  const pctHome  = val('m5_pct_home')  / 100;
+  const pctAC    = val('m5_pct_ac')    / 100;
+  const pctDC    = val('m5_pct_dc')    / 100;
+  const priceHome = val('m5_price_home');
+  const priceAC   = val('m5_price_ac');
+  const priceDC   = val('m5_price_dc');
+  const totalPct  = pctHome + pctAC + pctDC || 1;
+  const elPrice   = (pctHome * priceHome + pctAC * priceAC + pctDC * priceDC) / totalPct;
+  // Show effective price
+  const effEl = document.getElementById('m5_el_effective');
+  if (effEl) effEl.textContent = `Effectieve stroomprijs: €${elPrice.toFixed(3)}/kWh (gewogen gemiddelde)`;
   const vergoedingOn = document.getElementById('m5_vergoeding_on').checked;
   const werkPct      = val('m5_werk_pct') / 100;
   const vergoedingKm = val('m5_vergoeding_km');
@@ -2026,7 +2060,8 @@ const allInputIds = [
   'm5_cur_val','m5_cur_cons','m5_cur_mrb','m5_cur_resale',
   'm5_occ_val','m5_occ_cons','m5_occ_mrb','m5_occ_resale',
   'm5_ev_price','m5_ev_subsidy','m5_ev_cons','m5_ev_resale','m5_ev_mrb_base',
-  'm5_km','m5_km2','m5_years','m5_fuel_price','m5_el_price',
+  'm5_km','m5_km2','m5_years','m5_fuel_price',
+  'm5_pct_home','m5_price_home','m5_pct_ac','m5_price_ac','m5_pct_dc','m5_price_dc',
   'm5_werk_pct','m5_vergoeding_km',
 ];
 
