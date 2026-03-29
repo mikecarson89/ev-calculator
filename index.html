@@ -596,11 +596,11 @@
 
         <div class="input-group">
           <label>Aanschafprijs EV (€)</label>
-          <input type="number" id="m1_ev_price" value="45000" min="0" step="500">
+          <input type="number" id="m1_ev_price" value="38000" min="0" step="500">
         </div>
         <div class="input-group">
           <label>Aanschafprijs ICE (€)</label>
-          <input type="number" id="m1_ice_price" value="35000" min="0" step="500">
+          <input type="number" id="m1_ice_price" value="34000" min="0" step="500">
         </div>
         <div class="input-group">
           <label>Subsidie EV — SEPP 2026 (€)</label>
@@ -627,7 +627,7 @@
         </div>
         <div class="input-group">
           <label>Verbruik EV (kWh/100km)</label>
-          <input type="number" id="m1_ev_cons" value="18" min="0" step="0.5">
+          <input type="number" id="m1_ev_cons" value="15" min="0" step="0.5">
         </div>
         <div class="input-group">
           <label>Verbruik ICE (liter/100km)</label>
@@ -642,15 +642,20 @@
           <input type="number" id="m1_fuel_price" value="1.85" min="0" step="0.01">
         </div>
 
-        <div class="input-section-title">Vaste kosten</div>
+        <div class="input-section-title">Wegenbelasting (MRB)</div>
 
         <div class="input-group">
-          <label>Wegenbelasting EV (€/jaar) <span class="info-tag">MRB</span></label>
-          <input type="number" id="m1_mrb_ev" value="200" min="0" step="10">
+          <label>MRB volledig tarief EV (€/jaar) <span class="info-tag">zonder korting</span></label>
+          <input type="number" id="m1_mrb_ev" value="1008" min="0" step="10">
+        </div>
+        <div style="font-size:11px; color: var(--text-muted); margin-top:-8px; margin-bottom:14px; line-height:1.6;">
+          Korting afbouw: 2026–2028 → 30% korting (betaal 70%) &nbsp;·&nbsp;
+          2029 → 25% korting &nbsp;·&nbsp; 2030+ → volledig tarief.<br>
+          Calculator past dit automatisch per jaar toe.
         </div>
         <div class="input-group">
           <label>Wegenbelasting ICE (€/jaar) <span class="info-tag">MRB</span></label>
-          <input type="number" id="m1_mrb_ice" value="800" min="0" step="10">
+          <input type="number" id="m1_mrb_ice" value="600" min="0" step="10">
         </div>
 
         <div class="input-section-title">Zakelijk gebruik</div>
@@ -935,6 +940,18 @@ function onAll(ids, fn) {
 // MODULE 1: EV vs ICE
 // ============================================================
 
+// MRB korting afbouw (EV/waterstof personenauto NL)
+// 2025: 75% korting → factor 0.25
+// 2026-2028: 30% korting → factor 0.70
+// 2029: 25% korting → factor 0.75
+// 2030+: geen korting → factor 1.00
+function getEvMRBFactor(calendarYear) {
+  if (calendarYear <= 2025) return 0.25;
+  if (calendarYear <= 2028) return 0.70;
+  if (calendarYear === 2029) return 0.75;
+  return 1.00;
+}
+
 function calcMod1() {
   const evPrice    = val('m1_ev_price');
   const icePrice   = val('m1_ice_price');
@@ -951,8 +968,23 @@ function calcMod1() {
   const bijEV      = val('m1_bij_ev') / 100;
   const bijICE     = val('m1_bij_ice') / 100;
   const taxRate    = val('m1_tax_rate') / 100;
-  const mrbEV      = val('m1_mrb_ev');
-  const mrbICE     = val('m1_mrb_ice');
+  const mrbEVBase  = val('m1_mrb_ev');   // volledig tarief zonder korting
+  const mrbICE     = val('m1_mrb_ice');  // ICE: geen korting
+
+  // Precompute cumulative MRB per year (EV factor changes per calendar year)
+  const baseYear = new Date().getFullYear(); // 2026
+  const cumEvMRB  = [];
+  const cumIceMRB = [];
+  const evMRBPerYear = [];
+  let _cumEv = 0, _cumIce = 0;
+  for (let _y = 1; _y <= Math.max(years, 15); _y++) {
+    const factor = getEvMRBFactor(baseYear + _y - 1);
+    _cumEv  += mrbEVBase * factor;
+    _cumIce += mrbICE;
+    evMRBPerYear.push(mrbEVBase * factor);
+    cumEvMRB.push(_cumEv);
+    cumIceMRB.push(_cumIce);
+  }
 
   // Effective purchase cost (after subsidy)
   const evNet  = evPrice - subsidy;
@@ -972,7 +1004,8 @@ function calcMod1() {
     bijTaxICE = icePrice * bijICE * taxRate;
   }
   const bijSavingYear = bijTaxICE - bijTaxEV; // positive = EV cheaper in bijtelling
-  const mrbSavingYear = mrbICE - mrbEV;       // positive = EV cheaper in MRB
+  const mrbEVYear1    = evMRBPerYear[0];       // EV MRB in year 1 (current year)
+  const mrbSavingYear = mrbICE - mrbEVYear1;  // saving this year (positive = EV cheaper)
 
   // Residual values at end of period
   const evResidual  = evPrice  * evResale;
@@ -993,8 +1026,8 @@ function calcMod1() {
     const evResidualAdj  = (y === years) ? evResidual  : 0;
     const iceResidualAdj = (y === years) ? iceResidual : 0;
 
-    const evMRB    = mrbEV  * y;
-    const iceMRB   = mrbICE * y;
+    const evMRB    = cumEvMRB[y - 1];
+    const iceMRB   = cumIceMRB[y - 1];
 
     const evTotal  = evNet  + evEnergy  + evBij  + evMRB  - evResidualAdj;
     const iceTotal = iceNet + iceEnergy + iceBij + iceMRB - iceResidualAdj;
@@ -1005,7 +1038,8 @@ function calcMod1() {
       evEnergy, iceEnergy,
       evBij, iceBij,
       evMRB, iceMRB,
-      diff: iceTotal - evTotal,    // positive = EV cheaper
+      mrbLabel: evMRBPerYear[y - 1], // actual EV MRB this year (not cumulative)
+      diff: iceTotal - evTotal,
     });
   }
 
@@ -1013,8 +1047,8 @@ function calcMod1() {
   // Without residual at break-even interim years
   let breakEven = null;
   for (let y = 1; y <= years; y++) {
-    const evTmp  = evNet  + evEnergyYear  * y + bijTaxEV  * y + mrbEV  * y;
-    const iceTmp = iceNet + iceEnergyYear * y + bijTaxICE * y + mrbICE * y;
+    const evTmp  = evNet  + evEnergyYear  * y + bijTaxEV  * y + cumEvMRB[y - 1];
+    const iceTmp = iceNet + iceEnergyYear * y + bijTaxICE * y + cumIceMRB[y - 1];
     if (evTmp <= iceTmp) {
       breakEven = y;
       break;
@@ -1023,7 +1057,8 @@ function calcMod1() {
 
   // If no break-even within period, estimate fractionally
   // slope: iceEnergy - evEnergy + bijSavingYear per year
-  const annualGain = energySavingYear + bijSavingYear + mrbSavingYear;
+  const avgMRBSaving = years > 0 ? (cumIceMRB[years - 1] - cumEvMRB[years - 1]) / years : mrbSavingYear;
+  const annualGain = energySavingYear + bijSavingYear + avgMRBSaving;
   const initialExtra = evNet - iceNet; // extra upfront for EV (can be negative)
   let breakEvenFrac = null;
   if (annualGain > 0 && initialExtra > 0) {
@@ -1033,8 +1068,8 @@ function calcMod1() {
   }
 
   // Final net cost including residual
-  const evFinalCost  = evNet  + evEnergyYear  * years + bijTaxEV  * years + mrbEV  * years - evResidual;
-  const iceFinalCost = iceNet + iceEnergyYear * years + bijTaxICE * years + mrbICE * years - iceResidual;
+  const evFinalCost  = evNet  + evEnergyYear  * years + bijTaxEV  * years + cumEvMRB[years - 1]  - evResidual;
+  const iceFinalCost = iceNet + iceEnergyYear * years + bijTaxICE * years + cumIceMRB[years - 1] - iceResidual;
   const finalDiff    = iceFinalCost - evFinalCost; // positive = EV wins
 
   // ---- RENDER ----
@@ -1059,9 +1094,9 @@ function calcMod1() {
       <div class="kpi-sub">EV ${fmtEur(bijTaxEV)}/jr vs ICE ${fmtEur(bijTaxICE)}/jr</div>
     </div>` : ''}
     <div class="kpi">
-      <div class="kpi-label">MRB voordeel/jaar</div>
+      <div class="kpi-label">MRB voordeel ${baseYear}</div>
       <div class="kpi-value ${mrbSavingYear >= 0 ? 'green' : 'red'}">${fmtEur(mrbSavingYear)}</div>
-      <div class="kpi-sub">EV ${fmtEur(mrbEV)}/jr vs ICE ${fmtEur(mrbICE)}/jr</div>
+      <div class="kpi-sub">EV ${fmtEur(mrbEVYear1)}/jr · loopt op naar ${fmtEur(mrbEVBase)}/jr in 2030</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Break-even</div>
@@ -1083,7 +1118,7 @@ function calcMod1() {
   `;
 
   // Bar comparison: annual costs
-  const maxBar = Math.max(evEnergyYear, iceEnergyYear, bijTaxEV, bijTaxICE, mrbEV, mrbICE, 1);
+  const maxBar = Math.max(evEnergyYear, iceEnergyYear, bijTaxEV, bijTaxICE, mrbEVYear1, mrbICE, 1);
   const barsEl = document.getElementById('m1_bars');
   barsEl.innerHTML = `
     <div class="bar-compare-title">Jaarlijkse kosten vergelijking</div>
@@ -1105,8 +1140,8 @@ function calcMod1() {
       <div class="bar-track"><div class="bar-fill ice" style="width:${Math.min(100, bijTaxICE/maxBar*100)}%">${fmtEur(bijTaxICE)}</div></div>
     </div>` : ''}
     <div class="bar-row">
-      <div class="bar-label">EV MRB/jaar</div>
-      <div class="bar-track"><div class="bar-fill ev" style="width:${Math.min(100, mrbEV/maxBar*100)}%">${fmtEur(mrbEV)}</div></div>
+      <div class="bar-label">EV MRB ${baseYear}</div>
+      <div class="bar-track"><div class="bar-fill ev" style="width:${Math.min(100, mrbEVYear1/maxBar*100)}%">${fmtEur(mrbEVYear1)}</div></div>
     </div>
     <div class="bar-row">
       <div class="bar-label">ICE MRB/jaar</div>
@@ -1502,7 +1537,7 @@ function calcMod4(m1, m2, m3) {
     <div>Batterij aanschaf: <strong style="color:var(--text)">${fmtEur(batPrice)}</strong></div>
     <div>Extra investering totaal: <strong style="color:var(--accent)">${fmtEur(extraInvestment)}</strong></div>
     <div>EV besparing brandstof/jaar: <strong style="color:var(--green)">${fmtEur(evSavingYear)}</strong></div>
-    <div>EV besparing MRB/jaar: <strong style="color:var(--green)">${fmtEur(mrbSavingYear)}</strong></div>
+    <div>EV MRB besparing/jaar (nu): <strong style="color:var(--green)">${fmtEur(mrbSavingYear)}</strong></div>
     <div>Batterij besparing/jaar: <strong style="color:var(--green)">${fmtEur(batSavingYear)}</strong></div>
     <div>Zonnepanelen besparing/jaar: <strong style="color:var(--green)">${fmtEur(m2.totalSaving)}</strong></div>
   `;
