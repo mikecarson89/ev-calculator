@@ -2173,48 +2173,53 @@ function drawM5Charts(d) {
     }
   };
 
-  const maxYrs = Math.max(d.years, 10);   // always show at least 10 years
+  const maxYrs = Math.max(d.years, 10);
   const labels = Array.from({length: maxYrs + 1}, (_, i) => i === 0 ? 'Nu' : `Jaar ${i}`);
+  const refYrs = Math.max(d.years, 1);
 
-  // ── BUILD CUMULATIVE SAVINGS SERIES ──────────────────────────────────
-  // Restwaarde is included as a per-year advantage:
-  //   EV value at year y  = evPrice  * (1 - (1-evResale)  * y/years) — linear depreciation to looptijd
-  //   Focus value at yr y = focusVal * (1 - (1-focusResale)* y/years)  (if you had kept it)
-  //   Advantage at year y = EV value(y) - Focus value(y)
-  // This gives a smooth curve instead of a one-time spike.
-  const cumSavings = [_m5ResaleOn ? (d.evPrice - d.focusVal) : 0];  // at yr0: EV worth evPrice, gave up focusVal
+  // ── BUILD TWO CUMULATIVE SERIES (both start at -nettoInv) ─────────────
+  // Series A — rijkosten only (exclusief restwaarde):
+  //   pos[y] = -nettoInv + Σ(running_cost_savings)
+  //
+  // Series B — inclusief restwaarde:
+  //   pos[y] = -nettoInv + Σ(running_cost_savings) + (evValue[y] - focusValue[y])
+  //   where evValue[y]    = evPrice  × (1 - (1-evResale)  × y/refYrs)   [lineair]
+  //         focusValue[y] = focusVal × (1 - (1-focusResale)× y/refYrs)
+  //   Yr 0: already -nettoInv + (evPrice - focusVal) = -laadpaal cost ≈ -€1500
+
+  const posOps = [-d.nettoInv];
+  const posRes = [-d.nettoInv + (d.evPrice - d.focusVal)];
   let accSave = 0;
+
   for (let y = 1; y <= maxYrs; y++) {
-    const mrbEv = d.evMRBPerYear[y-1] ?? d.evMRBPerYear[d.evMRBPerYear.length - 1];
-    const focusYrCost = d.focusFuelYr + d.focusMRB + d.focusMaintYr;
-    const evYrCost    = d.evElYr     + mrbEv       + d.evMaintYr;
-    accSave += (focusYrCost - evYrCost);
-    let resaleAdv = 0;
-    if (_m5ResaleOn) {
-      const refYrs   = Math.max(d.years, 1);
-      const evValNow = d.evPrice  * Math.max(0, 1 - (1 - d.evResale)  * y / refYrs);
-      const foValNow = d.focusVal * Math.max(0, 1 - (1 - d.focusResale)* y / refYrs);
-      resaleAdv = evValNow - foValNow;
-    }
-    cumSavings.push(accSave + resaleAdv);
+    const mrbEv  = d.evMRBPerYear[y-1] ?? d.evMRBPerYear[d.evMRBPerYear.length - 1];
+    accSave     += (d.focusFuelYr + d.focusMRB + d.focusMaintYr) - (d.evElYr + mrbEv + d.evMaintYr);
+    const evVal  = d.evPrice  * Math.max(0, 1 - (1 - d.evResale)   * y / refYrs);
+    const foVal  = d.focusVal * Math.max(0, 1 - (1 - d.focusResale) * y / refYrs);
+    posOps.push(-d.nettoInv + accSave);
+    posRes.push(-d.nettoInv + accSave + (evVal - foVal));
   }
 
-  // Find break-even index (where cumSavings crosses nettoInv from below)
-  // nettoInv is what you paid out of pocket; cumSavings starts at (evPrice-focusVal) if resale on
-  const threshold = _m5ResaleOn ? 0 : d.nettoInv;  // with resale: net position crosses 0; without: crosses nettoInv
-  const checkVal  = _m5ResaleOn ? cumSavings.map(s => s - d.nettoInv) : cumSavings;
-  let beLabel = null;
-  for (let i = 1; i < checkVal.length; i++) {
-    if (checkVal[i] >= 0 && checkVal[i-1] < 0) {
-      const frac = (0 - checkVal[i-1]) / (checkVal[i] - checkVal[i-1]);
-      beLabel = `Jaar ${(i-1+frac).toFixed(1).replace('.',',')}`;
-      break;
+  // ── FIND BREAK-EVEN for each series ──────────────────────────────────
+  function findBE(series) {
+    for (let i = 1; i < series.length; i++) {
+      if (series[i] >= 0 && series[i-1] < 0) {
+        const frac = (0 - series[i-1]) / (series[i] - series[i-1]);
+        return `Jaar ${((i-1+frac).toFixed(1)).replace('.',',')}`;
+      }
     }
+    return null;
   }
+  const beOps = findBE(posOps);
+  const beRes = findBE(posRes);
+
+  const activeSeries = _m5ResaleOn ? posRes : posOps;
+  const activeBE     = _m5ResaleOn ? beRes  : beOps;
 
   document.getElementById('m5_netto_inv_label').textContent =
     `Netto investering: €${Math.round(d.nettoInv).toLocaleString('nl-NL')}` +
-    (beLabel ? `  ·  Break-even: ${beLabel}` : '  ·  Break-even: > ${maxYrs} jaar');
+    `  ·  Break-even rijkosten: ${beOps ?? `>${maxYrs}jr`}` +
+    `  ·  Incl. restwaarde: ${beRes ?? `>${maxYrs}jr`}`;
 
   // ── CHART 1: BREAK-EVEN ──────────────────────────────────────────────
   if (_m5ChartBE) { _m5ChartBE.destroy(); _m5ChartBE = null; }
@@ -2224,23 +2229,30 @@ function drawM5Charts(d) {
     data: {
       labels,
       datasets: [
-        { label: 'Cumulatieve besparing',
-          data: cumSavings,
-          borderColor: GREEN, backgroundColor: GREEN + '22',
-          borderWidth: 2.5, pointRadius: 3, fill: true, tension: 0.3 },
-        { label: `Netto investering (€${Math.round(d.nettoInv).toLocaleString('nl-NL')})`,
-          data: Array(maxYrs + 1).fill(d.nettoInv),
-          borderColor: RED, borderWidth: 1.8, borderDash: [6,4],
+        { label: 'Rijkosten terugverdiend (excl. restwaarde)',
+          data: posOps,
+          borderColor: _m5ResaleOn ? MUTED : GREEN,
+          backgroundColor: _m5ResaleOn ? 'transparent' : GREEN + '22',
+          borderWidth: _m5ResaleOn ? 1.5 : 2.5,
+          borderDash: _m5ResaleOn ? [4,3] : [],
+          pointRadius: 2, fill: !_m5ResaleOn, tension: 0.3 },
+        { label: 'Netto financiële positie (incl. restwaarde)',
+          data: posRes,
+          borderColor: _m5ResaleOn ? GREEN : MUTED,
+          backgroundColor: _m5ResaleOn ? GREEN + '22' : 'transparent',
+          borderWidth: _m5ResaleOn ? 2.5 : 1.5,
+          borderDash: _m5ResaleOn ? [] : [4,3],
+          pointRadius: 2, fill: _m5ResaleOn, tension: 0.3 },
+        { label: 'Break-even (nul-lijn)',
+          data: Array(maxYrs + 1).fill(0),
+          borderColor: RED, borderWidth: 1.5, borderDash: [6,4],
           pointRadius: 0, fill: false }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 400 },
-      plugins: {
-        ...CHART_DEFAULTS.plugins,
-        annotation: undefined
-      },
+      plugins: CHART_DEFAULTS.plugins,
       scales: CHART_DEFAULTS.scales
     }
   });
