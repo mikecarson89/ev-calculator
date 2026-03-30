@@ -595,6 +595,15 @@
         <div class="input-section-title">Aanschaf</div>
 
         <div class="input-group">
+          <label>EV model kiezen</label>
+          <select id="m1_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
+            <option value="ev3">Kia EV3 — €38.000 · 15 kWh/100km</option>
+            <option value="ev5">Kia EV5 — €44.500 · 16 kWh/100km</option>
+            <option value="custom">Handmatig invoeren</option>
+          </select>
+        </div>
+
+        <div class="input-group">
           <label>Aanschafprijs EV (€)</label>
           <input type="number" id="m1_ev_price" value="38000" min="0" step="500">
         </div>
@@ -958,6 +967,15 @@
         </div>
 
         <div class="input-section-title">EV (na inruil huidige auto)</div>
+
+        <div class="input-group">
+          <label>EV model kiezen</label>
+          <select id="m5_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
+            <option value="ev3">Kia EV3 — €38.000 · 15 kWh/100km</option>
+            <option value="ev5">Kia EV5 — €44.500 · 16 kWh/100km</option>
+            <option value="custom">Handmatig invoeren</option>
+          </select>
+        </div>
 
         <div class="input-group">
           <label>Aanschafprijs EV (€)</label>
@@ -2092,6 +2110,39 @@ document.getElementById('m1_zakelijk').addEventListener('change', function() {
 });
 
 document.getElementById('m5_vergoeding_on').addEventListener('change', recalcAll);
+
+  // EV preset selectors
+  const EV_PRESETS = {
+    ev3: { price: 38000, cons: 15 },
+    ev5: { price: 44500, cons: 16 },
+  };
+
+  function applyEvPreset(module, preset) {
+    if (preset === 'custom') return;
+    const p = EV_PRESETS[preset];
+    document.getElementById(module + '_ev_price').value = p.price;
+    document.getElementById(module + '_ev_cons').value  = p.cons;
+    recalcAll();
+  }
+
+  document.getElementById('m5_ev_preset').addEventListener('change', function() {
+    applyEvPreset('m5', this.value);
+  });
+  document.getElementById('m1_ev_preset').addEventListener('change', function() {
+    applyEvPreset('m1', this.value);
+  });
+
+  // Switch preset to "custom" when user manually edits EV price/cons
+  ['m5_ev_price','m5_ev_cons'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+      document.getElementById('m5_ev_preset').value = 'custom';
+    });
+  });
+  ['m1_ev_price','m1_ev_cons'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+      document.getElementById('m1_ev_preset').value = 'custom';
+    });
+  });
 
 // ============================================================
 // WIRE ALL INPUTS
