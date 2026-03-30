@@ -1079,21 +1079,17 @@
         <div id="m5_loan_body" style="display:none">
           <div class="input-group">
             <label>Eigen inbreng (€) <span class="info-tag">uit spaargeld / beleggingen</span></label>
-            <input type="number" id="m5_loan_own" value="5000" min="0" step="500">
+            <input type="number" id="m5_loan_own" value="0" min="0" step="500">
           </div>
           <div class="input-group">
-            <label>Leenbedrag (€)</label>
-            <input type="number" id="m5_loan_amount" value="20000" min="0" step="500">
-          </div>
-          <div class="input-group">
-            <label>Maandelijkse aflossing (€)</label>
-            <input type="number" id="m5_loan_monthly" value="618" min="0" step="1">
+            <label>Rente (% per jaar / APR)</label>
+            <input type="number" id="m5_loan_rate" value="7.0" min="0" max="30" step="0.1">
           </div>
           <div class="input-group">
             <label>Looptijd lening (maanden)</label>
             <input type="number" id="m5_loan_months" value="36" min="1" step="1">
           </div>
-          <div id="m5_loan_info" style="font-size:12px; color:var(--yellow); margin-top:-6px; margin-bottom:14px; padding-left:4px;"></div>
+          <div id="m5_loan_info" style="font-size:12px; color:var(--yellow); line-height:1.9; margin-top:4px; margin-bottom:14px; padding-left:4px;"></div>
         </div>
 
       </div><!-- end inputs-col -->
@@ -2139,25 +2135,28 @@ function calcMod5() {
       <div><div class="verdict-title">${vTitle}</div><div class="verdict-text">${vText}</div></div>
     </div>`;
 
-  // Loan inputs
-  const loanOn      = document.getElementById('m5_loan_on').checked;
-  const loanOwn     = val('m5_loan_own');
-  const loanAmount  = val('m5_loan_amount');
-  const loanMonthly = val('m5_loan_monthly');
-  const loanMonths  = Math.max(1, Math.round(val('m5_loan_months')));
+  // Loan inputs — leenbedrag is auto-calculated from nettoInv minus eigen inbreng
+  const loanOn     = document.getElementById('m5_loan_on').checked;
+  const loanOwn    = val('m5_loan_own');
+  const loanRatePct= val('m5_loan_rate');           // APR in %
+  const loanMonths = Math.max(1, Math.round(val('m5_loan_months')));
+  const nettoInvCalc = Math.max(0, evNetB + laadpaal);
+  const loanAmount = Math.max(0, nettoInvCalc - loanOwn);
+  const monthlyRate = loanRatePct / 100 / 12;
+  const loanMonthly = loanAmount === 0 ? 0
+    : monthlyRate > 0
+      ? loanAmount * monthlyRate / (1 - Math.pow(1 + monthlyRate, -loanMonths))
+      : loanAmount / loanMonths;
   const loanTotal   = loanMonthly * loanMonths;
   const loanInterest= loanTotal - loanAmount;
-  const loanCover   = loanOwn + loanAmount;
 
   if (loanOn) {
-    const netInv = Math.max(0, evNetB + laadpaal);
     const loanInfoEl = document.getElementById('m5_loan_info');
-    const gap = loanCover - netInv;
-    const gapLabel = gap >= 0
-      ? `✓ dekt netto investering (${gap > 0 ? '+€'+Math.round(gap).toLocaleString('nl-NL')+' over' : 'precies'})`
-      : `⚠ €${Math.round(-gap).toLocaleString('nl-NL')} tekort t.o.v. netto investering (€${Math.round(netInv).toLocaleString('nl-NL')})`;
-    if (loanInfoEl) loanInfoEl.textContent =
-      `Eigen: €${Math.round(loanOwn).toLocaleString('nl-NL')}  +  Lening: €${Math.round(loanAmount).toLocaleString('nl-NL')}  =  €${Math.round(loanCover).toLocaleString('nl-NL')}  ·  ${gapLabel}  ·  Rente totaal: €${Math.round(loanInterest).toLocaleString('nl-NL')}`;
+    if (loanInfoEl) loanInfoEl.innerHTML =
+      `Te financieren: <strong style="color:var(--text)">€${Math.round(nettoInvCalc).toLocaleString('nl-NL')}</strong><br>` +
+      `Eigen inbreng: €${Math.round(loanOwn).toLocaleString('nl-NL')}  ·  Leenbedrag: <strong style="color:var(--text)">€${Math.round(loanAmount).toLocaleString('nl-NL')}</strong><br>` +
+      `Maandbedrag: <strong style="color:var(--green)">€${Math.round(loanMonthly).toLocaleString('nl-NL')}/mnd</strong>  ·  ` +
+      `Looptijd: ${loanMonths} mnd  ·  Rente totaal: <strong style="color:var(--yellow)">€${Math.round(loanInterest).toLocaleString('nl-NL')}</strong>`;
   }
 
   // Draw break-even + cost charts
@@ -2463,7 +2462,7 @@ const allInputIds = [
   'm5_pct_home','m5_price_home','m5_pct_ac','m5_price_ac','m5_pct_dc','m5_price_dc',
   'm5_werk_pct','m5_vergoeding_km',
   'm2_install_cost','m3_roundtrip','m5_maint_ev','m5_maint_ice','m5_laadpaal',
-  'm5_loan_own','m5_loan_amount','m5_loan_monthly','m5_loan_months',
+  'm5_loan_own','m5_loan_rate','m5_loan_months',
 ];
 
 allInputIds.forEach(id => {
