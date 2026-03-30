@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EV + Batterij Calculator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1081,6 +1082,27 @@
         </div>
 
         <div id="m5_verdict"></div>
+
+        <div class="divider"></div>
+        <div class="output-section-title">Break-even analyse — Focus → EV</div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+          <button id="m5_resale_toggle" onclick="toggleM5Resale()" style="
+            background:var(--surface3); color:var(--blue); border:1px solid var(--border);
+            border-radius:20px; padding:5px 14px; font-size:12px; font-weight:600;
+            cursor:pointer; letter-spacing:0.3px;">
+            ✓ Inclusief restwaarde
+          </button>
+          <span id="m5_netto_inv_label" style="font-size:12px; color:var(--text-muted);"></span>
+        </div>
+        <div style="position:relative; height:260px; margin-bottom:20px;">
+          <canvas id="m5_chart_breakeven"></canvas>
+        </div>
+
+        <div class="output-section-title">Jaarlijkse rijkosten — Focus vs EV</div>
+        <div style="position:relative; height:260px; margin-bottom:8px;">
+          <canvas id="m5_chart_costs"></canvas>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2086,6 +2108,169 @@ function calcMod5() {
       <div class="verdict-icon">${vIcon}</div>
       <div><div class="verdict-title">${vTitle}</div><div class="verdict-text">${vText}</div></div>
     </div>`;
+
+  // Draw break-even + cost charts
+  drawM5Charts({
+    years,
+    nettoInv:      evNetB + laadpaal,
+    focusFuelYr,
+    focusMRB,
+    focusMaintYr:  maintICE,
+    evElYr:        evElYr_prim,
+    evMRBPerYear,
+    evMaintYr:     maintEV,
+    focusResidual,
+    evResidual,
+  });
+}
+
+// ============================================================
+// MODULE 5 CHARTS — break-even + annual costs
+// ============================================================
+
+let _m5ChartBE   = null;
+let _m5ChartCost = null;
+let _m5ResaleOn  = true;
+
+function toggleM5Resale() {
+  _m5ResaleOn = !_m5ResaleOn;
+  const btn = document.getElementById('m5_resale_toggle');
+  btn.textContent = (_m5ResaleOn ? '✓ Inclusief restwaarde' : '◯ Exclusief restwaarde');
+  btn.style.color = _m5ResaleOn ? 'var(--blue)' : 'var(--text-muted)';
+  recalcAll();
+}
+
+function drawM5Charts(d) {
+  // d = { years, nettoInv, focusFuelYr, focusMRB, focusMaintYr,
+  //        evElYr, evMRBPerYear, evMaintYr,
+  //        focusResidual, evResidual }
+
+  const GREEN  = '#00d4aa';
+  const RED    = '#e94560';
+  const BLUE   = '#4fc3f7';
+  const YELLOW = '#f5a623';
+  const MUTED  = '#8888aa';
+  const BG     = '#1a1a2e';
+  const TEXT   = '#e8e8f0';
+
+  const CHART_DEFAULTS = {
+    color: TEXT,
+    plugins: {
+      legend: { labels: { color: TEXT, boxWidth: 12, font: { size: 11 } } },
+      tooltip: { backgroundColor: '#12122a', borderColor: '#2a2a4a', borderWidth: 1,
+                 titleColor: TEXT, bodyColor: MUTED }
+    },
+    scales: {
+      x: { ticks: { color: MUTED, font: { size: 10 } },
+           grid: { color: '#2a2a4a' } },
+      y: { ticks: { color: MUTED, font: { size: 10 },
+                    callback: v => '€' + Math.round(v).toLocaleString('nl-NL') },
+           grid: { color: '#2a2a4a' } }
+    }
+  };
+
+  const maxYrs = Math.max(d.years, 10);   // always show at least 10 years
+  const labels = Array.from({length: maxYrs + 1}, (_, i) => i === 0 ? 'Nu' : `Jaar ${i}`);
+
+  // ── BUILD CUMULATIVE SAVINGS SERIES ──────────────────────────────────
+  const cumSavings = [0];
+  // with resale: subtract residual gain (evResidual - focusResidual) in final year
+  let accSave = 0;
+  for (let y = 1; y <= maxYrs; y++) {
+    const mrbEv = d.evMRBPerYear[y-1] ?? d.evMRBPerYear[d.evMRBPerYear.length - 1];
+    const focusYrCost = d.focusFuelYr + d.focusMRB + d.focusMaintYr;
+    const evYrCost    = d.evElYr     + mrbEv       + d.evMaintYr;
+    accSave += (focusYrCost - evYrCost);
+    // Add residual advantage in selected year
+    let resaleBonus = 0;
+    if (_m5ResaleOn && y === d.years) {
+      resaleBonus = d.evResidual - d.focusResidual;
+    }
+    cumSavings.push(accSave + resaleBonus);
+  }
+
+  // Find break-even index
+  let beLabel = null;
+  for (let i = 1; i < cumSavings.length; i++) {
+    if (cumSavings[i] >= d.nettoInv && cumSavings[i-1] < d.nettoInv) {
+      const frac = (d.nettoInv - cumSavings[i-1]) / (cumSavings[i] - cumSavings[i-1]);
+      beLabel = `Jaar ${(i-1+frac).toFixed(1).replace('.',',')}`;
+      break;
+    }
+  }
+
+  document.getElementById('m5_netto_inv_label').textContent =
+    `Netto investering: €${Math.round(d.nettoInv).toLocaleString('nl-NL')}` +
+    (beLabel ? `  ·  Break-even: ${beLabel}` : '  ·  Break-even: > ${maxYrs} jaar');
+
+  // ── CHART 1: BREAK-EVEN ──────────────────────────────────────────────
+  if (_m5ChartBE) { _m5ChartBE.destroy(); _m5ChartBE = null; }
+  const ctx1 = document.getElementById('m5_chart_breakeven').getContext('2d');
+  _m5ChartBE = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Cumulatieve besparing',
+          data: cumSavings,
+          borderColor: GREEN, backgroundColor: GREEN + '22',
+          borderWidth: 2.5, pointRadius: 3, fill: true, tension: 0.3 },
+        { label: `Netto investering (€${Math.round(d.nettoInv).toLocaleString('nl-NL')})`,
+          data: Array(maxYrs + 1).fill(d.nettoInv),
+          borderColor: RED, borderWidth: 1.8, borderDash: [6,4],
+          pointRadius: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 400 },
+      plugins: {
+        ...CHART_DEFAULTS.plugins,
+        annotation: undefined
+      },
+      scales: CHART_DEFAULTS.scales
+    }
+  });
+
+  // ── CHART 2: ANNUAL COSTS ─────────────────────────────────────────────
+  if (_m5ChartCost) { _m5ChartCost.destroy(); _m5ChartCost = null; }
+  const ctx2 = document.getElementById('m5_chart_costs').getContext('2d');
+
+  const costLabels = Array.from({length: maxYrs}, (_, i) => `J${i+1}`);
+  const focusFuel  = Array(maxYrs).fill(d.focusFuelYr);
+  const focusMRBs  = Array(maxYrs).fill(d.focusMRB);
+  const focusMaint = Array(maxYrs).fill(d.focusMaintYr);
+  const evEl       = Array(maxYrs).fill(d.evElYr);
+  const evMRBs     = Array.from({length: maxYrs}, (_, i) =>
+    d.evMRBPerYear[i] ?? d.evMRBPerYear[d.evMRBPerYear.length - 1]);
+  const evMaint    = Array(maxYrs).fill(d.evMaintYr);
+
+  _m5ChartCost = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: costLabels,
+      datasets: [
+        { label: 'Focus: brandstof',  data: focusFuel,  backgroundColor: '#c0392b', stack: 'focus' },
+        { label: 'Focus: MRB',        data: focusMRBs,  backgroundColor: '#e74c3c', stack: 'focus' },
+        { label: 'Focus: onderhoud',  data: focusMaint, backgroundColor: '#f39c12', stack: 'focus' },
+        { label: 'EV: stroom',        data: evEl,       backgroundColor: GREEN,     stack: 'ev' },
+        { label: 'EV: MRB',          data: evMRBs,     backgroundColor: BLUE,      stack: 'ev' },
+        { label: 'EV: onderhoud',     data: evMaint,    backgroundColor: '#9b59b6', stack: 'ev' },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 400 },
+      plugins: CHART_DEFAULTS.plugins,
+      scales: {
+        x: { stacked: true, ticks: { color: MUTED, font: { size: 10 } },
+             grid: { color: '#2a2a4a' } },
+        y: { stacked: true, ticks: { color: MUTED, font: { size: 10 },
+                                      callback: v => '€' + Math.round(v).toLocaleString('nl-NL') },
+             grid: { color: '#2a2a4a' } }
+      }
+    }
+  });
 }
 
 // ============================================================
