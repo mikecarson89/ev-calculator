@@ -1066,6 +1066,32 @@
         </div>
         <div id="m5_el_effective" style="font-size:12px; color:var(--green); margin-top:-6px; margin-bottom:14px; padding-left:4px;"></div>
 
+        <div class="input-section-title">Financiering (optioneel)</div>
+        <div class="toggle-section">
+          <div class="toggle-row">
+            <label for="m5_loan_on">Lening meenemen in berekening</label>
+            <label class="switch">
+              <input type="checkbox" id="m5_loan_on">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div id="m5_loan_body" style="display:none">
+          <div class="input-group">
+            <label>Leenbedrag (€)</label>
+            <input type="number" id="m5_loan_amount" value="20000" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>Maandelijkse aflossing (€)</label>
+            <input type="number" id="m5_loan_monthly" value="618" min="0" step="1">
+          </div>
+          <div class="input-group">
+            <label>Looptijd lening (maanden)</label>
+            <input type="number" id="m5_loan_months" value="36" min="1" step="1">
+          </div>
+          <div id="m5_loan_info" style="font-size:12px; color:var(--yellow); margin-top:-6px; margin-bottom:14px; padding-left:4px;"></div>
+        </div>
+
       </div><!-- end inputs-col -->
 
       <div class="outputs-col">
@@ -2109,6 +2135,20 @@ function calcMod5() {
       <div><div class="verdict-title">${vTitle}</div><div class="verdict-text">${vText}</div></div>
     </div>`;
 
+  // Loan inputs
+  const loanOn      = document.getElementById('m5_loan_on').checked;
+  const loanAmount  = val('m5_loan_amount');
+  const loanMonthly = val('m5_loan_monthly');
+  const loanMonths  = Math.max(1, Math.round(val('m5_loan_months')));
+  const loanTotal   = loanMonthly * loanMonths;
+  const loanInterest= loanTotal - loanAmount;
+
+  if (loanOn) {
+    const loanInfoEl = document.getElementById('m5_loan_info');
+    if (loanInfoEl) loanInfoEl.textContent =
+      `Totale rente: €${Math.round(loanInterest).toLocaleString('nl-NL')}  ·  Totaal terug: €${Math.round(loanTotal).toLocaleString('nl-NL')}`;
+  }
+
   // Draw break-even + cost charts
   drawM5Charts({
     years,
@@ -2125,6 +2165,11 @@ function calcMod5() {
     focusVal,
     evResale,
     focusResale,
+    loanOn,
+    loanAmount,
+    loanMonthly,
+    loanMonths,
+    loanInterest,
   });
 }
 
@@ -2200,6 +2245,29 @@ function drawM5Charts(d) {
     posRes.push(-d.nettoInv + accSave + (evVal - foVal));
   }
 
+  // ── BUILD LOAN SERIES ────────────────────────────────────────────────
+  // posLoan: same as posOps but during loan period also subtract monthly payment.
+  // Upfront own contribution = nettoInv - loanAmount (could be 0 if fully financed).
+  const posLoan = [];
+  if (d.loanOn) {
+    const ownContrib = Math.max(0, d.nettoInv - d.loanAmount);
+    let loanAcc = -ownContrib;  // start with what you paid out of pocket yourself
+    let cumSaveLoan = 0;
+    posLoan.push(loanAcc);
+    for (let y = 1; y <= maxYrs; y++) {
+      const mrbEv   = d.evMRBPerYear[y-1] ?? d.evMRBPerYear[d.evMRBPerYear.length - 1];
+      const saveMo  = ((d.focusFuelYr + d.focusMRB + d.focusMaintYr) - (d.evElYr + mrbEv + d.evMaintYr)) / 12;
+      let yearPos = loanAcc;
+      for (let m = 1; m <= 12; m++) {
+        const mo = (y - 1) * 12 + m;
+        const loanPay = mo <= d.loanMonths ? d.loanMonthly : 0;
+        yearPos += saveMo - loanPay;
+      }
+      loanAcc = yearPos;
+      posLoan.push(loanAcc);
+    }
+  }
+
   // ── FIND BREAK-EVEN for each series ──────────────────────────────────
   function findBE(series) {
     for (let i = 1; i < series.length; i++) {
@@ -2210,16 +2278,15 @@ function drawM5Charts(d) {
     }
     return null;
   }
-  const beOps = findBE(posOps);
-  const beRes = findBE(posRes);
-
-  const activeSeries = _m5ResaleOn ? posRes : posOps;
-  const activeBE     = _m5ResaleOn ? beRes  : beOps;
+  const beOps  = findBE(posOps);
+  const beRes  = findBE(posRes);
+  const beLoan = d.loanOn ? findBE(posLoan) : null;
 
   document.getElementById('m5_netto_inv_label').textContent =
-    `Netto investering: €${Math.round(d.nettoInv).toLocaleString('nl-NL')}` +
-    `  ·  Break-even rijkosten: ${beOps ?? `>${maxYrs}jr`}` +
-    `  ·  Incl. restwaarde: ${beRes ?? `>${maxYrs}jr`}`;
+    `Netto: €${Math.round(d.nettoInv).toLocaleString('nl-NL')}` +
+    `  ·  Rijkosten BE: ${beOps ?? `>${maxYrs}jr`}` +
+    `  ·  +Restwaarde: ${beRes ?? `>${maxYrs}jr`}` +
+    (d.loanOn ? `  ·  Met lening: ${beLoan ?? `>${maxYrs}jr`}  ·  Rente: €${Math.round(d.loanInterest).toLocaleString('nl-NL')}` : '');
 
   // ── CHART 1: BREAK-EVEN ──────────────────────────────────────────────
   if (_m5ChartBE) { _m5ChartBE.destroy(); _m5ChartBE = null; }
@@ -2246,7 +2313,14 @@ function drawM5Charts(d) {
         { label: 'Break-even (nul-lijn)',
           data: Array(maxYrs + 1).fill(0),
           borderColor: RED, borderWidth: 1.5, borderDash: [6,4],
-          pointRadius: 0, fill: false }
+          pointRadius: 0, fill: false },
+        ...(d.loanOn ? [{
+          label: `Met lening (€${Math.round(d.loanMonthly)}/mnd × ${d.loanMonths}mnd)`,
+          data: posLoan,
+          borderColor: YELLOW, backgroundColor: YELLOW + '18',
+          borderWidth: 2, borderDash: [3,2],
+          pointRadius: 2, fill: false, tension: 0.3
+        }] : [])
       ]
     },
     options: {
@@ -2320,6 +2394,10 @@ document.getElementById('m1_zakelijk').addEventListener('change', function() {
 });
 
 document.getElementById('m5_vergoeding_on').addEventListener('change', recalcAll);
+document.getElementById('m5_loan_on').addEventListener('change', function() {
+  document.getElementById('m5_loan_body').style.display = this.checked ? 'block' : 'none';
+  recalcAll();
+});
 
   // EV preset selectors
   const EV_PRESETS = {
@@ -2373,6 +2451,7 @@ const allInputIds = [
   'm5_pct_home','m5_price_home','m5_pct_ac','m5_price_ac','m5_pct_dc','m5_price_dc',
   'm5_werk_pct','m5_vergoeding_km',
   'm2_install_cost','m3_roundtrip','m5_maint_ev','m5_maint_ice','m5_laadpaal',
+  'm5_loan_amount','m5_loan_monthly','m5_loan_months',
 ];
 
 allInputIds.forEach(id => {
