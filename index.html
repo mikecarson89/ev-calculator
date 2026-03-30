@@ -2121,6 +2121,10 @@ function calcMod5() {
     evMaintYr:     maintEV,
     focusResidual,
     evResidual,
+    evPrice,
+    focusVal,
+    evResale,
+    focusResale,
   });
 }
 
@@ -2173,27 +2177,36 @@ function drawM5Charts(d) {
   const labels = Array.from({length: maxYrs + 1}, (_, i) => i === 0 ? 'Nu' : `Jaar ${i}`);
 
   // ── BUILD CUMULATIVE SAVINGS SERIES ──────────────────────────────────
-  const cumSavings = [0];
-  // with resale: subtract residual gain (evResidual - focusResidual) in final year
+  // Restwaarde is included as a per-year advantage:
+  //   EV value at year y  = evPrice  * (1 - (1-evResale)  * y/years) — linear depreciation to looptijd
+  //   Focus value at yr y = focusVal * (1 - (1-focusResale)* y/years)  (if you had kept it)
+  //   Advantage at year y = EV value(y) - Focus value(y)
+  // This gives a smooth curve instead of a one-time spike.
+  const cumSavings = [_m5ResaleOn ? (d.evPrice - d.focusVal) : 0];  // at yr0: EV worth evPrice, gave up focusVal
   let accSave = 0;
   for (let y = 1; y <= maxYrs; y++) {
     const mrbEv = d.evMRBPerYear[y-1] ?? d.evMRBPerYear[d.evMRBPerYear.length - 1];
     const focusYrCost = d.focusFuelYr + d.focusMRB + d.focusMaintYr;
     const evYrCost    = d.evElYr     + mrbEv       + d.evMaintYr;
     accSave += (focusYrCost - evYrCost);
-    // Add residual advantage in selected year
-    let resaleBonus = 0;
-    if (_m5ResaleOn && y === d.years) {
-      resaleBonus = d.evResidual - d.focusResidual;
+    let resaleAdv = 0;
+    if (_m5ResaleOn) {
+      const refYrs   = Math.max(d.years, 1);
+      const evValNow = d.evPrice  * Math.max(0, 1 - (1 - d.evResale)  * y / refYrs);
+      const foValNow = d.focusVal * Math.max(0, 1 - (1 - d.focusResale)* y / refYrs);
+      resaleAdv = evValNow - foValNow;
     }
-    cumSavings.push(accSave + resaleBonus);
+    cumSavings.push(accSave + resaleAdv);
   }
 
-  // Find break-even index
+  // Find break-even index (where cumSavings crosses nettoInv from below)
+  // nettoInv is what you paid out of pocket; cumSavings starts at (evPrice-focusVal) if resale on
+  const threshold = _m5ResaleOn ? 0 : d.nettoInv;  // with resale: net position crosses 0; without: crosses nettoInv
+  const checkVal  = _m5ResaleOn ? cumSavings.map(s => s - d.nettoInv) : cumSavings;
   let beLabel = null;
-  for (let i = 1; i < cumSavings.length; i++) {
-    if (cumSavings[i] >= d.nettoInv && cumSavings[i-1] < d.nettoInv) {
-      const frac = (d.nettoInv - cumSavings[i-1]) / (cumSavings[i] - cumSavings[i-1]);
+  for (let i = 1; i < checkVal.length; i++) {
+    if (checkVal[i] >= 0 && checkVal[i-1] < 0) {
+      const frac = (0 - checkVal[i-1]) / (checkVal[i] - checkVal[i-1]);
       beLabel = `Jaar ${(i-1+frac).toFixed(1).replace('.',',')}`;
       break;
     }
