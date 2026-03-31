@@ -599,14 +599,14 @@
           <label>EV model kiezen</label>
           <select id="m1_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
             <option value="ev3">Kia EV3 — €38.000 · 15 kWh/100km</option>
-            <option value="ev5">Kia EV5 — €44.500 · 16 kWh/100km</option>
+            <option value="ev5" selected>Kia EV5 — €44.500 · 16 kWh/100km</option>
             <option value="custom">Handmatig invoeren</option>
           </select>
         </div>
 
         <div class="input-group">
           <label>Aanschafprijs EV (€)</label>
-          <input type="number" id="m1_ev_price" value="38000" min="0" step="500">
+          <input type="number" id="m1_ev_price" value="44500" min="0" step="500">
         </div>
         <div class="input-group">
           <label>Aanschafprijs ICE (€)</label>
@@ -637,7 +637,7 @@
         </div>
         <div class="input-group">
           <label>Verbruik EV (kWh/100km)</label>
-          <input type="number" id="m1_ev_cons" value="15" min="0" step="0.5">
+          <input type="number" id="m1_ev_cons" value="16" min="0" step="0.5">
         </div>
         <div class="input-group">
           <label>Verbruik ICE (liter/100km)</label>
@@ -973,14 +973,14 @@
           <label>EV model kiezen</label>
           <select id="m5_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
             <option value="ev3">Kia EV3 — €38.000 · 15 kWh/100km</option>
-            <option value="ev5">Kia EV5 — €44.500 · 16 kWh/100km</option>
+            <option value="ev5" selected>Kia EV5 — €44.500 · 16 kWh/100km</option>
             <option value="custom">Handmatig invoeren</option>
           </select>
         </div>
 
         <div class="input-group">
           <label>Aanschafprijs EV (€)</label>
-          <input type="number" id="m5_ev_price" value="38000" min="0" step="500">
+          <input type="number" id="m5_ev_price" value="44500" min="0" step="500">
         </div>
         <div class="input-group">
           <label>Subsidie EV — SEPP (€)</label>
@@ -988,7 +988,7 @@
         </div>
         <div class="input-group">
           <label>Verbruik EV (kWh/100km)</label>
-          <input type="number" id="m5_ev_cons" value="15" min="0" step="0.5">
+          <input type="number" id="m5_ev_cons" value="16" min="0" step="0.5">
         </div>
         <div class="input-group">
           <label>Restwaarde EV na looptijd (%)</label>
