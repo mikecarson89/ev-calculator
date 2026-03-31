@@ -585,327 +585,6 @@
   <!-- ============================================================ -->
   <!-- MODULE 1: EV vs ICE -->
   <!-- ============================================================ -->
-  <div class="module" id="mod1">
-    <div class="module-header">
-      <span class="module-badge">Module 1</span>
-      <h2>EV vs Verbrandingsmotor</h2>
-    </div>
-    <div class="module-body">
-      <div class="inputs-col">
-
-        <div class="input-section-title">Aanschaf</div>
-
-        <div class="input-group">
-          <label>EV model kiezen</label>
-          <select id="m1_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
-            <option value="ev3">Kia EV3 — €38.000 · 15 kWh/100km</option>
-            <option value="ev5" selected>Kia EV5 — €44.500 · 16 kWh/100km</option>
-            <option value="custom">Handmatig invoeren</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Aanschafprijs EV (€)</label>
-          <input type="number" id="m1_ev_price" value="44500" min="0" step="500">
-        </div>
-        <div class="input-group">
-          <label>Aanschafprijs ICE (€)</label>
-          <input type="number" id="m1_ice_price" value="34000" min="0" step="500">
-        </div>
-        <div class="input-group">
-          <label>Subsidie EV — SEPP 2026 (€)</label>
-          <input type="number" id="m1_subsidy" value="2950" min="0" step="50">
-        </div>
-        <div class="input-group">
-          <label>Looptijd (jaar)</label>
-          <input type="number" id="m1_years" value="5" min="1" max="15" step="1">
-        </div>
-        <div class="input-group">
-          <label>Restwaarde EV na looptijd (%)</label>
-          <input type="number" id="m1_ev_resale" value="55" min="0" max="100">
-        </div>
-        <div class="input-group">
-          <label>Restwaarde ICE na looptijd (%)</label>
-          <input type="number" id="m1_ice_resale" value="45" min="0" max="100">
-        </div>
-
-        <div class="input-section-title">Gebruik &amp; Energie</div>
-
-        <div class="input-group">
-          <label>Km per jaar</label>
-          <input type="number" id="m1_km" value="20000" min="0" step="1000">
-        </div>
-        <div class="input-group">
-          <label>Verbruik EV (kWh/100km)</label>
-          <input type="number" id="m1_ev_cons" value="16" min="0" step="0.5">
-        </div>
-        <div class="input-group">
-          <label>Verbruik ICE (liter/100km)</label>
-          <input type="number" id="m1_ice_cons" value="7" min="0" step="0.1">
-        </div>
-        <div class="input-group">
-          <label>Stroomprijs thuis laden (€/kWh)</label>
-          <input type="number" id="m1_el_price" value="0.22" min="0" step="0.01">
-        </div>
-        <div class="input-group">
-          <label>Brandstofprijs (€/liter)</label>
-          <input type="number" id="m1_fuel_price" value="2.00" min="0" step="0.01">
-        </div>
-
-        <div class="input-section-title">Wegenbelasting (MRB)</div>
-
-        <div class="input-group">
-          <label>MRB volledig tarief EV (€/jaar) <span class="info-tag">zonder korting</span></label>
-          <input type="number" id="m1_mrb_ev" value="1008" min="0" step="10">
-        </div>
-        <div style="font-size:11px; color: var(--text-muted); margin-top:-8px; margin-bottom:14px; line-height:1.6;">
-          Korting afbouw: 2026–2028 → 30% korting (betaal 70%) &nbsp;·&nbsp;
-          2029 → 25% korting &nbsp;·&nbsp; 2030+ → volledig tarief.<br>
-          Calculator past dit automatisch per jaar toe.
-        </div>
-        <div class="input-group">
-          <label>Wegenbelasting ICE (€/jaar) <span class="info-tag">MRB</span></label>
-          <input type="number" id="m1_mrb_ice" value="600" min="0" step="10">
-        </div>
-
-        <div class="input-section-title">Zakelijk gebruik</div>
-
-        <div class="toggle-section">
-          <div class="toggle-row">
-            <label for="m1_zakelijk">Zakelijk gebruik (bijtelling)</label>
-            <label class="switch">
-              <input type="checkbox" id="m1_zakelijk">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="toggle-body" id="m1_zakelijk_body" style="display:none">
-            <div class="input-group">
-              <label>Bijtelling EV (%)</label>
-              <input type="number" id="m1_bij_ev" value="16" min="0" max="30">
-            </div>
-            <div class="input-group">
-              <label>Bijtelling ICE (%)</label>
-              <input type="number" id="m1_bij_ice" value="22" min="0" max="30">
-            </div>
-            <div class="input-group">
-              <label>Marginaal belastingtarief (%)</label>
-              <input type="number" id="m1_tax_rate" value="37" min="0" max="55">
-            </div>
-            <div class="input-group">
-              <label>Bruto jaarinkomen (€)</label>
-              <input type="number" id="m1_income" value="80000" min="0" step="1000">
-            </div>
-          </div>
-        </div>
-
-      </div><!-- end inputs-col -->
-
-      <div class="outputs-col">
-        <div class="output-section-title">Totaaloverzicht</div>
-        <div class="kpi-grid" id="m1_kpis"></div>
-
-        <div class="bar-compare" id="m1_bars"></div>
-
-        <div class="divider"></div>
-        <div class="output-section-title">Jaar-voor-jaar vergelijking</div>
-        <div class="table-wrapper">
-          <table class="data-table" id="m1_table"></table>
-        </div>
-        <div id="m1_verdict"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- MODULE 2: Zonnepanelen -->
-  <!-- ============================================================ -->
-  <div class="module" id="mod2">
-    <div class="module-header">
-      <span class="module-badge">Module 2</span>
-      <h2>Zonnepanelen Analyse</h2>
-    </div>
-    <div class="module-body">
-      <div class="inputs-col">
-
-        <div class="input-section-title">Installatie</div>
-
-        <div class="input-group">
-          <label>Aanschaf + installatie totaal (€)</label>
-          <input type="number" id="m2_install_cost" value="2100" min="0" step="100">
-        </div>
-        <div class="input-group">
-          <label>Aantal panelen</label>
-          <input type="number" id="m2_panels" value="6" min="1" max="100">
-        </div>
-        <div class="input-group">
-          <label>Vermogen per paneel (Wp)</label>
-          <input type="number" id="m2_wp" value="400" min="100" max="700" step="10">
-        </div>
-        <div class="input-group">
-          <label>Jaaropbrengst per kWp (kWh) <span class="info-tag">NL gem.</span></label>
-          <input type="number" id="m2_yield" value="875" min="600" max="1200" step="25">
-        </div>
-
-        <div class="input-section-title">Verbruik &amp; Tarief</div>
-
-        <div class="input-group">
-          <label>Eigen jaarverbruik totaal (kWh)</label>
-          <input type="number" id="m2_own_use" value="3600" min="0" step="100">
-        </div>
-        <div class="input-group">
-          <label>Stroomprijs (€/kWh)</label>
-          <input type="number" id="m2_el_price" value="0.22" min="0" step="0.01">
-        </div>
-        <div class="input-group">
-          <label>Teruglevertarief (€/kWh)</label>
-          <input type="number" id="m2_feed_price" value="0.09" min="0" step="0.01">
-        </div>
-
-        <div class="input-section-title">Saldering</div>
-
-        <div class="toggle-section">
-          <div class="toggle-row">
-            <label for="m2_saldering">Saldering actief (tot 2027)</label>
-            <label class="switch">
-              <input type="checkbox" id="m2_saldering">
-              <span class="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>% opbrengst overdag gebruikt thuis</label>
-          <input type="number" id="m2_self_ratio" value="35" min="0" max="100">
-        </div>
-
-      </div>
-
-      <div class="outputs-col">
-        <div class="output-section-title">Opbrengst overzicht</div>
-        <div class="kpi-grid" id="m2_kpis"></div>
-
-        <div class="output-section-title">Energiebalans</div>
-        <div id="m2_bars" class="bar-compare"></div>
-
-        <div id="m2_verdict"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- MODULE 3: Thuisbatterij -->
-  <!-- ============================================================ -->
-  <div class="module" id="mod3">
-    <div class="module-header">
-      <span class="module-badge">Module 3</span>
-      <h2>Thuisbatterij</h2>
-    </div>
-    <div class="module-body">
-      <div class="inputs-col">
-
-        <div class="input-section-title">Batterij specs</div>
-
-        <div class="input-group">
-          <label>Aanschafprijs (€)</label>
-          <input type="number" id="m3_price" value="1195" min="0" step="100">
-        </div>
-        <div class="input-group">
-          <label>Capaciteit (kWh)</label>
-          <input type="number" id="m3_cap" value="2.7" min="1" max="30" step="0.5">
-        </div>
-        <div class="input-group">
-          <label>Nuttig bruikbaar (%)</label>
-          <input type="number" id="m3_usable" value="90" min="50" max="100">
-        </div>
-        <div class="input-group">
-          <label>Roundtrip rendement (%) <span class="info-tag">laad+ontlaad</span></label>
-          <input type="number" id="m3_roundtrip" value="92" min="70" max="100">
-        </div>
-        <div class="input-group">
-          <label>Levensduur (cycli)</label>
-          <input type="number" id="m3_cycles" value="6000" min="500" max="10000" step="100">
-        </div>
-        <div class="input-group">
-          <label>Cycli per dag (gemiddeld)</label>
-          <input type="number" id="m3_cycles_day" value="0.8" min="0" max="3" step="0.1">
-        </div>
-
-        <div class="input-section-title">Tarieven</div>
-
-        <div class="input-group">
-          <label>Stroomprijs import (€/kWh)</label>
-          <input type="number" id="m3_el_price" value="0.22" min="0" step="0.01">
-        </div>
-        <div class="input-group">
-          <label>Teruglevertarief (€/kWh)</label>
-          <input type="number" id="m3_feed_price" value="0.09" min="0" step="0.01">
-        </div>
-
-        <div class="input-section-title">Zonnepanelen koppeling</div>
-
-        <div class="input-group">
-          <label>Beschikbaar zonne-overschot/dag (kWh)</label>
-          <input type="number" id="m3_solar_excess" value="2.1" min="0" max="50" step="0.1">
-        </div>
-        <div style="font-size:11px; color: var(--text-muted); margin-top:-8px; margin-bottom:14px; line-height:1.5;">
-          Gemiddeld over het jaar — wordt automatisch bijgewerkt vanuit Module 2
-        </div>
-
-      </div>
-
-      <div class="outputs-col">
-        <div class="output-section-title">Batterij rendement</div>
-        <div class="kpi-grid" id="m3_kpis"></div>
-
-        <div class="output-section-title">Break-even analyse</div>
-        <div id="m3_breakeven_vis"></div>
-
-        <div id="m3_verdict"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- MODULE 4: Gecombineerd -->
-  <!-- ============================================================ -->
-  <div class="module" id="mod4">
-    <div class="module-header">
-      <span class="module-badge">Module 4</span>
-      <h2>Gecombineerd Scenario</h2>
-    </div>
-    <div class="module-body">
-      <div class="inputs-col">
-        <div class="input-section-title">Investeringen</div>
-        <div style="font-size:13px; color:var(--text-muted); line-height:1.7; padding: 8px 0;">
-          Dit overzicht combineert de uitkomsten van de bovenstaande modules. Pas de waarden daar aan om dit scenario te updaten.
-        </div>
-        <div class="divider"></div>
-        <div class="output-section-title" style="margin-top:0">Samenvatting inputs</div>
-        <div id="m4_summary_inputs" style="font-size:13px; color:var(--text-muted); line-height:2;"></div>
-      </div>
-
-      <div class="outputs-col">
-        <div class="output-section-title">Gecombineerde besparing</div>
-        <div class="combined-grid" id="m4_cards"></div>
-
-        <div class="output-section-title">Tijdlijn terugverdienen</div>
-        <div id="m4_timeline_label" class="timeline-label"></div>
-        <div class="timeline" id="m4_timeline"></div>
-
-        <div class="divider"></div>
-        <div class="output-section-title">Jaar-voor-jaar gecombineerd</div>
-        <div class="table-wrapper">
-          <table class="data-table" id="m4_table"></table>
-        </div>
-
-        <div id="m4_verdict"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================================================ -->
-  <!-- MODULE 5: Ruil Scenario -->
-  <!-- ============================================================ -->
   <div class="module" id="mod5">
     <div class="module-header">
       <span class="module-badge">Module 5</span>
@@ -1146,6 +825,331 @@
         <div id="m5_el_effective" style="font-size:12px; color:var(--green); margin-top:-6px; padding-left:4px;"></div>
       </div>
 
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- MODULE 2: Zonnepanelen -->
+  <!-- ============================================================ -->
+  <div class="module" id="mod1">
+    <div class="module-header">
+      <span class="module-badge">Module 1</span>
+      <h2>EV vs Verbrandingsmotor</h2>
+    </div>
+    <div class="module-body">
+      <div class="inputs-col">
+
+        <div class="input-section-title">Aanschaf</div>
+
+        <div class="input-group">
+          <label>EV model kiezen</label>
+          <select id="m1_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
+            <option value="ev3">Kia EV3 — €38.000 · 15 kWh/100km</option>
+            <option value="ev5" selected>Kia EV5 — €44.500 · 16 kWh/100km</option>
+            <option value="custom">Handmatig invoeren</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Aanschafprijs EV (€)</label>
+          <input type="number" id="m1_ev_price" value="44500" min="0" step="500">
+        </div>
+        <div class="input-group">
+          <label>Aanschafprijs ICE (€)</label>
+          <input type="number" id="m1_ice_price" value="34000" min="0" step="500">
+        </div>
+        <div class="input-group">
+          <label>Subsidie EV — SEPP 2026 (€)</label>
+          <input type="number" id="m1_subsidy" value="2950" min="0" step="50">
+        </div>
+        <div class="input-group">
+          <label>Looptijd (jaar)</label>
+          <input type="number" id="m1_years" value="5" min="1" max="15" step="1">
+        </div>
+        <div class="input-group">
+          <label>Restwaarde EV na looptijd (%)</label>
+          <input type="number" id="m1_ev_resale" value="55" min="0" max="100">
+        </div>
+        <div class="input-group">
+          <label>Restwaarde ICE na looptijd (%)</label>
+          <input type="number" id="m1_ice_resale" value="45" min="0" max="100">
+        </div>
+
+        <div class="input-section-title">Gebruik &amp; Energie</div>
+
+        <div class="input-group">
+          <label>Km per jaar</label>
+          <input type="number" id="m1_km" value="20000" min="0" step="1000">
+        </div>
+        <div class="input-group">
+          <label>Verbruik EV (kWh/100km)</label>
+          <input type="number" id="m1_ev_cons" value="16" min="0" step="0.5">
+        </div>
+        <div class="input-group">
+          <label>Verbruik ICE (liter/100km)</label>
+          <input type="number" id="m1_ice_cons" value="7" min="0" step="0.1">
+        </div>
+        <div class="input-group">
+          <label>Stroomprijs thuis laden (€/kWh)</label>
+          <input type="number" id="m1_el_price" value="0.22" min="0" step="0.01">
+        </div>
+        <div class="input-group">
+          <label>Brandstofprijs (€/liter)</label>
+          <input type="number" id="m1_fuel_price" value="2.00" min="0" step="0.01">
+        </div>
+
+        <div class="input-section-title">Wegenbelasting (MRB)</div>
+
+        <div class="input-group">
+          <label>MRB volledig tarief EV (€/jaar) <span class="info-tag">zonder korting</span></label>
+          <input type="number" id="m1_mrb_ev" value="1008" min="0" step="10">
+        </div>
+        <div style="font-size:11px; color: var(--text-muted); margin-top:-8px; margin-bottom:14px; line-height:1.6;">
+          Korting afbouw: 2026–2028 → 30% korting (betaal 70%) &nbsp;·&nbsp;
+          2029 → 25% korting &nbsp;·&nbsp; 2030+ → volledig tarief.<br>
+          Calculator past dit automatisch per jaar toe.
+        </div>
+        <div class="input-group">
+          <label>Wegenbelasting ICE (€/jaar) <span class="info-tag">MRB</span></label>
+          <input type="number" id="m1_mrb_ice" value="600" min="0" step="10">
+        </div>
+
+        <div class="input-section-title">Zakelijk gebruik</div>
+
+        <div class="toggle-section">
+          <div class="toggle-row">
+            <label for="m1_zakelijk">Zakelijk gebruik (bijtelling)</label>
+            <label class="switch">
+              <input type="checkbox" id="m1_zakelijk">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-body" id="m1_zakelijk_body" style="display:none">
+            <div class="input-group">
+              <label>Bijtelling EV (%)</label>
+              <input type="number" id="m1_bij_ev" value="16" min="0" max="30">
+            </div>
+            <div class="input-group">
+              <label>Bijtelling ICE (%)</label>
+              <input type="number" id="m1_bij_ice" value="22" min="0" max="30">
+            </div>
+            <div class="input-group">
+              <label>Marginaal belastingtarief (%)</label>
+              <input type="number" id="m1_tax_rate" value="37" min="0" max="55">
+            </div>
+            <div class="input-group">
+              <label>Bruto jaarinkomen (€)</label>
+              <input type="number" id="m1_income" value="80000" min="0" step="1000">
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end inputs-col -->
+
+      <div class="outputs-col">
+        <div class="output-section-title">Totaaloverzicht</div>
+        <div class="kpi-grid" id="m1_kpis"></div>
+
+        <div class="bar-compare" id="m1_bars"></div>
+
+        <div class="divider"></div>
+        <div class="output-section-title">Jaar-voor-jaar vergelijking</div>
+        <div class="table-wrapper">
+          <table class="data-table" id="m1_table"></table>
+        </div>
+        <div id="m1_verdict"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- MODULE 3: Thuisbatterij -->
+  <!-- ============================================================ -->
+  <div class="module" id="mod2">
+    <div class="module-header">
+      <span class="module-badge">Module 2</span>
+      <h2>Zonnepanelen Analyse</h2>
+    </div>
+    <div class="module-body">
+      <div class="inputs-col">
+
+        <div class="input-section-title">Installatie</div>
+
+        <div class="input-group">
+          <label>Aanschaf + installatie totaal (€)</label>
+          <input type="number" id="m2_install_cost" value="2100" min="0" step="100">
+        </div>
+        <div class="input-group">
+          <label>Aantal panelen</label>
+          <input type="number" id="m2_panels" value="6" min="1" max="100">
+        </div>
+        <div class="input-group">
+          <label>Vermogen per paneel (Wp)</label>
+          <input type="number" id="m2_wp" value="400" min="100" max="700" step="10">
+        </div>
+        <div class="input-group">
+          <label>Jaaropbrengst per kWp (kWh) <span class="info-tag">NL gem.</span></label>
+          <input type="number" id="m2_yield" value="875" min="600" max="1200" step="25">
+        </div>
+
+        <div class="input-section-title">Verbruik &amp; Tarief</div>
+
+        <div class="input-group">
+          <label>Eigen jaarverbruik totaal (kWh)</label>
+          <input type="number" id="m2_own_use" value="3600" min="0" step="100">
+        </div>
+        <div class="input-group">
+          <label>Stroomprijs (€/kWh)</label>
+          <input type="number" id="m2_el_price" value="0.22" min="0" step="0.01">
+        </div>
+        <div class="input-group">
+          <label>Teruglevertarief (€/kWh)</label>
+          <input type="number" id="m2_feed_price" value="0.09" min="0" step="0.01">
+        </div>
+
+        <div class="input-section-title">Saldering</div>
+
+        <div class="toggle-section">
+          <div class="toggle-row">
+            <label for="m2_saldering">Saldering actief (tot 2027)</label>
+            <label class="switch">
+              <input type="checkbox" id="m2_saldering">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>% opbrengst overdag gebruikt thuis</label>
+          <input type="number" id="m2_self_ratio" value="35" min="0" max="100">
+        </div>
+
+      </div>
+
+      <div class="outputs-col">
+        <div class="output-section-title">Opbrengst overzicht</div>
+        <div class="kpi-grid" id="m2_kpis"></div>
+
+        <div class="output-section-title">Energiebalans</div>
+        <div id="m2_bars" class="bar-compare"></div>
+
+        <div id="m2_verdict"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- MODULE 4: Gecombineerd -->
+  <!-- ============================================================ -->
+  <div class="module" id="mod3">
+    <div class="module-header">
+      <span class="module-badge">Module 3</span>
+      <h2>Thuisbatterij</h2>
+    </div>
+    <div class="module-body">
+      <div class="inputs-col">
+
+        <div class="input-section-title">Batterij specs</div>
+
+        <div class="input-group">
+          <label>Aanschafprijs (€)</label>
+          <input type="number" id="m3_price" value="1195" min="0" step="100">
+        </div>
+        <div class="input-group">
+          <label>Capaciteit (kWh)</label>
+          <input type="number" id="m3_cap" value="2.7" min="1" max="30" step="0.5">
+        </div>
+        <div class="input-group">
+          <label>Nuttig bruikbaar (%)</label>
+          <input type="number" id="m3_usable" value="90" min="50" max="100">
+        </div>
+        <div class="input-group">
+          <label>Roundtrip rendement (%) <span class="info-tag">laad+ontlaad</span></label>
+          <input type="number" id="m3_roundtrip" value="92" min="70" max="100">
+        </div>
+        <div class="input-group">
+          <label>Levensduur (cycli)</label>
+          <input type="number" id="m3_cycles" value="6000" min="500" max="10000" step="100">
+        </div>
+        <div class="input-group">
+          <label>Cycli per dag (gemiddeld)</label>
+          <input type="number" id="m3_cycles_day" value="0.8" min="0" max="3" step="0.1">
+        </div>
+
+        <div class="input-section-title">Tarieven</div>
+
+        <div class="input-group">
+          <label>Stroomprijs import (€/kWh)</label>
+          <input type="number" id="m3_el_price" value="0.22" min="0" step="0.01">
+        </div>
+        <div class="input-group">
+          <label>Teruglevertarief (€/kWh)</label>
+          <input type="number" id="m3_feed_price" value="0.09" min="0" step="0.01">
+        </div>
+
+        <div class="input-section-title">Zonnepanelen koppeling</div>
+
+        <div class="input-group">
+          <label>Beschikbaar zonne-overschot/dag (kWh)</label>
+          <input type="number" id="m3_solar_excess" value="2.1" min="0" max="50" step="0.1">
+        </div>
+        <div style="font-size:11px; color: var(--text-muted); margin-top:-8px; margin-bottom:14px; line-height:1.5;">
+          Gemiddeld over het jaar — wordt automatisch bijgewerkt vanuit Module 2
+        </div>
+
+      </div>
+
+      <div class="outputs-col">
+        <div class="output-section-title">Batterij rendement</div>
+        <div class="kpi-grid" id="m3_kpis"></div>
+
+        <div class="output-section-title">Break-even analyse</div>
+        <div id="m3_breakeven_vis"></div>
+
+        <div id="m3_verdict"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- MODULE 5: Ruil Scenario -->
+  <!-- ============================================================ -->
+  <div class="module" id="mod4">
+    <div class="module-header">
+      <span class="module-badge">Module 4</span>
+      <h2>Gecombineerd Scenario</h2>
+    </div>
+    <div class="module-body">
+      <div class="inputs-col">
+        <div class="input-section-title">Investeringen</div>
+        <div style="font-size:13px; color:var(--text-muted); line-height:1.7; padding: 8px 0;">
+          Dit overzicht combineert de uitkomsten van de bovenstaande modules. Pas de waarden daar aan om dit scenario te updaten.
+        </div>
+        <div class="divider"></div>
+        <div class="output-section-title" style="margin-top:0">Samenvatting inputs</div>
+        <div id="m4_summary_inputs" style="font-size:13px; color:var(--text-muted); line-height:2;"></div>
+      </div>
+
+      <div class="outputs-col">
+        <div class="output-section-title">Gecombineerde besparing</div>
+        <div class="combined-grid" id="m4_cards"></div>
+
+        <div class="output-section-title">Tijdlijn terugverdienen</div>
+        <div id="m4_timeline_label" class="timeline-label"></div>
+        <div class="timeline" id="m4_timeline"></div>
+
+        <div class="divider"></div>
+        <div class="output-section-title">Jaar-voor-jaar gecombineerd</div>
+        <div class="table-wrapper">
+          <table class="data-table" id="m4_table"></table>
+        </div>
+
+        <div id="m4_verdict"></div>
+      </div>
     </div>
   </div>
 
