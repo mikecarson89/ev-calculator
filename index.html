@@ -730,7 +730,7 @@
             <input type="number" id="m5_fuel_price" value="2.00" min="0" step="0.01">
           </div>
 
-          <div class="input-section-title">Onderhoud (€/jaar per auto)</div>
+          <div class="input-section-title">Onderhoud &amp; Verzekering (€/jaar)</div>
 
           <div class="input-group">
             <label>Onderhoud EV (€/jaar)</label>
@@ -743,6 +743,22 @@
           <div class="input-group">
             <label>Laadpaal installatie thuis (€) <span class="info-tag">eenmalig</span></label>
             <input type="number" id="m5_laadpaal" value="1500" min="0" step="100">
+          </div>
+          <div class="input-group">
+            <label>Verzekering EV (€/jaar) <span class="info-tag">all-risk nieuw / WA+ occasion</span></label>
+            <input type="number" id="m5_ins_ev" value="1700" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>Verzekering huidige auto (€/jaar)</label>
+            <input type="number" id="m5_ins_cur" value="900" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>Verzekering tweede auto (€/jaar)</label>
+            <input type="number" id="m5_ins_leon" value="800" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>APK (€ per 2 jaar per auto) <span class="info-tag">gemiddeld</span></label>
+            <input type="number" id="m5_apk" value="65" min="0" step="5">
           </div>
 
           <div class="input-section-title">Kilometervergoeding werk</div>
@@ -2108,6 +2124,11 @@ function calcMod5() {
   const maintEV     = val('m5_maint_ev');
   const maintICE    = val('m5_maint_ice');
   const laadpaal    = val('m5_laadpaal');
+  const insEV       = val('m5_ins_ev');
+  const insCur      = val('m5_ins_cur');
+  const insLeon     = val('m5_ins_leon');
+  const apkPer2yr   = val('m5_apk');
+  const apkYr       = apkPer2yr / 2;
   const evPrice     = val('m5_ev_price');
   const evSubsidy   = val('m5_ev_subsidy');
   const evCons      = val('m5_ev_cons');
@@ -2165,9 +2186,15 @@ function calcMod5() {
   const maintICETotal = maintICE * years;
   const maintEVTotal  = maintEV  * years;
 
+  const insTotal_AA = (insCur + insLeon) * years;      // A: both ICE
+  const insTotal_B  = (insEV  + insLeon) * years;      // B: EV + Leon
+  const insTotal_C  = (insCur + insEV)   * years;      // C: Focus + EV second
+  const apkTotal    = apkYr * years * 2;               // both cars, both scenarios
+
   // A: Beide houden — Focus (jij, km) + Seat Leon (tweede, km2) — beide ICE onderhoud
   const aTCO = focusVal + focusFuelYr * years + focusMRB * years - focusResidual + maintICETotal
              + leonVal  + leonFuelYr  * years + leonMRB  * years - leonResidual  + maintICETotal
+             + insTotal_AA + apkTotal
              - vergTotal;
 
   // B: Focus inruilen → EV (jij rijdt EV, km) + Seat Leon blijft (km2)
@@ -2175,6 +2202,7 @@ function calcMod5() {
   const evNetB = Math.max(0, evPrice - focusVal - evSubsidy);
   const bTCO = evNetB + laadpaal + evElYr_prim * years + cumEvMRB - evResidual + maintEVTotal
              + leonVal + leonFuelYr * years + leonMRB * years - leonResidual + maintICETotal
+             + insTotal_B + apkTotal
              - vergTotal;
 
   // C: Seat Leon inruilen → EV (tweede auto, km2) + Focus blijft (jij, km)
@@ -2182,6 +2210,7 @@ function calcMod5() {
   const evNetC = Math.max(0, evPrice - leonVal - evSubsidy);
   const cTCO = focusVal + focusFuelYr * years + focusMRB * years - focusResidual + maintICETotal
              + evNetC  + laadpaal + evElYr_sec  * years + cumEvMRB - evResidual + maintEVTotal
+             + insTotal_C + apkTotal
              - vergTotal;
 
   const scenarios = [
@@ -2257,12 +2286,19 @@ function calcMod5() {
     cumEvMRBSoFar += evMRBPerYear[y - 1];
     const isLast = y === years;
     const verg = vergoedingJaar * y;
+    const insA = (insCur + insLeon) * y;
+    const insB = (insEV  + insLeon) * y;
+    const insC = (insCur + insEV)   * y;
+    const apkY = apkYr * y * 2;
     const rA = (focusVal + focusFuelYr*y + focusMRB*y + maintICE*y - (isLast?focusResidual:0))
-             + (leonVal  + leonFuelYr*y  + leonMRB*y  + maintICE*y - (isLast?leonResidual:0)) - verg;
+             + (leonVal  + leonFuelYr*y  + leonMRB*y  + maintICE*y - (isLast?leonResidual:0))
+             + insA + apkY - verg;
     const rB = (evNetB  + laadpaal + evElYr_prim*y + cumEvMRBSoFar + maintEV*y - (isLast?evResidual:0))
-             + (leonVal + leonFuelYr*y   + leonMRB*y + maintICE*y  - (isLast?leonResidual:0)) - verg;
+             + (leonVal + leonFuelYr*y   + leonMRB*y + maintICE*y  - (isLast?leonResidual:0))
+             + insB + apkY - verg;
     const rC = (focusVal + focusFuelYr*y + focusMRB*y + maintICE*y - (isLast?focusResidual:0))
-             + (evNetC  + laadpaal + evElYr_sec*y + cumEvMRBSoFar + maintEV*y - (isLast?evResidual:0)) - verg;
+             + (evNetC  + laadpaal + evElYr_sec*y + cumEvMRBSoFar + maintEV*y - (isLast?evResidual:0))
+             + insC + apkY - verg;
     const diff = rA - rB;
     html += `<tr>
       <td>Jaar ${y}${isLast?' ✱':''}</td>
@@ -2280,14 +2316,25 @@ function calcMod5() {
   const focusEvSaving = aTCO - bTCO;
   const leonEvSaving  = aTCO - cTCO;
   let vClass, vIcon, vTitle, vText;
+  // Warranty warning for occasion EVs
+  const evBat = EV_PRESETS[evPresetKey];
+  let warrantyWarn = '';
+  if (evBat && evBat.startKm > 0) {
+    const kmLeft = Math.max(0, evBat.warrantyKm - evBat.startKm);
+    const yrsLeft = km > 0 ? kmLeft / km : evBat.warrantyYrsLeft;
+    if (yrsLeft < years) {
+      warrantyWarn = ` ⚠️ Batterijgarantie verloopt al na ~${fmt(yrsLeft, 1)} jaar (bij ${fmt(km/1000,0)}k km/jr). De rest van de looptijd (${fmt(years - yrsLeft, 1)} jaar) rij je zonder garantiedekking — potentieel risico €10.000-15.000.`;
+    }
+  }
+
   if (bTCO <= cTCO && bTCO <= aTCO) {
     vClass = 'smart'; vIcon = '✅';
     vTitle = `Focus → EV wint — ${fmtEur(focusEvSaving)} goedkoper dan beide houden`;
-    vText  = `Jij rijdt de meeste km (${fmt(km/1000,0)}k/jaar), dus de EV als jóuw auto levert de meeste brandstofbesparing op: ${fmtEur(focusFuelYr - evElYr_prim)}/jaar. Netto investering: ${fmtEur(evNetB)} na inruil Focus.${leonEvSaving < focusEvSaving ? ` De Seat Leon inruilen (${fmtEur(leonEvSaving)} besparing) loont minder omdat die auto minder km maakt.` : ''}`;
+    vText  = `Jij rijdt de meeste km (${fmt(km/1000,0)}k/jaar), dus de EV als jóuw auto levert de meeste brandstofbesparing op: ${fmtEur(focusFuelYr - evElYr_prim)}/jaar. Netto investering: ${fmtEur(evNetB)} na inruil Focus.${leonEvSaving < focusEvSaving ? ` De Seat Leon inruilen (${fmtEur(leonEvSaving)} besparing) loont minder omdat die auto minder km maakt.` : ''}${warrantyWarn}`;
   } else if (cTCO <= bTCO && cTCO <= aTCO) {
     vClass = 'neutral-v'; vIcon = '🟡';
     vTitle = `Seat Leon → EV wint — ${fmtEur(leonEvSaving)} goedkoper dan beide houden`;
-    vText  = `De Seat Leon inruilen voor een EV als tweede auto is het goedkoopst over ${years} jaar. Netto investering: ${fmtEur(evNetC)}.`;
+    vText  = `De Seat Leon inruilen voor een EV als tweede auto is het goedkoopst over ${years} jaar. Netto investering: ${fmtEur(evNetC)}.${warrantyWarn}`;
   } else {
     vClass = 'wait'; vIcon = '⏳';
     vTitle = 'Beide houden is goedkoopst op papier';
@@ -2743,8 +2790,8 @@ document.getElementById('m5_loan_on').addEventListener('change', function() {
 
   // EV preset selectors
   const EV_PRESETS = {
-    enyaq: { price: 29600, cons: 16, subsidy: 0,    resale: 32, chem: 'NMC', initHealth: 91, degradYr: 2.5 },
-    ev5:   { price: 44500, cons: 16, subsidy: 2950, resale: 55, chem: 'LFP', initHealth: 100, degradYr: 1.2 },
+    enyaq: { price: 29600, cons: 16, subsidy: 0,    resale: 32, chem: 'NMC', initHealth: 91, degradYr: 2.5, ins: 1100, warrantyKm: 160000, warrantyYrsLeft: 5, startKm: 74000 },
+    ev5:   { price: 44500, cons: 16, subsidy: 2950, resale: 55, chem: 'LFP', initHealth: 100, degradYr: 1.2, ins: 1700, warrantyKm: 160000, warrantyYrsLeft: 8, startKm: 0     },
   };
 
   function applyEvPreset(module, preset, skipSync) {
@@ -2756,6 +2803,8 @@ document.getElementById('m5_loan_on').addEventListener('change', function() {
     if (subsidyEl) subsidyEl.value = p.subsidy;
     const resaleEl = document.getElementById(module + '_ev_resale');
     if (resaleEl) resaleEl.value = p.resale;
+    const insEl = document.getElementById(module + '_ins_ev');
+    if (insEl) insEl.value = p.ins;
     // Sync other modules
     if (!skipSync) {
       ['m1', 'm5'].forEach(mod => {
@@ -2818,6 +2867,7 @@ const allInputIds = [
   'm5_pct_home','m5_price_home','m5_pct_ac','m5_price_ac','m5_pct_dc','m5_price_dc',
   'm5_werk_pct','m5_vergoeding_km',
   'm2_install_cost','m3_roundtrip','m5_maint_ev','m5_maint_ice','m5_laadpaal',
+  'm5_ins_ev','m5_ins_cur','m5_ins_leon','m5_apk',
   'm5_loan_own','m5_loan_rate','m5_loan_months',
 ];
 
