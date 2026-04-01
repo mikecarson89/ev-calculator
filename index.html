@@ -845,7 +845,7 @@
         <div class="input-group">
           <label>EV model kiezen</label>
           <select id="m1_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
-            <option value="ev3">Kia EV3 — €38.000 · 15 kWh/100km</option>
+            <option value="enyaq">Škoda Enyaq 60 — €28.450 · 16 kWh/100km (occasion 2024)</option>
             <option value="ev5" selected>Kia EV5 — €44.500 · 16 kWh/100km</option>
             <option value="custom">Handmatig invoeren</option>
           </select>
@@ -2567,15 +2567,27 @@ document.getElementById('m5_loan_on').addEventListener('change', function() {
 
   // EV preset selectors
   const EV_PRESETS = {
-    enyaq: { price: 28450, cons: 16 },
-    ev5:   { price: 44500, cons: 16 },
+    enyaq: { price: 28450, cons: 16, subsidy: 0,    resale: 45 },
+    ev5:   { price: 44500, cons: 16, subsidy: 2950, resale: 55 },
   };
 
-  function applyEvPreset(module, preset) {
+  function applyEvPreset(module, preset, skipSync) {
     if (preset === 'custom') return;
     const p = EV_PRESETS[preset];
     document.getElementById(module + '_ev_price').value = p.price;
     document.getElementById(module + '_ev_cons').value  = p.cons;
+    const subsidyEl = document.getElementById(module + '_ev_subsidy');
+    if (subsidyEl) subsidyEl.value = p.subsidy;
+    const resaleEl = document.getElementById(module + '_ev_resale');
+    if (resaleEl) resaleEl.value = p.resale;
+    // Sync other modules
+    if (!skipSync) {
+      ['m1', 'm5'].forEach(mod => {
+        if (mod === module) return;
+        const sel = document.getElementById(mod + '_ev_preset');
+        if (sel) { sel.value = preset; applyEvPreset(mod, preset, true); }
+      });
+    }
     recalcAll();
   }
 
