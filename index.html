@@ -630,9 +630,10 @@
 
         <div class="output-section-title">Batterijgezondheid &amp; restwaarde-impact</div>
         <div id="m5_battery_note" style="font-size:12px; color:var(--text-muted); margin-bottom:10px; line-height:1.7;"></div>
-        <div style="position:relative; height:280px; margin-bottom:8px;">
+        <div style="position:relative; height:280px; margin-bottom:16px;">
           <canvas id="m5_chart_battery"></canvas>
         </div>
+        <div id="m5_battery_verdict"></div>
       </div>
 
       <!-- ── 2. AUTO & GEBRUIK INPUTS (twee kolommen) ─────────────────── -->
@@ -2589,6 +2590,67 @@ function drawM5Charts(d) {
     ${showRef ? `<strong style="color:var(--text)">LFP</strong> (nieuwe EV5) degradeert ~${refDegrad}%/jaar. ` : ''}
     Batterijgezondheid onder 80% raakt de verkoopbaarheid en daarmee de restwaarde.
     <span style="color:var(--yellow)">Gele stippellijn = 80% grens.</span>`;
+
+  // ── BATTERY VERDICT ───────────────────────────────────────────────────
+  const batVerdictEl = document.getElementById('m5_battery_verdict');
+  if (batVerdictEl) {
+    const evHealthAtYears  = Math.max(60, bat.initHealth - bat.degradYr * d.years);
+    const refHealthAtYears = Math.max(70, refInit - refDegrad * d.years);
+    const evResaleAtYears  = evResaleAdj[d.years] || 0;
+    const refResaleAtYears = refResaleAdj[d.years] || 0;
+    const refPrice         = EV_PRESETS['ev5'] ? EV_PRESETS['ev5'].price : d.evPrice;
+    const priceDiff        = refPrice - d.evPrice;  // how much more expensive is EV5
+
+    // Total cost comparison over years (netto investering + running costs)
+    // Running costs come from d object
+    let evRunning = 0, refRunning = 0;
+    for (let y = 1; y <= d.years; y++) {
+      const mrbEv = d.evMRBPerYear[y-1] ?? d.evMRBPerYear[d.evMRBPerYear.length-1];
+      evRunning  += d.evElYr + mrbEv + d.evMaintYr;
+      refRunning += d.evElYr + mrbEv + d.evMaintYr;  // same running costs assumed
+    }
+    const evNetInv  = d.nettoInv;
+    const refNetInv = d.nettoInv + priceDiff;  // EV5 costs more upfront
+    const evTCO     = evNetInv  + evRunning  - evResaleAtYears;
+    const refTCO    = refNetInv + refRunning - refResaleAtYears;
+    const tcoDiff   = evTCO - refTCO;  // positive = EV (cheaper), negative = ref (cheaper)
+
+    let vClass, icon, title, body;
+    if (!showRef) {
+      // Same model selected as reference — no comparison possible
+      vClass = 'neutral-v'; icon = '🔋';
+      title = 'EV5 geselecteerd — vergelijking met referentie niet van toepassing';
+      body = `Je hebt de EV5 (LFP) geselecteerd. Dit is de referentieauto in de batterijgrafiek. Wissel naar de Enyaq om het verschil te zien.`;
+    } else if (tcoDiff > 0) {
+      // EV (Enyaq) has higher TCO than EV5 → EV5 is cheaper over full period
+      vClass = 'wait'; icon = '⚠️';
+      title = `${bat.chem}-batterij (${bat.initHealth < 100 ? 'occasion' : 'nieuw'}) is duurder over ${d.years} jaar`;
+      body = `Ondanks de lagere aanschafprijs (${fmtEur(priceDiff)} goedkoper) is de totale kostprijs over ${d.years} jaar
+              <strong style="color:var(--red)">${fmtEur(Math.abs(tcoDiff))} hoger</strong> dan de EV5.
+              Dit komt doordat de ${bat.chem}-batterij sneller degradeert (${bat.degradYr}%/jaar vs ${refDegrad}%/jaar voor LFP):
+              batterijgezondheid na ${d.years} jaar is <strong>${fmt(evHealthAtYears,0)}%</strong> vs <strong>${fmt(refHealthAtYears,0)}%</strong> voor de EV5.
+              Restwaarde na ${d.years} jaar: <strong>${fmtEur(evResaleAtYears)}</strong> vs <strong>${fmtEur(refResaleAtYears)}</strong> voor de EV5.
+              <br><em>Conclusie: de EV5 is over ${d.years} jaar de financieel slimmere keuze.</em>`;
+    } else {
+      // EV (Enyaq) cheaper TCO → Enyaq wins
+      vClass = 'smart'; icon = '✅';
+      title = `${bat.chem}-occasion is goedkoper over ${d.years} jaar`;
+      body = `Ook na correctie voor batterijdegradatie is de totale kostprijs over ${d.years} jaar
+              <strong style="color:var(--green)">${fmtEur(Math.abs(tcoDiff))} lager</strong> dan de EV5.
+              Batterijgezondheid na ${d.years} jaar: <strong>${fmt(evHealthAtYears,0)}%</strong> vs <strong>${fmt(refHealthAtYears,0)}%</strong> voor de EV5.
+              Restwaarde na ${d.years} jaar: <strong>${fmtEur(evResaleAtYears)}</strong> vs <strong>${fmtEur(refResaleAtYears)}</strong> voor de EV5.
+              <br><em>Conclusie: de goedkopere occasion wint, ook op lange termijn. Let wel op rijbereik — dat daalt sneller bij ${bat.chem}.</em>`;
+    }
+
+    batVerdictEl.innerHTML = `
+      <div class="verdict ${vClass}" style="margin-top:12px;">
+        <div class="verdict-icon">${icon}</div>
+        <div>
+          <div class="verdict-title">${title}</div>
+          <div class="verdict-text">${body}</div>
+        </div>
+      </div>`;
+  }
 
   _m5ChartBat = new Chart(ctx3, {
     type: 'line',
