@@ -624,8 +624,14 @@
         </div>
 
         <div class="output-section-title">Jaarlijkse rijkosten — Focus vs EV</div>
-        <div style="position:relative; height:260px; margin-bottom:8px;">
+        <div style="position:relative; height:260px; margin-bottom:20px;">
           <canvas id="m5_chart_costs"></canvas>
+        </div>
+
+        <div class="output-section-title">Batterijgezondheid &amp; restwaarde-impact</div>
+        <div id="m5_battery_note" style="font-size:12px; color:var(--text-muted); margin-bottom:10px; line-height:1.7;"></div>
+        <div style="position:relative; height:280px; margin-bottom:8px;">
+          <canvas id="m5_chart_battery"></canvas>
         </div>
       </div>
 
@@ -2106,6 +2112,8 @@ function calcMod5() {
   const evCons      = val('m5_ev_cons');
   const evResale    = val('m5_ev_resale') / 100;
   const evMRBBase   = val('m5_ev_mrb_base');
+  const evPresetKey = document.getElementById('m5_ev_preset').value;
+  const evBatData   = EV_PRESETS[evPresetKey] || { chem:'?', initHealth:100, degradYr:1.5 };
   const km          = val('m5_km');   // Tom's km/jr (primaire chauffeur)
   const km2         = val('m5_km2');  // tweede auto km/jr
   const years       = Math.max(1, Math.round(val('m5_years')));
@@ -2336,6 +2344,7 @@ function calcMod5() {
     loanMonthly,
     loanMonths,
     loanInterest,
+    evBatData,
   });
 }
 
@@ -2345,6 +2354,7 @@ function calcMod5() {
 
 let _m5ChartBE   = null;
 let _m5ChartCost = null;
+let _m5ChartBat  = null;
 let _m5ResaleOn  = true;
 
 function toggleM5Resale() {
@@ -2536,6 +2546,110 @@ function drawM5Charts(d) {
       }
     }
   });
+
+  // ── CHART 3: BATTERY DEGRADATION ──────────────────────────────────────
+  if (_m5ChartBat) { _m5ChartBat.destroy(); _m5ChartBat = null; }
+  const ctx3 = document.getElementById('m5_chart_battery').getContext('2d');
+
+  const bat       = d.evBatData || { chem:'?', initHealth:100, degradYr:1.5 };
+  const refChem   = 'LFP';   // reference = new LFP (EV5)
+  const refDegrad = 1.2;
+  const refInit   = 100;
+  const maxYrsBat = Math.max(10, d.years);
+  const batLabels = ['Nu', ...Array.from({length: maxYrsBat}, (_, i) => `Jaar ${i+1}`)];
+
+  // EV health curve
+  const evHealth = [bat.initHealth];
+  for (let y = 1; y <= maxYrsBat; y++)
+    evHealth.push(Math.max(60, bat.initHealth - bat.degradYr * y));
+
+  // Reference LFP health (new EV5)
+  const refHealth = [refInit];
+  for (let y = 1; y <= maxYrsBat; y++)
+    refHealth.push(Math.max(70, refInit - refDegrad * y));
+
+  // Residual value adjusted for battery health (simplified: value ∝ health beyond 80%)
+  const evResaleAdj = evHealth.map(h => {
+    const penalty = Math.max(0, (80 - h) / 80 * 0.4);  // below 80% starts hurting resale
+    return Math.round(d.evPrice * (d.evResale - penalty) * (h / bat.initHealth) * 100) / 100;
+  });
+  const refResaleAdj = refHealth.map(h => {
+    const penalty = Math.max(0, (80 - h) / 80 * 0.4);
+    const refPrice = EV_PRESETS['ev5'] ? EV_PRESETS['ev5'].price : d.evPrice;
+    const refResalePct = EV_PRESETS['ev5'] ? EV_PRESETS['ev5'].resale / 100 : 0.55;
+    return Math.round(refPrice * (refResalePct - penalty) * (h / 100) * 100) / 100;
+  });
+
+  // Show reference line only if a different preset is active
+  const showRef = bat.chem !== refChem || bat.initHealth !== refInit;
+
+  const noteEl = document.getElementById('m5_battery_note');
+  noteEl.innerHTML = `
+    <strong style="color:var(--text)">${bat.chem}</strong> (jouw EV) degradeert ~${bat.degradYr}%/jaar.
+    ${showRef ? `<strong style="color:var(--text)">LFP</strong> (nieuwe EV5) degradeert ~${refDegrad}%/jaar. ` : ''}
+    Batterijgezondheid onder 80% raakt de verkoopbaarheid en daarmee de restwaarde.
+    <span style="color:var(--yellow)">Gele stippellijn = 80% grens.</span>`;
+
+  _m5ChartBat = new Chart(ctx3, {
+    type: 'line',
+    data: {
+      labels: batLabels,
+      datasets: [
+        {
+          label: `${bat.chem} batterijgezondheid (jouw EV)`,
+          data: evHealth,
+          borderColor: GREEN, backgroundColor: 'transparent',
+          pointRadius: 3, borderWidth: 2.5, yAxisID: 'yHealth',
+        },
+        ...(showRef ? [{
+          label: `LFP batterijgezondheid (nieuwe EV5)`,
+          data: refHealth,
+          borderColor: BLUE, backgroundColor: 'transparent',
+          pointRadius: 3, borderWidth: 2, borderDash: [4,3], yAxisID: 'yHealth',
+        }] : []),
+        {
+          label: '80% gezondheidsgrens',
+          data: Array(maxYrsBat + 1).fill(80),
+          borderColor: YELLOW, backgroundColor: 'transparent',
+          borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, yAxisID: 'yHealth',
+        },
+        {
+          label: `Restwaarde ${bat.chem} (€)`,
+          data: evResaleAdj,
+          borderColor: '#e94560', backgroundColor: 'transparent',
+          pointRadius: 3, borderWidth: 2, yAxisID: 'yEur',
+        },
+        ...(showRef ? [{
+          label: `Restwaarde LFP/EV5 (€)`,
+          data: refResaleAdj,
+          borderColor: '#9b59b6', backgroundColor: 'transparent',
+          pointRadius: 3, borderWidth: 2, borderDash: [4,3], yAxisID: 'yEur',
+        }] : []),
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 400 },
+      plugins: CHART_DEFAULTS.plugins,
+      scales: {
+        x: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: '#2a2a4a' } },
+        yHealth: {
+          type: 'linear', position: 'left',
+          min: 60, max: 105,
+          ticks: { color: MUTED, font: { size: 10 }, callback: v => v + '%' },
+          grid: { color: '#2a2a4a' },
+          title: { display: true, text: 'Batterijgezondheid (%)', color: MUTED, font: { size: 10 } },
+        },
+        yEur: {
+          type: 'linear', position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { color: MUTED, font: { size: 10 },
+                   callback: v => '€' + Math.round(v).toLocaleString('nl-NL') },
+          title: { display: true, text: 'Restwaarde (€)', color: MUTED, font: { size: 10 } },
+        },
+      }
+    }
+  });
 }
 
 // ============================================================
@@ -2567,8 +2681,8 @@ document.getElementById('m5_loan_on').addEventListener('change', function() {
 
   // EV preset selectors
   const EV_PRESETS = {
-    enyaq: { price: 29600, cons: 16, subsidy: 0,    resale: 40 },
-    ev5:   { price: 44500, cons: 16, subsidy: 2950, resale: 55 },
+    enyaq: { price: 29600, cons: 16, subsidy: 0,    resale: 40, chem: 'NMC', initHealth: 91, degradYr: 2.5 },
+    ev5:   { price: 44500, cons: 16, subsidy: 2950, resale: 55, chem: 'LFP', initHealth: 100, degradYr: 1.2 },
   };
 
   function applyEvPreset(module, preset, skipSync) {
