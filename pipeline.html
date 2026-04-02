@@ -13,23 +13,13 @@
     padding: 24px;
     min-height: 100vh;
   }
-
-  h1 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #e8e8f0;
-    margin-bottom: 4px;
-  }
-  .subtitle {
-    font-size: 0.85rem;
-    color: #6666aa;
-    margin-bottom: 24px;
-  }
+  h1 { font-size: 1.4rem; font-weight: 600; color: #e8e8f0; margin-bottom: 4px; }
+  .subtitle { font-size: 0.85rem; color: #6666aa; margin-bottom: 24px; }
 
   .layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 24px;
+    grid-template-columns: 260px 1fr;
+    gap: 20px;
     align-items: start;
   }
 
@@ -38,23 +28,21 @@
     background: #1a1a2e;
     border: 1px solid #2a2a4a;
     border-radius: 10px;
-    padding: 20px;
+    padding: 18px;
   }
-  .inputs-panel h2 {
-    font-size: 0.8rem;
+  .panel-title {
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     color: #6666aa;
-    margin-bottom: 16px;
-  }
-  .input-group {
     margin-bottom: 14px;
   }
+  .input-group { margin-bottom: 12px; }
   .input-group label {
     display: block;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: #aaaacc;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   .input-group input[type="number"] {
     width: 100%;
@@ -62,217 +50,145 @@
     border: 1px solid #2a2a4a;
     border-radius: 6px;
     color: #e8e8f0;
-    padding: 7px 10px;
-    font-size: 0.9rem;
+    padding: 6px 10px;
+    font-size: 0.88rem;
     outline: none;
+    transition: border-color 0.15s;
   }
-  .input-group input[type="number"]:focus {
-    border-color: #4fc3f7;
-  }
-  .input-group .unit {
-    font-size: 0.75rem;
-    color: #6666aa;
-    margin-left: 4px;
-  }
+  .input-group input[type="number"]:focus { border-color: #4fc3f7; }
+  .unit { font-size: 0.72rem; color: #6666aa; }
+  hr.div { border: none; border-top: 1px solid #2a2a4a; margin: 14px 0; }
 
-  .section-divider {
-    border: none;
-    border-top: 1px solid #2a2a4a;
-    margin: 16px 0;
-  }
+  /* ── MAIN ── */
+  .main-panel { display: flex; flex-direction: column; gap: 18px; }
 
-  /* ── MAIN CONTENT ── */
-  .main-panel {
+  /* ── PER PERSOON BANNER ── */
+  .person-banner {
+    background: linear-gradient(135deg, #12122a 0%, #1a1a2e 100%);
+    border: 1px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 16px 20px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 20px;
   }
+  .person-main {
+    flex: 1;
+  }
+  .person-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6666aa;
+    margin-bottom: 4px;
+  }
+  .person-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #4fc3f7;
+    line-height: 1;
+  }
+  .person-sub { font-size: 0.78rem; color: #6666aa; margin-top: 3px; }
+  .person-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 200px;
+    align-items: center;
+  }
+  .person-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4fc3f7;
+    opacity: 0.7;
+  }
+  .person-dot.empty {
+    background: transparent;
+    border: 1px solid #2a2a4a;
+  }
+  .person-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    border-left: 1px solid #2a2a4a;
+    padding-left: 20px;
+  }
+  .mini-stat { text-align: center; }
+  .mini-val { font-size: 1.2rem; font-weight: 700; color: #00d4aa; }
+  .mini-lbl { font-size: 0.68rem; color: #6666aa; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
 
-  /* ── FUNNEL ── */
+  /* ── FUNNEL SVG ── */
   .funnel-card {
     background: #1a1a2e;
     border: 1px solid #2a2a4a;
     border-radius: 10px;
-    padding: 24px 32px;
+    padding: 20px 24px;
   }
   .funnel-card h2 {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     color: #6666aa;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
-
-  .funnel-stage {
+  .funnel-wrap {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 6px;
+    gap: 24px;
+    align-items: flex-start;
   }
-  .stage-label {
-    width: 110px;
-    font-size: 0.82rem;
-    color: #aaaacc;
-    text-align: right;
-    flex-shrink: 0;
-  }
-  .stage-bar-wrap {
-    flex: 1;
+  #funnel-svg { flex-shrink: 0; }
+  .funnel-legend {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+    min-width: 180px;
   }
-  .stage-bar {
-    height: 36px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #0f0f1a;
-    transition: width 0.3s ease;
-    min-width: 48px;
-    white-space: nowrap;
-  }
-  .stage-num {
-    font-size: 0.82rem;
-    color: #e8e8f0;
-    font-weight: 600;
-    width: 36px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-  .stage-now {
-    font-size: 0.78rem;
-    color: #6666aa;
-    flex-shrink: 0;
-  }
-
-  .conversion-arrow {
+  .legend-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 6px;
-    padding-left: 124px;
+    font-size: 0.78rem;
+    color: #aaaacc;
   }
-  .conv-line {
-    width: 2px;
-    height: 14px;
-    background: #2a2a4a;
-    margin-left: 0;
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
   }
-  .conv-badge {
-    font-size: 0.72rem;
-    color: #6666aa;
-    background: #12122a;
-    border: 1px solid #2a2a4a;
-    border-radius: 12px;
-    padding: 2px 8px;
-  }
-
-  /* current pipeline input row */
-  .stage-current-input {
-    width: 60px;
-    background: #12122a;
-    border: 1px solid #2a2a4a;
-    border-radius: 4px;
-    color: #f5a623;
-    padding: 4px 6px;
-    font-size: 0.82rem;
-    text-align: center;
-    outline: none;
-  }
-  .stage-current-input:focus { border-color: #f5a623; }
-  .gap-badge {
-    font-size: 0.75rem;
-    padding: 2px 7px;
-    border-radius: 10px;
-    font-weight: 600;
-  }
-  .gap-ok   { background: #00d4aa22; color: #00d4aa; }
-  .gap-warn { background: #f5a62322; color: #f5a623; }
-  .gap-bad  { background: #e9456022; color: #e94560; }
-
-  /* ── STATS ROW ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-  }
-  .stat-card {
-    background: #1a1a2e;
-    border: 1px solid #2a2a4a;
-    border-radius: 10px;
-    padding: 16px 18px;
-  }
-  .stat-label {
-    font-size: 0.75rem;
-    color: #6666aa;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 6px;
-  }
-  .stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #00d4aa;
-  }
-  .stat-sub {
-    font-size: 0.75rem;
-    color: #6666aa;
-    margin-top: 2px;
-  }
+  .legend-num { font-weight: 700; color: #e8e8f0; margin-left: auto; }
+  .legend-conv { font-size: 0.7rem; color: #6666aa; margin-left: 18px; margin-top: -2px; margin-bottom: 2px; }
 
   /* ── URGENCY TABLE ── */
   .urgency-card {
     background: #1a1a2e;
     border: 1px solid #2a2a4a;
     border-radius: 10px;
-    padding: 20px 24px;
+    padding: 18px 22px;
   }
   .urgency-card h2 {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     color: #6666aa;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.83rem;
-  }
-  th {
-    text-align: left;
-    padding: 6px 10px;
-    color: #6666aa;
-    font-weight: 500;
-    border-bottom: 1px solid #2a2a4a;
-  }
-  td {
-    padding: 7px 10px;
-    border-bottom: 1px solid #1e1e36;
-    color: #ccccdd;
-  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; padding: 5px 10px; color: #6666aa; font-weight: 500; border-bottom: 1px solid #2a2a4a; }
+  td { padding: 7px 10px; border-bottom: 1px solid #1e1e36; color: #ccccdd; }
   tr:last-child td { border-bottom: none; }
-  td.highlight { color: #e8e8f0; font-weight: 600; }
-  td.urgent { color: #e94560; font-weight: 600; }
-  td.ok { color: #00d4aa; }
+  td.hl { color: #e8e8f0; font-weight: 600; }
+  .ok-txt { color: #00d4aa; font-weight: 600; }
+  .warn-txt { color: #f5a623; font-weight: 600; }
+  .bad-txt { color: #e94560; font-weight: 600; }
 
-  .legend {
-    display: flex;
-    gap: 18px;
-    margin-top: 12px;
-    font-size: 0.75rem;
-    color: #6666aa;
-  }
-  .legend span { display: flex; align-items: center; gap: 5px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; }
-
-  @media (max-width: 900px) {
+  @media (max-width: 860px) {
     .layout { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .person-stats-row { border-left: none; padding-left: 0; border-top: 1px solid #2a2a4a; padding-top: 12px; margin-top: 4px; }
+    .person-banner { flex-direction: column; align-items: flex-start; }
+    .funnel-wrap { flex-direction: column; }
   }
 </style>
 </head>
@@ -283,9 +199,9 @@
 
 <div class="layout">
 
-  <!-- ── INPUTS ── -->
+  <!-- INPUTS -->
   <div class="inputs-panel">
-    <h2>Doelstelling</h2>
+    <div class="panel-title">Doelstelling</div>
     <div class="input-group">
       <label>Inzetten (closes) dit jaar</label>
       <input type="number" id="inp_closes" value="9" min="1" max="100">
@@ -296,17 +212,15 @@
     </div>
     <div class="input-group">
       <label>Aantal mensen</label>
-      <input type="number" id="inp_people" value="4" min="1" max="20">
+      <input type="number" id="inp_people" value="4" min="1" max="50">
     </div>
     <div class="input-group">
-      <label>Salescyclus</label>
+      <label>Salescyclus <span class="unit">(maanden)</span></label>
       <input type="number" id="inp_cycle" value="6" min="1" max="24">
-      <span class="unit">maanden lead → close</span>
     </div>
 
-    <hr class="section-divider">
-    <h2>Conversieratio's</h2>
-
+    <hr class="div">
+    <div class="panel-title">Conversieratio's</div>
     <div class="input-group">
       <label>Lead → Kwalificatie <span class="unit">%</span></label>
       <input type="number" id="conv_lq" value="50" min="1" max="100">
@@ -324,84 +238,78 @@
       <input type="number" id="conv_oc" value="50" min="1" max="100">
     </div>
 
-    <hr class="section-divider">
-    <h2>Huidige pipeline <span style="color:#f5a623;font-size:0.75rem;text-transform:none;letter-spacing:0">(optioneel)</span></h2>
-    <p style="font-size:0.75rem;color:#6666aa;margin-bottom:12px;">Vul in wat er nu in elke fase zit om het gat te zien.</p>
+    <hr class="div">
+    <div class="panel-title">Huidige pipeline <span class="unit" style="text-transform:none;letter-spacing:0">(optioneel)</span></div>
     <div class="input-group">
-      <label>Huidige Leads</label>
-      <input type="number" id="cur_lead" value="" placeholder="—" min="0">
+      <label>Leads nu</label>
+      <input type="number" id="cur_lead" placeholder="—" min="0">
     </div>
     <div class="input-group">
-      <label>Huidige Kwalificaties</label>
-      <input type="number" id="cur_qual" value="" placeholder="—" min="0">
+      <label>Kwalificaties nu</label>
+      <input type="number" id="cur_qual" placeholder="—" min="0">
     </div>
     <div class="input-group">
-      <label>Huidige Intake/Demo</label>
-      <input type="number" id="cur_intake" value="" placeholder="—" min="0">
+      <label>Intake/Demo nu</label>
+      <input type="number" id="cur_intake" placeholder="—" min="0">
     </div>
     <div class="input-group">
-      <label>Huidige Onderhandeling</label>
-      <input type="number" id="cur_ond" value="" placeholder="—" min="0">
+      <label>Onderhandeling nu</label>
+      <input type="number" id="cur_ond" placeholder="—" min="0">
     </div>
   </div>
 
-  <!-- ── MAIN ── -->
+  <!-- MAIN -->
   <div class="main-panel">
 
-    <!-- STATS ROW -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Leads / maand</div>
-        <div class="stat-value" id="stat_leads_month">—</div>
-        <div class="stat-sub">totaal team</div>
+    <!-- PER PERSOON BANNER -->
+    <div class="person-banner">
+      <div class="person-main">
+        <div class="person-label">Leads per persoon per maand</div>
+        <div class="person-value" id="stat_per_person">—</div>
+        <div class="person-sub" id="person_sub">nieuwe leads toevoegen aan de pijplijn</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Per persoon / maand</div>
-        <div class="stat-value" id="stat_per_person">—</div>
-        <div class="stat-sub">nieuwe leads</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Totaal leads nodig</div>
-        <div class="stat-value" id="stat_total_leads">—</div>
-        <div class="stat-sub">over hele periode</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Overall conversie</div>
-        <div class="stat-value" id="stat_overall_conv">—</div>
-        <div class="stat-sub">lead → close</div>
+      <div class="person-dots" id="person_dots"></div>
+      <div class="person-stats-row">
+        <div class="mini-stat">
+          <div class="mini-val" id="stat_leads_month">—</div>
+          <div class="mini-lbl">Leads/mnd totaal</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-val" id="stat_total_leads">—</div>
+          <div class="mini-lbl">Totaal leads nodig</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-val" id="stat_overall_conv">—</div>
+          <div class="mini-lbl">Overall conversie</div>
+        </div>
       </div>
     </div>
 
     <!-- FUNNEL -->
     <div class="funnel-card">
-      <h2>Trechter — benodigde pipeline</h2>
-      <div id="funnel_container"></div>
-      <div class="legend" style="margin-top:16px;">
-        <span><span class="dot" style="background:#4fc3f7"></span> Benodigde totale volume</span>
-        <span><span class="dot" style="background:#f5a623"></span> Huidig (ingevuld)</span>
-        <span><span class="dot" style="background:#00d4aa"></span> Op schema / surplus</span>
-        <span><span class="dot" style="background:#e94560"></span> Tekort</span>
+      <h2>Trechter</h2>
+      <div class="funnel-wrap">
+        <svg id="funnel-svg" width="340" height="320"></svg>
+        <div class="funnel-legend" id="funnel-legend"></div>
       </div>
     </div>
 
     <!-- URGENCY TABLE -->
     <div class="urgency-card">
       <h2>Wat moet er nú in de pijplijn zitten?</h2>
-      <table id="urgency_table">
+      <table>
         <thead>
           <tr>
             <th>Fase</th>
+            <th>Nodig (totaal)</th>
             <th>Nodig nu</th>
-            <th>Sluit af in</th>
             <th>Huidig</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody id="urgency_body"></tbody>
       </table>
-      <p style="font-size:0.75rem;color:#6666aa;margin-top:10px;">
-        "Nodig nu" = rekening houdend met uitval per fase, om het jaardoel te halen.
-      </p>
+      <p style="font-size:0.72rem;color:#6666aa;margin-top:8px;">"Nodig nu" = het deel dat al actief in de pijplijn moet zitten gezien de resterende maanden.</p>
     </div>
 
   </div>
@@ -409,194 +317,261 @@
 
 <script>
   const STAGES = [
-    { id: 'lead',   label: 'Lead',           color: '#4fc3f7' },
-    { id: 'qual',   label: 'Kwalificatie',   color: '#7e88ff' },
-    { id: 'intake', label: 'Intake / Demo',  color: '#a78bfa' },
-    { id: 'ond',    label: 'Onderhandeling', color: '#f59e0b' },
-    { id: 'close',  label: 'Close',          color: '#00d4aa' },
+    { label: 'Lead',           color: '#4fc3f7', curId: 'cur_lead'   },
+    { label: 'Kwalificatie',   color: '#818cf8', curId: 'cur_qual'   },
+    { label: 'Intake / Demo',  color: '#a78bfa', curId: 'cur_intake' },
+    { label: 'Onderhandeling', color: '#f59e0b', curId: 'cur_ond'    },
+    { label: 'Close',          color: '#00d4aa', curId: null         },
   ];
 
   function val(id, fallback = 0) {
     const v = parseFloat(document.getElementById(id).value);
     return isNaN(v) ? fallback : v;
   }
+  function curVal(id) {
+    const el = document.getElementById(id);
+    if (!el || el.value === '') return null;
+    const v = parseFloat(el.value);
+    return isNaN(v) ? null : v;
+  }
 
   function recalc() {
-    const closes    = val('inp_closes', 9);
-    const months    = val('inp_months', 9);
-    const people    = val('inp_people', 4);
-    const cycle     = val('inp_cycle', 6);
-    const cLQ       = val('conv_lq', 50) / 100;
-    const cQI       = val('conv_qi', 40) / 100;
-    const cIO       = val('conv_io', 50) / 100;
-    const cOC       = val('conv_oc', 50) / 100;
+    const closes = val('inp_closes', 9);
+    const months = val('inp_months', 9);
+    const people = Math.max(val('inp_people', 4), 1);
+    const cycle  = val('inp_cycle', 6);
+    const cLQ    = Math.max(val('conv_lq', 50), 1) / 100;
+    const cQI    = Math.max(val('conv_qi', 40), 1) / 100;
+    const cIO    = Math.max(val('conv_io', 50), 1) / 100;
+    const cOC    = Math.max(val('conv_oc', 50), 1) / 100;
 
-    // Backcast: how many needed per stage to yield `closes`
-    const nClose  = closes;
-    const nOnd    = Math.ceil(nClose / cOC);
-    const nIntake = Math.ceil(nOnd   / cIO);
+    // Backcast volumes
+    const nClose  = Math.ceil(closes);
+    const nOnd    = Math.ceil(nClose  / cOC);
+    const nIntake = Math.ceil(nOnd    / cIO);
     const nQual   = Math.ceil(nIntake / cQI);
     const nLead   = Math.ceil(nQual   / cLQ);
-
     const volumes = [nLead, nQual, nIntake, nOnd, nClose];
     const maxVol  = nLead;
 
-    // Current pipeline values
-    const curLead   = document.getElementById('cur_lead').value   !== '' ? val('cur_lead')   : null;
-    const curQual   = document.getElementById('cur_qual').value   !== '' ? val('cur_qual')   : null;
-    const curIntake = document.getElementById('cur_intake').value !== '' ? val('cur_intake') : null;
-    const curOnd    = document.getElementById('cur_ond').value    !== '' ? val('cur_ond')    : null;
-    const currents  = [curLead, curQual, curIntake, curOnd, null]; // close has no current
+    // Per persoon
+    const leadsPerMonth = nLead / months;
+    const perPerson     = leadsPerMonth / people;
+    const perPersonRnd  = Math.ceil(perPerson * 10) / 10;
 
-    // Stats
-    const leadsPerMonth   = (nLead / months).toFixed(1);
-    const perPerson       = (nLead / months / people).toFixed(1);
-    const overallConv     = ((closes / nLead) * 100).toFixed(1);
+    document.getElementById('stat_per_person').textContent = perPersonRnd.toFixed(1);
+    document.getElementById('stat_leads_month').textContent = leadsPerMonth.toFixed(1);
+    document.getElementById('stat_total_leads').textContent = nLead;
+    document.getElementById('stat_overall_conv').textContent = ((closes / nLead) * 100).toFixed(1) + '%';
+    document.getElementById('person_sub').textContent =
+      `per persoon · ${leadsPerMonth.toFixed(1)} totaal per maand voor ${people} mensen`;
 
-    document.getElementById('stat_leads_month').textContent  = leadsPerMonth;
-    document.getElementById('stat_per_person').textContent   = perPerson;
-    document.getElementById('stat_total_leads').textContent  = nLead;
-    document.getElementById('stat_overall_conv').textContent = overallConv + '%';
+    // Person dots (visual: up to 20 dots representing leads per month per person)
+    const dotsContainer = document.getElementById('person_dots');
+    dotsContainer.innerHTML = '';
+    const dotCount = Math.min(Math.ceil(perPerson * months), 40);
+    const showDots = Math.min(dotCount, 30);
+    for (let i = 0; i < showDots; i++) {
+      const d = document.createElement('div');
+      d.className = 'person-dot';
+      dotsContainer.appendChild(d);
+    }
+    if (dotCount > 30) {
+      const more = document.createElement('div');
+      more.style.cssText = 'font-size:0.75rem;color:#6666aa;';
+      more.textContent = `+${dotCount - 30}`;
+      dotsContainer.appendChild(more);
+    }
 
-    // ── Funnel ──
-    const container = document.getElementById('funnel_container');
-    container.innerHTML = '';
+    // ── FUNNEL SVG ──
+    const svg = document.getElementById('funnel-svg');
+    svg.innerHTML = '';
+    const svgW = 340;
+    const stageH = 52;
+    const gapH   = 6;
+    const totalH = STAGES.length * stageH + (STAGES.length - 1) * gapH + 10;
+    svg.setAttribute('height', totalH);
+    svg.setAttribute('viewBox', `0 0 ${svgW} ${totalH}`);
 
-    const convRatios = [cLQ, cQI, cIO, cOC];
+    const maxBarW = svgW - 10;
+    const cx = svgW / 2;
+
     const convLabels = [
-      `${val('conv_lq')}% →`,
-      `${val('conv_qi')}% →`,
-      `${val('conv_io')}% →`,
-      `${val('conv_oc')}% →`,
+      `${val('conv_lq')}%`, `${val('conv_qi')}%`, `${val('conv_io')}%`, `${val('conv_oc')}%`
     ];
 
+    // Draw each stage as a trapezoid
     volumes.forEach((vol, i) => {
-      const stage = STAGES[i];
-      const cur   = currents[i];
-      const pct   = vol / maxVol;
-      const barW  = Math.max(pct * 100, 8);
+      const topW = (volumes[i] / maxVol) * maxBarW;
+      const botW = i < volumes.length - 1
+        ? (volumes[i + 1] / maxVol) * maxBarW
+        : (volumes[i] / maxVol) * maxBarW * 0.7;
 
-      // Stage row
-      const row = document.createElement('div');
-      row.className = 'funnel-stage';
+      const y = i * (stageH + gapH);
 
-      const lbl = document.createElement('div');
-      lbl.className = 'stage-label';
-      lbl.textContent = stage.label;
+      // Trapezoid points
+      const x0 = cx - topW / 2;
+      const x1 = cx + topW / 2;
+      const x2 = cx + botW / 2;
+      const x3 = cx - botW / 2;
+      const pts = `${x0},${y} ${x1},${y} ${x2},${y + stageH} ${x3},${y + stageH}`;
 
-      const barWrap = document.createElement('div');
-      barWrap.className = 'stage-bar-wrap';
+      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      poly.setAttribute('points', pts);
+      poly.setAttribute('fill', STAGES[i].color);
+      poly.setAttribute('opacity', '0.82');
+      svg.appendChild(poly);
 
-      const bar = document.createElement('div');
-      bar.className = 'stage-bar';
-      bar.style.width = barW + '%';
-      bar.style.background = stage.color;
-      bar.style.opacity = '0.85';
-      bar.textContent = vol;
+      // Stage label (left side)
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      lbl.setAttribute('x', x0 - 6);
+      lbl.setAttribute('y', y + stageH / 2 + 1);
+      lbl.setAttribute('text-anchor', 'end');
+      lbl.setAttribute('dominant-baseline', 'middle');
+      lbl.setAttribute('fill', '#aaaacc');
+      lbl.setAttribute('font-size', '11');
+      lbl.setAttribute('font-family', 'Segoe UI, sans-serif');
+      lbl.textContent = STAGES[i].label;
+      svg.appendChild(lbl);
 
-      const numEl = document.createElement('div');
-      numEl.className = 'stage-num';
-      numEl.textContent = vol;
-      bar.textContent = '';
+      // Volume number (center of trapezoid)
+      const num = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      num.setAttribute('x', cx);
+      num.setAttribute('y', y + stageH / 2 + 1);
+      num.setAttribute('text-anchor', 'middle');
+      num.setAttribute('dominant-baseline', 'middle');
+      num.setAttribute('fill', '#0f0f1a');
+      num.setAttribute('font-size', '14');
+      num.setAttribute('font-weight', '700');
+      num.setAttribute('font-family', 'Segoe UI, sans-serif');
+      num.textContent = vol;
+      svg.appendChild(num);
 
-      barWrap.appendChild(bar);
-      barWrap.appendChild(numEl);
-
-      // Gap badge if current entered
-      if (cur !== null && i < 4) {
-        const diff = cur - vol;
-        const badge = document.createElement('span');
-        badge.className = 'gap-badge ' + (diff >= 0 ? 'gap-ok' : diff >= -vol * 0.3 ? 'gap-warn' : 'gap-bad');
-        badge.textContent = (diff >= 0 ? '+' : '') + diff + ' nu';
-        barWrap.appendChild(badge);
-
-        // Also show a current bar overlay
-        const curBar = document.createElement('div');
-        curBar.style.cssText = `
-          position: absolute;
-          height: 36px;
-          width: ${Math.min(cur / maxVol * 100, 100)}%;
-          background: ${diff >= 0 ? '#00d4aa33' : '#e9456033'};
-          border: 1px dashed ${diff >= 0 ? '#00d4aa' : '#e94560'};
-          border-radius: 4px;
-          pointer-events: none;
-        `;
+      // Conversion % between stages
+      if (i < STAGES.length - 1) {
+        const midY = y + stageH + gapH / 2;
+        const convTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        convTxt.setAttribute('x', cx + botW / 2 + 8);
+        convTxt.setAttribute('y', midY);
+        convTxt.setAttribute('dominant-baseline', 'middle');
+        convTxt.setAttribute('fill', '#555577');
+        convTxt.setAttribute('font-size', '10');
+        convTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
+        convTxt.textContent = `↓ ${convLabels[i]}`;
+        svg.appendChild(convTxt);
       }
 
-      row.appendChild(lbl);
-      row.appendChild(barWrap);
-      container.appendChild(row);
+      // Current pipeline overlay (dashed border if cur entered)
+      const cur = STAGES[i].curId ? curVal(STAGES[i].curId) : null;
+      if (cur !== null && i < 4) {
+        const curW = Math.min((cur / maxVol) * maxBarW, topW + 10);
+        const curX = cx - curW / 2;
+        const diff = cur - vol;
+        const color = diff >= 0 ? '#00d4aa' : '#e94560';
 
-      // Conversion arrow between stages
-      if (i < STAGES.length - 1) {
-        const arrow = document.createElement('div');
-        arrow.className = 'conversion-arrow';
-        const line = document.createElement('div');
-        line.className = 'conv-line';
-        const badge = document.createElement('span');
-        badge.className = 'conv-badge';
-        badge.textContent = convLabels[i];
-        arrow.appendChild(line);
-        arrow.appendChild(badge);
-        container.appendChild(arrow);
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', curX);
+        rect.setAttribute('y', y + 2);
+        rect.setAttribute('width', curW);
+        rect.setAttribute('height', stageH - 4);
+        rect.setAttribute('rx', '3');
+        rect.setAttribute('fill', 'none');
+        rect.setAttribute('stroke', color);
+        rect.setAttribute('stroke-width', '1.5');
+        rect.setAttribute('stroke-dasharray', '4 3');
+        svg.appendChild(rect);
+
+        // Gap text
+        const gapTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        gapTxt.setAttribute('x', cx - topW / 2 - 8);
+        gapTxt.setAttribute('y', y + stageH / 2 + 1);
+        gapTxt.setAttribute('text-anchor', 'end');
+        gapTxt.setAttribute('dominant-baseline', 'middle');
+        gapTxt.setAttribute('fill', color);
+        gapTxt.setAttribute('font-size', '10');
+        gapTxt.setAttribute('font-weight', '600');
+        gapTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
+        gapTxt.textContent = (diff >= 0 ? '+' : '') + diff;
+        svg.appendChild(gapTxt);
       }
     });
 
-    // ── Urgency table ──
-    // How many months each stage takes (evenly distributed across cycle)
-    const stageMonths = cycle / (STAGES.length - 1); // months per stage
-    const closesPerMonth = closes / months;
+    // ── LEGEND ──
+    const legend = document.getElementById('funnel-legend');
+    legend.innerHTML = '';
+    volumes.forEach((vol, i) => {
+      const item = document.createElement('div');
+      item.className = 'legend-item';
+      item.innerHTML = `
+        <span class="legend-dot" style="background:${STAGES[i].color}"></span>
+        <span>${STAGES[i].label}</span>
+        <span class="legend-num">${vol}</span>
+      `;
+      legend.appendChild(item);
 
+      if (i < STAGES.length - 1) {
+        const conv = document.createElement('div');
+        conv.className = 'legend-conv';
+        conv.textContent = `↓ ${convLabels[i]} converteert`;
+        legend.appendChild(conv);
+      }
+    });
+
+    // Per persoon breakdown in legend
+    const sep = document.createElement('div');
+    sep.style.cssText = 'border-top:1px solid #2a2a4a;margin:10px 0;';
+    legend.appendChild(sep);
+
+    const pp = document.createElement('div');
+    pp.style.cssText = 'font-size:0.75rem;color:#6666aa;line-height:1.6;';
+    pp.innerHTML = `
+      <strong style="color:#4fc3f7">${perPersonRnd.toFixed(1)} leads/mnd</strong> per persoon<br>
+      <strong style="color:#e8e8f0">${Math.ceil(nLead / months)}</strong> leads/mnd totaal<br>
+      <strong style="color:#e8e8f0">${nLead}</strong> leads over ${months} mnd
+    `;
+    legend.appendChild(pp);
+
+    // ── URGENCY TABLE ──
+    const stageMonths = cycle / (STAGES.length - 1);
     const tbody = document.getElementById('urgency_body');
     tbody.innerHTML = '';
 
-    const stageData = [
-      { label: 'Onderhandeling', needed: nOnd,    cur: curOnd,    closesIn: stageMonths },
-      { label: 'Intake/Demo',    needed: nIntake,  cur: curIntake, closesIn: stageMonths * 2 },
-      { label: 'Kwalificatie',   needed: nQual,    cur: curQual,   closesIn: stageMonths * 3 },
-      { label: 'Lead',           needed: nLead,    cur: curLead,   closesIn: stageMonths * 4 },
+    const stageInfo = [
+      { label: 'Lead',           needed: nLead,   cur: curVal('cur_lead'),   closesIn: stageMonths * 4 },
+      { label: 'Kwalificatie',   needed: nQual,   cur: curVal('cur_qual'),   closesIn: stageMonths * 3 },
+      { label: 'Intake/Demo',    needed: nIntake, cur: curVal('cur_intake'), closesIn: stageMonths * 2 },
+      { label: 'Onderhandeling', needed: nOnd,    cur: curVal('cur_ond'),    closesIn: stageMonths     },
     ];
 
-    // What's the "now needed" in each stage to stay on track?
-    // At this point in the year, active pipeline per stage should be proportional
-    // to deals that will close within cycle time
-    const monthsInCycle = cycle;
-    const activeRatio   = Math.min(months / monthsInCycle, 1);
-
-    stageData.forEach(s => {
-      const nowNeeded  = Math.ceil(s.needed * Math.min(s.closesIn / months, 1));
-      const closingIn  = `~${s.closesIn.toFixed(1)} mnd`;
-      const curDisplay = s.cur !== null ? s.cur : '—';
-      let statusHtml   = '—';
+    stageInfo.forEach(s => {
+      const nowNeeded = Math.ceil(s.needed * Math.min(s.closesIn / months, 1));
+      const curDisp   = s.cur !== null ? s.cur : '—';
+      let statusHtml  = '<span style="color:#555577">—</span>';
 
       if (s.cur !== null) {
         const diff = s.cur - nowNeeded;
         if (diff >= 0) {
-          statusHtml = `<span class="ok">✓ +${diff} surplus</span>`;
-        } else if (diff >= -nowNeeded * 0.4) {
-          statusHtml = `<span style="color:#f5a623">⚠ ${diff} tekort</span>`;
+          statusHtml = `<span class="ok-txt">✓ +${diff} surplus</span>`;
+        } else if (diff >= -nowNeeded * 0.35) {
+          statusHtml = `<span class="warn-txt">⚠ ${diff} tekort</span>`;
         } else {
-          statusHtml = `<span class="urgent">✗ ${diff} tekort</span>`;
+          statusHtml = `<span class="bad-txt">✗ ${diff} tekort</span>`;
         }
       }
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="highlight">${s.label}</td>
-        <td class="highlight">${nowNeeded}</td>
-        <td>${closingIn}</td>
-        <td style="color:#f5a623">${curDisplay}</td>
+        <td class="hl">${s.label}</td>
+        <td>${s.needed}</td>
+        <td class="hl">${nowNeeded}</td>
+        <td style="color:#f5a623">${curDisp}</td>
         <td>${statusHtml}</td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  // Auto-recalc on all inputs
-  document.querySelectorAll('input[type="number"]').forEach(el => {
-    el.addEventListener('input', recalc);
-  });
-
+  document.querySelectorAll('input[type="number"]').forEach(el => el.addEventListener('input', recalc));
   recalc();
 </script>
 </body>
