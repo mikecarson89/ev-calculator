@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Trechter — New Business</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f1a;
+    color: #e8e8f0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    padding: 24px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #e8e8f0;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+    color: #6666aa;
+    margin-bottom: 24px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── INPUTS ── */
+  .inputs-panel {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .inputs-panel h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6666aa;
+    margin-bottom: 16px;
+  }
+  .input-group {
+    margin-bottom: 14px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: #aaaacc;
+    margin-bottom: 4px;
+  }
+  .input-group input[type="number"] {
+    width: 100%;
+    background: #12122a;
+    border: 1px solid #2a2a4a;
+    border-radius: 6px;
+    color: #e8e8f0;
+    padding: 7px 10px;
+    font-size: 0.9rem;
+    outline: none;
+  }
+  .input-group input[type="number"]:focus {
+    border-color: #4fc3f7;
+  }
+  .input-group .unit {
+    font-size: 0.75rem;
+    color: #6666aa;
+    margin-left: 4px;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid #2a2a4a;
+    margin: 16px 0;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ── FUNNEL ── */
+  .funnel-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 24px 32px;
+  }
+  .funnel-card h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6666aa;
+    margin-bottom: 20px;
+  }
+
+  .funnel-stage {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+  .stage-label {
+    width: 110px;
+    font-size: 0.82rem;
+    color: #aaaacc;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .stage-bar-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stage-bar {
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #0f0f1a;
+    transition: width 0.3s ease;
+    min-width: 48px;
+    white-space: nowrap;
+  }
+  .stage-num {
+    font-size: 0.82rem;
+    color: #e8e8f0;
+    font-weight: 600;
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .stage-now {
+    font-size: 0.78rem;
+    color: #6666aa;
+    flex-shrink: 0;
+  }
+
+  .conversion-arrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding-left: 124px;
+  }
+  .conv-line {
+    width: 2px;
+    height: 14px;
+    background: #2a2a4a;
+    margin-left: 0;
+  }
+  .conv-badge {
+    font-size: 0.72rem;
+    color: #6666aa;
+    background: #12122a;
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 2px 8px;
+  }
+
+  /* current pipeline input row */
+  .stage-current-input {
+    width: 60px;
+    background: #12122a;
+    border: 1px solid #2a2a4a;
+    border-radius: 4px;
+    color: #f5a623;
+    padding: 4px 6px;
+    font-size: 0.82rem;
+    text-align: center;
+    outline: none;
+  }
+  .stage-current-input:focus { border-color: #f5a623; }
+  .gap-badge {
+    font-size: 0.75rem;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .gap-ok   { background: #00d4aa22; color: #00d4aa; }
+  .gap-warn { background: #f5a62322; color: #f5a623; }
+  .gap-bad  { background: #e9456022; color: #e94560; }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .stat-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: #6666aa;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #00d4aa;
+  }
+  .stat-sub {
+    font-size: 0.75rem;
+    color: #6666aa;
+    margin-top: 2px;
+  }
+
+  /* ── URGENCY TABLE ── */
+  .urgency-card {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 20px 24px;
+  }
+  .urgency-card h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6666aa;
+    margin-bottom: 14px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+  }
+  th {
+    text-align: left;
+    padding: 6px 10px;
+    color: #6666aa;
+    font-weight: 500;
+    border-bottom: 1px solid #2a2a4a;
+  }
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #1e1e36;
+    color: #ccccdd;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.highlight { color: #e8e8f0; font-weight: 600; }
+  td.urgent { color: #e94560; font-weight: 600; }
+  td.ok { color: #00d4aa; }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: #6666aa;
+  }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<h1>Pipeline Trechter — New Business</h1>
+<p class="subtitle">Reverse-engineered vanuit jaardoel · Quintor</p>
+
+<div class="layout">
+
+  <!-- ── INPUTS ── -->
+  <div class="inputs-panel">
+    <h2>Doelstelling</h2>
+    <div class="input-group">
+      <label>Inzetten (closes) dit jaar</label>
+      <input type="number" id="inp_closes" value="9" min="1" max="100">
+    </div>
+    <div class="input-group">
+      <label>Resterende maanden</label>
+      <input type="number" id="inp_months" value="9" min="1" max="12">
+    </div>
+    <div class="input-group">
+      <label>Aantal mensen</label>
+      <input type="number" id="inp_people" value="4" min="1" max="20">
+    </div>
+    <div class="input-group">
+      <label>Salescyclus</label>
+      <input type="number" id="inp_cycle" value="6" min="1" max="24">
+      <span class="unit">maanden lead → close</span>
+    </div>
+
+    <hr class="section-divider">
+    <h2>Conversieratio's</h2>
+
+    <div class="input-group">
+      <label>Lead → Kwalificatie <span class="unit">%</span></label>
+      <input type="number" id="conv_lq" value="50" min="1" max="100">
+    </div>
+    <div class="input-group">
+      <label>Kwalificatie → Intake/Demo <span class="unit">%</span></label>
+      <input type="number" id="conv_qi" value="40" min="1" max="100">
+    </div>
+    <div class="input-group">
+      <label>Intake → Onderhandeling <span class="unit">%</span></label>
+      <input type="number" id="conv_io" value="50" min="1" max="100">
+    </div>
+    <div class="input-group">
+      <label>Onderhandeling → Close <span class="unit">%</span></label>
+      <input type="number" id="conv_oc" value="50" min="1" max="100">
+    </div>
+
+    <hr class="section-divider">
+    <h2>Huidige pipeline <span style="color:#f5a623;font-size:0.75rem;text-transform:none;letter-spacing:0">(optioneel)</span></h2>
+    <p style="font-size:0.75rem;color:#6666aa;margin-bottom:12px;">Vul in wat er nu in elke fase zit om het gat te zien.</p>
+    <div class="input-group">
+      <label>Huidige Leads</label>
+      <input type="number" id="cur_lead" value="" placeholder="—" min="0">
+    </div>
+    <div class="input-group">
+      <label>Huidige Kwalificaties</label>
+      <input type="number" id="cur_qual" value="" placeholder="—" min="0">
+    </div>
+    <div class="input-group">
+      <label>Huidige Intake/Demo</label>
+      <input type="number" id="cur_intake" value="" placeholder="—" min="0">
+    </div>
+    <div class="input-group">
+      <label>Huidige Onderhandeling</label>
+      <input type="number" id="cur_ond" value="" placeholder="—" min="0">
+    </div>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="main-panel">
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Leads / maand</div>
+        <div class="stat-value" id="stat_leads_month">—</div>
+        <div class="stat-sub">totaal team</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Per persoon / maand</div>
+        <div class="stat-value" id="stat_per_person">—</div>
+        <div class="stat-sub">nieuwe leads</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Totaal leads nodig</div>
+        <div class="stat-value" id="stat_total_leads">—</div>
+        <div class="stat-sub">over hele periode</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Overall conversie</div>
+        <div class="stat-value" id="stat_overall_conv">—</div>
+        <div class="stat-sub">lead → close</div>
+      </div>
+    </div>
+
+    <!-- FUNNEL -->
+    <div class="funnel-card">
+      <h2>Trechter — benodigde pipeline</h2>
+      <div id="funnel_container"></div>
+      <div class="legend" style="margin-top:16px;">
+        <span><span class="dot" style="background:#4fc3f7"></span> Benodigde totale volume</span>
+        <span><span class="dot" style="background:#f5a623"></span> Huidig (ingevuld)</span>
+        <span><span class="dot" style="background:#00d4aa"></span> Op schema / surplus</span>
+        <span><span class="dot" style="background:#e94560"></span> Tekort</span>
+      </div>
+    </div>
+
+    <!-- URGENCY TABLE -->
+    <div class="urgency-card">
+      <h2>Wat moet er nú in de pijplijn zitten?</h2>
+      <table id="urgency_table">
+        <thead>
+          <tr>
+            <th>Fase</th>
+            <th>Nodig nu</th>
+            <th>Sluit af in</th>
+            <th>Huidig</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="urgency_body"></tbody>
+      </table>
+      <p style="font-size:0.75rem;color:#6666aa;margin-top:10px;">
+        "Nodig nu" = rekening houdend met uitval per fase, om het jaardoel te halen.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const STAGES = [
+    { id: 'lead',   label: 'Lead',           color: '#4fc3f7' },
+    { id: 'qual',   label: 'Kwalificatie',   color: '#7e88ff' },
+    { id: 'intake', label: 'Intake / Demo',  color: '#a78bfa' },
+    { id: 'ond',    label: 'Onderhandeling', color: '#f59e0b' },
+    { id: 'close',  label: 'Close',          color: '#00d4aa' },
+  ];
+
+  function val(id, fallback = 0) {
+    const v = parseFloat(document.getElementById(id).value);
+    return isNaN(v) ? fallback : v;
+  }
+
+  function recalc() {
+    const closes    = val('inp_closes', 9);
+    const months    = val('inp_months', 9);
+    const people    = val('inp_people', 4);
+    const cycle     = val('inp_cycle', 6);
+    const cLQ       = val('conv_lq', 50) / 100;
+    const cQI       = val('conv_qi', 40) / 100;
+    const cIO       = val('conv_io', 50) / 100;
+    const cOC       = val('conv_oc', 50) / 100;
+
+    // Backcast: how many needed per stage to yield `closes`
+    const nClose  = closes;
+    const nOnd    = Math.ceil(nClose / cOC);
+    const nIntake = Math.ceil(nOnd   / cIO);
+    const nQual   = Math.ceil(nIntake / cQI);
+    const nLead   = Math.ceil(nQual   / cLQ);
+
+    const volumes = [nLead, nQual, nIntake, nOnd, nClose];
+    const maxVol  = nLead;
+
+    // Current pipeline values
+    const curLead   = document.getElementById('cur_lead').value   !== '' ? val('cur_lead')   : null;
+    const curQual   = document.getElementById('cur_qual').value   !== '' ? val('cur_qual')   : null;
+    const curIntake = document.getElementById('cur_intake').value !== '' ? val('cur_intake') : null;
+    const curOnd    = document.getElementById('cur_ond').value    !== '' ? val('cur_ond')    : null;
+    const currents  = [curLead, curQual, curIntake, curOnd, null]; // close has no current
+
+    // Stats
+    const leadsPerMonth   = (nLead / months).toFixed(1);
+    const perPerson       = (nLead / months / people).toFixed(1);
+    const overallConv     = ((closes / nLead) * 100).toFixed(1);
+
+    document.getElementById('stat_leads_month').textContent  = leadsPerMonth;
+    document.getElementById('stat_per_person').textContent   = perPerson;
+    document.getElementById('stat_total_leads').textContent  = nLead;
+    document.getElementById('stat_overall_conv').textContent = overallConv + '%';
+
+    // ── Funnel ──
+    const container = document.getElementById('funnel_container');
+    container.innerHTML = '';
+
+    const convRatios = [cLQ, cQI, cIO, cOC];
+    const convLabels = [
+      `${val('conv_lq')}% →`,
+      `${val('conv_qi')}% →`,
+      `${val('conv_io')}% →`,
+      `${val('conv_oc')}% →`,
+    ];
+
+    volumes.forEach((vol, i) => {
+      const stage = STAGES[i];
+      const cur   = currents[i];
+      const pct   = vol / maxVol;
+      const barW  = Math.max(pct * 100, 8);
+
+      // Stage row
+      const row = document.createElement('div');
+      row.className = 'funnel-stage';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'stage-label';
+      lbl.textContent = stage.label;
+
+      const barWrap = document.createElement('div');
+      barWrap.className = 'stage-bar-wrap';
+
+      const bar = document.createElement('div');
+      bar.className = 'stage-bar';
+      bar.style.width = barW + '%';
+      bar.style.background = stage.color;
+      bar.style.opacity = '0.85';
+      bar.textContent = vol;
+
+      const numEl = document.createElement('div');
+      numEl.className = 'stage-num';
+      numEl.textContent = vol;
+      bar.textContent = '';
+
+      barWrap.appendChild(bar);
+      barWrap.appendChild(numEl);
+
+      // Gap badge if current entered
+      if (cur !== null && i < 4) {
+        const diff = cur - vol;
+        const badge = document.createElement('span');
+        badge.className = 'gap-badge ' + (diff >= 0 ? 'gap-ok' : diff >= -vol * 0.3 ? 'gap-warn' : 'gap-bad');
+        badge.textContent = (diff >= 0 ? '+' : '') + diff + ' nu';
+        barWrap.appendChild(badge);
+
+        // Also show a current bar overlay
+        const curBar = document.createElement('div');
+        curBar.style.cssText = `
+          position: absolute;
+          height: 36px;
+          width: ${Math.min(cur / maxVol * 100, 100)}%;
+          background: ${diff >= 0 ? '#00d4aa33' : '#e9456033'};
+          border: 1px dashed ${diff >= 0 ? '#00d4aa' : '#e94560'};
+          border-radius: 4px;
+          pointer-events: none;
+        `;
+      }
+
+      row.appendChild(lbl);
+      row.appendChild(barWrap);
+      container.appendChild(row);
+
+      // Conversion arrow between stages
+      if (i < STAGES.length - 1) {
+        const arrow = document.createElement('div');
+        arrow.className = 'conversion-arrow';
+        const line = document.createElement('div');
+        line.className = 'conv-line';
+        const badge = document.createElement('span');
+        badge.className = 'conv-badge';
+        badge.textContent = convLabels[i];
+        arrow.appendChild(line);
+        arrow.appendChild(badge);
+        container.appendChild(arrow);
+      }
+    });
+
+    // ── Urgency table ──
+    // How many months each stage takes (evenly distributed across cycle)
+    const stageMonths = cycle / (STAGES.length - 1); // months per stage
+    const closesPerMonth = closes / months;
+
+    const tbody = document.getElementById('urgency_body');
+    tbody.innerHTML = '';
+
+    const stageData = [
+      { label: 'Onderhandeling', needed: nOnd,    cur: curOnd,    closesIn: stageMonths },
+      { label: 'Intake/Demo',    needed: nIntake,  cur: curIntake, closesIn: stageMonths * 2 },
+      { label: 'Kwalificatie',   needed: nQual,    cur: curQual,   closesIn: stageMonths * 3 },
+      { label: 'Lead',           needed: nLead,    cur: curLead,   closesIn: stageMonths * 4 },
+    ];
+
+    // What's the "now needed" in each stage to stay on track?
+    // At this point in the year, active pipeline per stage should be proportional
+    // to deals that will close within cycle time
+    const monthsInCycle = cycle;
+    const activeRatio   = Math.min(months / monthsInCycle, 1);
+
+    stageData.forEach(s => {
+      const nowNeeded  = Math.ceil(s.needed * Math.min(s.closesIn / months, 1));
+      const closingIn  = `~${s.closesIn.toFixed(1)} mnd`;
+      const curDisplay = s.cur !== null ? s.cur : '—';
+      let statusHtml   = '—';
+
+      if (s.cur !== null) {
+        const diff = s.cur - nowNeeded;
+        if (diff >= 0) {
+          statusHtml = `<span class="ok">✓ +${diff} surplus</span>`;
+        } else if (diff >= -nowNeeded * 0.4) {
+          statusHtml = `<span style="color:#f5a623">⚠ ${diff} tekort</span>`;
+        } else {
+          statusHtml = `<span class="urgent">✗ ${diff} tekort</span>`;
+        }
+      }
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="highlight">${s.label}</td>
+        <td class="highlight">${nowNeeded}</td>
+        <td>${closingIn}</td>
+        <td style="color:#f5a623">${curDisplay}</td>
+        <td>${statusHtml}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Auto-recalc on all inputs
+  document.querySelectorAll('input[type="number"]').forEach(el => {
+    el.addEventListener('input', recalc);
+  });
+
+  recalc();
+</script>
+</body>
+</html>
