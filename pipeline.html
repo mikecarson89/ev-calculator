@@ -255,7 +255,7 @@
       <div class="kpi-stats">
         <div class="mini">
           <div class="mini-v" id="stat_kwal_month">—</div>
-          <div class="mini-l">Kwal./mnd totaal</div>
+          <div class="mini-l">Kwal./mnd team</div>
         </div>
         <div class="mini">
           <div class="mini-v" id="stat_total_kwal">—</div>
@@ -270,7 +270,7 @@
 
     <!-- FUNNEL -->
     <div class="card">
-      <div class="card-title">Trechter (kwalificatie als instap)</div>
+      <div class="card-title">Trechter (start bij kwalificatie)</div>
       <div class="funnel-row">
         <svg id="funnel-svg" width="320" height="260"></svg>
         <div class="funnel-legend" id="funnel-legend"></div>
@@ -296,7 +296,7 @@
             <th>Maand</th>
             <th>Close-doel</th>
             <th>Kwal. nodig</th>
-            <th>Kwal. moeten starten in</th>
+            <th>Kwal. starten in</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -304,7 +304,7 @@
       </table>
       <p style="font-size:0.71rem;color:#94a3b8;margin-top:10px;">
         Gebaseerd op salescyclus van <span id="cycle_note">6</span> maanden kwalificatie → close.
-        Rood = kwalificaties hätten al eerder moeten starten.
+        Rood = kwalificaties hadden al eerder moeten starten.
       </p>
     </div>
 
@@ -526,8 +526,8 @@
     // Update table header if pipeline is filled
     const thead = document.querySelector('#q_tbody').closest('table').querySelector('thead tr');
     thead.innerHTML = hasPipeline
-      ? `<th>Maand</th><th>Close-doel</th><th>Gedekt door pipeline</th><th>Nog nodig (gap)</th><th>Kwal. starten in</th><th>Status</th>`
-      : `<th>Maand</th><th>Close-doel</th><th>Kwal. nodig</th><th>Kwal. starten in</th><th>Status</th>`;
+      ? `<th>Maand</th><th>Doel</th><th>Gedekt door pijplijn</th><th>Nog te starten</th><th>Kwal. starten in</th><th>Status</th>`
+      : `<th>Maand</th><th>Doel</th><th>Kwal. nodig</th><th>Kwal. starten in</th><th>Status</th>`;
 
     monthlyCloses.forEach((closes, i) => {
       const closeOffset    = MONTH_OFF[i];
@@ -540,9 +540,9 @@
 
       let badge, label;
       if (closes === 0) {
-        badge = 'badge-info'; label = '○ Geen target';
+        badge = 'badge-info'; label = '○ Geen doel';
       } else if (gap === 0 && hasPipeline) {
-        badge = 'badge-ok'; label = '✓ Gedekt';
+        badge = 'badge-ok'; label = '✓ Volledig gedekt';
       } else if (kwalStartOff < -3) {
         badge = 'badge-bad'; label = '⚠ Te laat';
       } else if (kwalStartOff < 0) {
@@ -559,7 +559,7 @@
       const tr = document.createElement('tr');
       if (hasPipeline) {
         const coveredStr  = closes > 0 ? `${covered.toFixed(1)} / ${closes}` : '—';
-        const gapDisplay  = closes > 0 ? (gap > 0 ? `<strong style="color:#dc2626">${kwalForGap} kwal.</strong>` : `<span style="color:#16a34a">✓ geen gap</span>`) : '—';
+        const gapDisplay  = closes > 0 ? (gap > 0 ? `<strong style="color:#dc2626">${kwalForGap} kwal.</strong>` : `<span style="color:#16a34a">✓ volledig gedekt</span>`) : '—';
         tr.innerHTML = `
           <td class="hl">${MONTH_LBLS[i]} 2026</td>
           <td>${closes > 0 ? closes : '—'}</td>
