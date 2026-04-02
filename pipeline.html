@@ -448,12 +448,7 @@
         r.setAttribute('rx','3'); r.setAttribute('fill','none');
         r.setAttribute('stroke',col); r.setAttribute('stroke-width','1.5');
         r.setAttribute('stroke-dasharray','4 3'); svg.appendChild(r);
-        const g = mk('text');
-        g.setAttribute('x',cx+topW/2+8); g.setAttribute('y',y+stageH/2+1);
-        g.setAttribute('dominant-baseline','middle'); g.setAttribute('fill',col);
-        g.setAttribute('font-size','10'); g.setAttribute('font-weight','600');
-        g.setAttribute('font-family','Segoe UI,sans-serif');
-        g.textContent=(diff>=0?'+':'')+diff+' nu'; svg.appendChild(g);
+        // gap-getal staat in de legenda (zie hieronder), niet rechts van de balk
       }
     });
 
@@ -461,10 +456,15 @@
     const legend = document.getElementById('funnel-legend');
     legend.innerHTML = '';
     volumes.forEach((vol,i) => {
+      const c = curVals[i];
+      const diff = (c !== null && i < 3) ? c - vol : null;
+      const diffStr = diff !== null
+        ? ` <span style="color:${diff>=0?'#16a34a':'#dc2626'};font-size:0.72rem;font-weight:600;">(${diff>=0?'+':''}${diff} nu)</span>`
+        : '';
       const item = document.createElement('div'); item.className='leg-item';
-      item.innerHTML=`<span class="leg-dot" style="background:${STAGES[i].color}"></span><span>${STAGES[i].label}</span><span class="leg-num">${vol}</span>`;
+      item.innerHTML=`<span class="leg-dot" style="background:${STAGES[i].color}"></span><span>${STAGES[i].label}${diffStr}</span><span class="leg-num">${vol}</span>`;
       legend.appendChild(item);
-      if (i<STAGES.length-1) { const c=document.createElement('div'); c.className='leg-conv'; c.textContent=`↓ ${convLabels[i]} converteert`; legend.appendChild(c); }
+      if (i<STAGES.length-1) { const cv=document.createElement('div'); cv.className='leg-conv'; cv.textContent=`↓ ${convLabels[i]} converteert`; legend.appendChild(cv); }
     });
     const sep=document.createElement('div'); sep.className='leg-sep'; legend.appendChild(sep);
     const pp=document.createElement('div'); pp.style.cssText='font-size:0.74rem;color:#64748b;line-height:1.7;';
