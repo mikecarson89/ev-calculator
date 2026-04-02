@@ -402,9 +402,12 @@
     const convLabels = [`${val('conv_ki')}%`,`${val('conv_io')}%`,`${val('conv_oc')}%`];
     const curVals = [cur('cur_qual'), cur('cur_intake'), cur('cur_ond'), null];
 
+    const minStageW = 52; // minimumbreedte zodat getal altijd past
     volumes.forEach((vol, i) => {
-      const topW = (volumes[i]/maxVol)*maxBarW;
-      const botW = i < volumes.length-1 ? (volumes[i+1]/maxVol)*maxBarW : topW*0.65;
+      const topW = Math.max((volumes[i]/maxVol)*maxBarW, minStageW);
+      const botW = i < volumes.length-1
+        ? Math.max((volumes[i+1]/maxVol)*maxBarW, minStageW)
+        : Math.max(topW*0.65, minStageW);
       const y = i*(stageH+gapH);
       const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
       poly.setAttribute('points',`${cx-topW/2},${y} ${cx+topW/2},${y} ${cx+botW/2},${y+stageH} ${cx-botW/2},${y+stageH}`);
