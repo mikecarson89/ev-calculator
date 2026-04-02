@@ -204,15 +204,15 @@
     <div class="card">
       <div class="card-title">Conversieratio's (funnel)</div>
       <div class="input-group">
-        <label>Kwalificatie → Intake/Demo <span class="unit">%</span></label>
+        <label>Kwalificatie → Demo <span class="unit">%</span></label>
         <input type="number" id="conv_ki" value="40" min="1" max="100">
       </div>
       <div class="input-group">
-        <label>Intake → Onderhandeling <span class="unit">%</span></label>
+        <label>Demo → Intake <span class="unit">%</span></label>
         <input type="number" id="conv_io" value="50" min="1" max="100">
       </div>
       <div class="input-group">
-        <label>Onderhandeling → Close <span class="unit">%</span></label>
+        <label>Intake → Close <span class="unit">%</span></label>
         <input type="number" id="conv_oc" value="50" min="1" max="100">
       </div>
       <hr class="div">
@@ -229,11 +229,11 @@
         <input type="number" id="cur_qual" placeholder="—" min="0">
       </div>
       <div class="input-group">
-        <label>Intake/Demo nu</label>
+        <label>Demo nu</label>
         <input type="number" id="cur_intake" placeholder="—" min="0">
       </div>
       <div class="input-group">
-        <label>Onderhandeling nu</label>
+        <label>Intake nu</label>
         <input type="number" id="cur_ond" placeholder="—" min="0">
       </div>
     </div>
@@ -312,10 +312,10 @@
 
 <script>
   const STAGES = [
-    { label: 'Kwalificatie',   color: '#6366f1' },
-    { label: 'Intake / Demo',  color: '#8b5cf6' },
-    { label: 'Onderhandeling', color: '#f59e0b' },
-    { label: 'Close',          color: '#16a34a' },
+    { label: 'Kwalificatie', color: '#6366f1' },
+    { label: 'Demo',         color: '#8b5cf6' },
+    { label: 'Intake',       color: '#f59e0b' },
+    { label: 'Close',        color: '#16a34a' },
   ];
 
   // Monthly plan: index 0 = Mei, 1 = Jun, ..., 7 = Dec
