@@ -506,20 +506,21 @@
     const cDemo   = cur('cur_intake');
     const cKwal   = cur('cur_qual');
 
-    // Intake items: remaining time = stageDur (last stage), close in months stageDur±
+    // Vensters: items sluiten gelijkmatig verdeeld binnen hun resterende fase-tijd
+    // Intake (laatste fase, ~stageDur mnd resterend): sluit in 0–stageDur
     if (cIntake !== null && cIntake > 0) {
       const expectedCloses = cIntake * cOC;
-      addPipelineContrib(cIntake, expectedCloses, 0 + stageDur*2/3, 0 + stageDur*4/3);
+      addPipelineContrib(cIntake, expectedCloses, 0, stageDur);
     }
-    // Demo items: remaining time = 2*stageDur, close window around that
+    // Demo (2 fasen resterend): sluit in stageDur–2*stageDur
     if (cDemo !== null && cDemo > 0) {
       const expectedCloses = cDemo * cIO * cOC;
-      addPipelineContrib(cDemo, expectedCloses, 0 + stageDur*4/3, 0 + stageDur*8/3);
+      addPipelineContrib(cDemo, expectedCloses, stageDur, stageDur * 2);
     }
-    // Kwalificatie items: remaining time = cycle, close window around that
+    // Kwalificatie (3 fasen = volledige cyclus): sluit in 2*stageDur–cycle
     if (cKwal !== null && cKwal > 0) {
       const expectedCloses = cKwal * cKI * cIO * cOC;
-      addPipelineContrib(cKwal, expectedCloses, 0 + cycle*2/3, 0 + cycle*4/3);
+      addPipelineContrib(cKwal, expectedCloses, stageDur * 2, cycle);
     }
 
     const hasPipeline = cIntake !== null || cDemo !== null || cKwal !== null;
