@@ -171,23 +171,21 @@
   <div style="display:flex;flex-direction:column;gap:16px;">
 
     <div class="card">
-      <div class="card-title">Kwartaaldoelen (closes)</div>
-      <div class="q-row">
-        <div class="input-group q-input">
-          <label>Q2</label>
-          <input type="number" id="q2" value="2" min="0" max="20">
-        </div>
-        <div class="input-group q-input">
-          <label>Q3</label>
-          <input type="number" id="q3" value="3" min="0" max="20">
-        </div>
-        <div class="input-group q-input">
-          <label>Q4</label>
-          <input type="number" id="q4" value="4" min="0" max="20">
-        </div>
+      <div class="card-title">Maandelijkse close-doelen (inzetten)</div>
+      <div class="q-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="input-group q-input"><label>Mei</label><input type="number" id="m_mei" value="2" min="0" max="20" step="0.5"></div>
+        <div class="input-group q-input"><label>Jun</label><input type="number" id="m_jun" value="1.5" min="0" max="20" step="0.5"></div>
+        <div class="input-group q-input"><label>Jul</label><input type="number" id="m_jul" value="2.5" min="0" max="20" step="0.5"></div>
+        <div class="input-group q-input"><label>Aug</label><input type="number" id="m_aug" value="2.5" min="0" max="20" step="0.5"></div>
+      </div>
+      <div class="q-row" style="grid-template-columns:repeat(4,1fr);margin-top:4px">
+        <div class="input-group q-input"><label>Sep</label><input type="number" id="m_sep" value="3.5" min="0" max="20" step="0.5"></div>
+        <div class="input-group q-input"><label>Okt</label><input type="number" id="m_okt" value="3.5" min="0" max="20" step="0.5"></div>
+        <div class="input-group q-input"><label>Nov</label><input type="number" id="m_nov" value="4.5" min="0" max="20" step="0.5"></div>
+        <div class="input-group q-input"><label>Dec</label><input type="number" id="m_dec" value="4.5" min="0" max="20" step="0.5"></div>
       </div>
       <div class="q-total">
-        Jaartotaal: <strong id="total_closes">9</strong>
+        Jaartotaal: <strong id="total_closes">24.5</strong>
       </div>
     </div>
 
@@ -288,24 +286,24 @@
       <div class="res-num" id="res_leads">—</div>
     </div>
 
-    <!-- QUARTERLY TIMELINE -->
+    <!-- MONTHLY TIMELINE -->
     <div class="card">
-      <div class="card-title">Kwartaalplanning — wat moet wanneer in de pijplijn</div>
+      <div class="card-title">Maandplanning — wanneer moeten kwalificaties starten?</div>
       <table>
         <thead>
           <tr>
-            <th>Kwartaal</th>
-            <th>Closes</th>
+            <th>Maand</th>
+            <th>Close-doel</th>
             <th>Kwal. nodig</th>
-            <th>Kwal. starten in</th>
-            <th>Huidig</th>
+            <th>Kwal. moeten starten in</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody id="q_tbody"></tbody>
       </table>
       <p style="font-size:0.71rem;color:#94a3b8;margin-top:10px;">
-        "Kwal. starten in" = wanneer je kwalificatiegesprekken moeten plaatsvinden om op tijd te sluiten. Gebaseerd op salescyclus van <span id="cycle_note">6</span> maanden.
+        Gebaseerd op salescyclus van <span id="cycle_note">6</span> maanden kwalificatie → close.
+        Rood = kwalificaties hätten al eerder moeten starten.
       </p>
     </div>
 
@@ -313,13 +311,18 @@
 </div>
 
 <script>
-  // Funnel stages (kwalificatie as entry)
   const STAGES = [
     { label: 'Kwalificatie',   color: '#6366f1' },
     { label: 'Intake / Demo',  color: '#8b5cf6' },
     { label: 'Onderhandeling', color: '#f59e0b' },
     { label: 'Close',          color: '#16a34a' },
   ];
+
+  // Monthly plan: index 0 = Mei, 1 = Jun, ..., 7 = Dec
+  const MONTH_IDS  = ['m_mei','m_jun','m_jul','m_aug','m_sep','m_okt','m_nov','m_dec'];
+  const MONTH_LBLS = ['Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+  // Offset from April 2026: Mei = +1, Jun = +2, ... Dec = +8
+  const MONTH_OFF  = [1,2,3,4,5,6,7,8];
 
   function val(id, fb = 0) {
     const v = parseFloat(document.getElementById(id).value);
@@ -328,24 +331,19 @@
   function cur(id) {
     const el = document.getElementById(id);
     if (!el || el.value === '') return null;
-    const v = parseFloat(el.value);
-    return isNaN(v) ? null : v;
+    const v = parseFloat(el.value); return isNaN(v) ? null : v;
   }
 
-  // Month offset from April 2026
-  function monthName(offset) {
-    const months = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
-    const base = 3; // April = index 3
-    const idx = ((base + offset) % 12 + 12) % 12;
-    const yr  = 2026 + Math.floor((base + offset) / 12);
-    return `${months[idx]} ${yr !== 2026 ? yr : ''}`.trim();
+  // Month name from offset relative to April 2026
+  function mname(off) {
+    const names = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+    const base = 3; // April
+    const idx = ((base + off) % 12 + 12) % 12;
+    const yr  = 2026 + Math.floor((base + off) / 12);
+    return `${names[idx]}${yr !== 2026 ? ' ' + yr : ''}`;
   }
 
   function recalc() {
-    const q2 = val('q2', 0);
-    const q3 = val('q3', 0);
-    const q4 = val('q4', 0);
-    const totalCloses = q2 + q3 + q4;
     const people = Math.max(val('inp_people', 4), 1);
     const cycle  = val('inp_cycle', 6);
     const cKI    = Math.max(val('conv_ki', 40), 1) / 100;
@@ -353,32 +351,34 @@
     const cOC    = Math.max(val('conv_oc', 50), 1) / 100;
     const cLK    = Math.max(val('conv_lk', 50), 1) / 100;
 
-    document.getElementById('total_closes').textContent = totalCloses;
+    // Monthly close targets
+    const monthlyCloses = MONTH_IDS.map(id => val(id, 0));
+    const totalCloses   = monthlyCloses.reduce((a, b) => a + b, 0);
+    document.getElementById('total_closes').textContent = totalCloses.toFixed(1);
     document.getElementById('cycle_note').textContent = cycle;
 
-    // Backcast from closes
+    // Total funnel volumes (backcast from total closes)
     const nClose  = totalCloses;
-    const nOnd    = Math.ceil(nClose  / cOC);
-    const nIntake = Math.ceil(nOnd    / cIO);
-    const nKwal   = Math.ceil(nIntake / cKI);
-    const nLead   = Math.ceil(nKwal   / cLK);
-    const volumes = [nKwal, nIntake, nOnd, nClose];
-    const maxVol  = nKwal;
+    const nOnd    = nClose  / cOC;
+    const nIntake = nOnd    / cIO;
+    const nKwal   = nIntake / cKI;
+    const nLead   = nKwal   / cLK;
+    const volumes = [nKwal, nIntake, nOnd, nClose].map(Math.ceil);
+    const maxVol  = volumes[0];
 
-    // Months remaining: April = 0, year ends Dec = 9 months
-    const totalMonths = 9;
+    const totalMonths  = MONTH_IDS.length; // 8 months (May-Dec)
     const kwalPerMonth = nKwal / totalMonths;
     const perPerson    = kwalPerMonth / people;
 
     // ── KPI BANNER ──
     document.getElementById('kpi_per_person').textContent = perPerson.toFixed(1);
     document.getElementById('kpi_sub').textContent =
-      `kwalificatiegesprekken per persoon · ${kwalPerMonth.toFixed(1)}/mnd totaal voor ${people} mensen`;
+      `kwalificatiegesprekken per persoon · ${kwalPerMonth.toFixed(1)}/mnd gemiddeld · ${people} mensen`;
     document.getElementById('stat_kwal_month').textContent = kwalPerMonth.toFixed(1);
-    document.getElementById('stat_total_kwal').textContent = nKwal;
-    document.getElementById('stat_conv').textContent = ((nClose / nKwal) * 100).toFixed(0) + '%';
+    document.getElementById('stat_total_kwal').textContent = Math.ceil(nKwal);
+    document.getElementById('stat_conv').textContent = nKwal > 0
+      ? ((nClose / nKwal) * 100).toFixed(0) + '%' : '—';
 
-    // KPI dots
     const dots = document.getElementById('kpi_dots');
     dots.innerHTML = '';
     const dotN = Math.min(Math.ceil(perPerson * totalMonths), 35);
@@ -388,167 +388,126 @@
     if (dotN > 30) {
       const m = document.createElement('div');
       m.style.cssText = 'font-size:0.72rem;color:#6366f1;opacity:0.7;';
-      m.textContent = `+${dotN - 30}`; dots.appendChild(m);
+      m.textContent = `+${dotN-30}`; dots.appendChild(m);
     }
 
     // ── FUNNEL SVG ──
     const svg = document.getElementById('funnel-svg');
     svg.innerHTML = '';
     const svgW = 320, stageH = 52, gapH = 6;
-    const totalH = STAGES.length * stageH + (STAGES.length - 1) * gapH + 8;
-    svg.setAttribute('height', totalH);
-    svg.setAttribute('viewBox', `0 0 ${svgW} ${totalH}`);
-    const maxBarW = svgW - 80;
-    const cx = svgW / 2 + 20;
-    const convLabels = [`${val('conv_ki')}%`, `${val('conv_io')}%`, `${val('conv_oc')}%`];
+    svg.setAttribute('height', STAGES.length * stageH + (STAGES.length-1)*gapH + 8);
+    svg.setAttribute('viewBox', `0 0 ${svgW} ${STAGES.length * stageH + (STAGES.length-1)*gapH + 8}`);
+    const maxBarW = svgW - 80, cx = svgW/2 + 20;
+    const convLabels = [`${val('conv_ki')}%`,`${val('conv_io')}%`,`${val('conv_oc')}%`];
     const curVals = [cur('cur_qual'), cur('cur_intake'), cur('cur_ond'), null];
 
     volumes.forEach((vol, i) => {
-      const topW = (volumes[i] / maxVol) * maxBarW;
-      const botW = i < volumes.length - 1
-        ? (volumes[i+1] / maxVol) * maxBarW
-        : (volumes[i] / maxVol) * maxBarW * 0.65;
-      const y   = i * (stageH + gapH);
-      const x0  = cx - topW/2, x1 = cx + topW/2;
-      const x2  = cx + botW/2, x3 = cx - botW/2;
-
-      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      poly.setAttribute('points', `${x0},${y} ${x1},${y} ${x2},${y+stageH} ${x3},${y+stageH}`);
-      poly.setAttribute('fill', STAGES[i].color);
-      poly.setAttribute('opacity', '0.85');
+      const topW = (volumes[i]/maxVol)*maxBarW;
+      const botW = i < volumes.length-1 ? (volumes[i+1]/maxVol)*maxBarW : topW*0.65;
+      const y = i*(stageH+gapH);
+      const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      poly.setAttribute('points',`${cx-topW/2},${y} ${cx+topW/2},${y} ${cx+botW/2},${y+stageH} ${cx-botW/2},${y+stageH}`);
+      poly.setAttribute('fill',STAGES[i].color); poly.setAttribute('opacity','0.85');
       svg.appendChild(poly);
 
-      // Label left
-      const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      lbl.setAttribute('x', x0 - 6); lbl.setAttribute('y', y + stageH/2 + 1);
-      lbl.setAttribute('text-anchor', 'end'); lbl.setAttribute('dominant-baseline', 'middle');
-      lbl.setAttribute('fill', '#475569'); lbl.setAttribute('font-size', '11');
-      lbl.setAttribute('font-family', 'Segoe UI, sans-serif');
-      lbl.textContent = STAGES[i].label; svg.appendChild(lbl);
+      const mk = (tag) => document.createElementNS('http://www.w3.org/2000/svg',tag);
+      const lbl = mk('text');
+      lbl.setAttribute('x',cx-topW/2-6); lbl.setAttribute('y',y+stageH/2+1);
+      lbl.setAttribute('text-anchor','end'); lbl.setAttribute('dominant-baseline','middle');
+      lbl.setAttribute('fill','#475569'); lbl.setAttribute('font-size','11');
+      lbl.setAttribute('font-family','Segoe UI,sans-serif'); lbl.textContent=STAGES[i].label;
+      svg.appendChild(lbl);
 
-      // Number center
-      const num = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      num.setAttribute('x', cx); num.setAttribute('y', y + stageH/2 + 1);
-      num.setAttribute('text-anchor', 'middle'); num.setAttribute('dominant-baseline', 'middle');
-      num.setAttribute('fill', '#ffffff'); num.setAttribute('font-size', '15');
-      num.setAttribute('font-weight', '700'); num.setAttribute('font-family', 'Segoe UI, sans-serif');
+      const num = mk('text');
+      num.setAttribute('x',cx); num.setAttribute('y',y+stageH/2+1);
+      num.setAttribute('text-anchor','middle'); num.setAttribute('dominant-baseline','middle');
+      num.setAttribute('fill','#fff'); num.setAttribute('font-size','15');
+      num.setAttribute('font-weight','700'); num.setAttribute('font-family','Segoe UI,sans-serif');
       num.textContent = vol; svg.appendChild(num);
 
-      // Conversion label between stages
-      if (i < STAGES.length - 1) {
-        const midY = y + stageH + gapH/2;
-        const cTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        cTxt.setAttribute('x', cx + botW/2 + 8); cTxt.setAttribute('y', midY);
-        cTxt.setAttribute('dominant-baseline', 'middle');
-        cTxt.setAttribute('fill', '#94a3b8'); cTxt.setAttribute('font-size', '10');
-        cTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
-        cTxt.textContent = `↓ ${convLabels[i]}`; svg.appendChild(cTxt);
+      if (i < STAGES.length-1) {
+        const t = mk('text');
+        t.setAttribute('x',cx+botW/2+8); t.setAttribute('y',y+stageH+gapH/2);
+        t.setAttribute('dominant-baseline','middle'); t.setAttribute('fill','#94a3b8');
+        t.setAttribute('font-size','10'); t.setAttribute('font-family','Segoe UI,sans-serif');
+        t.textContent=`↓ ${convLabels[i]}`; svg.appendChild(t);
       }
 
-      // Current pipeline overlay
       const c = curVals[i];
       if (c !== null && i < 3) {
-        const curW = Math.min((c / maxVol) * maxBarW, topW + 12);
-        const diff = c - vol;
-        const col  = diff >= 0 ? '#16a34a' : '#dc2626';
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', cx - curW/2); rect.setAttribute('y', y + 2);
-        rect.setAttribute('width', curW); rect.setAttribute('height', stageH - 4);
-        rect.setAttribute('rx', '3'); rect.setAttribute('fill', 'none');
-        rect.setAttribute('stroke', col); rect.setAttribute('stroke-width', '1.5');
-        rect.setAttribute('stroke-dasharray', '4 3'); svg.appendChild(rect);
-
-        const gTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        gTxt.setAttribute('x', cx + topW/2 + 8); gTxt.setAttribute('y', y + stageH/2 + 1);
-        gTxt.setAttribute('dominant-baseline', 'middle'); gTxt.setAttribute('fill', col);
-        gTxt.setAttribute('font-size', '10'); gTxt.setAttribute('font-weight', '600');
-        gTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
-        gTxt.textContent = (diff >= 0 ? '+' : '') + diff + ' nu'; svg.appendChild(gTxt);
+        const curW = Math.min((c/maxVol)*maxBarW, topW+12);
+        const diff = c - vol; const col = diff>=0 ? '#16a34a' : '#dc2626';
+        const r = mk('rect');
+        r.setAttribute('x',cx-curW/2); r.setAttribute('y',y+2);
+        r.setAttribute('width',curW); r.setAttribute('height',stageH-4);
+        r.setAttribute('rx','3'); r.setAttribute('fill','none');
+        r.setAttribute('stroke',col); r.setAttribute('stroke-width','1.5');
+        r.setAttribute('stroke-dasharray','4 3'); svg.appendChild(r);
+        const g = mk('text');
+        g.setAttribute('x',cx+topW/2+8); g.setAttribute('y',y+stageH/2+1);
+        g.setAttribute('dominant-baseline','middle'); g.setAttribute('fill',col);
+        g.setAttribute('font-size','10'); g.setAttribute('font-weight','600');
+        g.setAttribute('font-family','Segoe UI,sans-serif');
+        g.textContent=(diff>=0?'+':'')+diff+' nu'; svg.appendChild(g);
       }
     });
 
-    // ── FUNNEL LEGEND ──
+    // ── LEGEND ──
     const legend = document.getElementById('funnel-legend');
     legend.innerHTML = '';
-    volumes.forEach((vol, i) => {
-      const item = document.createElement('div'); item.className = 'leg-item';
-      item.innerHTML = `<span class="leg-dot" style="background:${STAGES[i].color}"></span>
-        <span>${STAGES[i].label}</span><span class="leg-num">${vol}</span>`;
+    volumes.forEach((vol,i) => {
+      const item = document.createElement('div'); item.className='leg-item';
+      item.innerHTML=`<span class="leg-dot" style="background:${STAGES[i].color}"></span><span>${STAGES[i].label}</span><span class="leg-num">${vol}</span>`;
       legend.appendChild(item);
-      if (i < STAGES.length - 1) {
-        const c = document.createElement('div'); c.className = 'leg-conv';
-        c.textContent = `↓ ${convLabels[i]} converteert`; legend.appendChild(c);
-      }
+      if (i<STAGES.length-1) { const c=document.createElement('div'); c.className='leg-conv'; c.textContent=`↓ ${convLabels[i]} converteert`; legend.appendChild(c); }
     });
-    const sep = document.createElement('div'); sep.className = 'leg-sep'; legend.appendChild(sep);
-    const pp = document.createElement('div');
-    pp.style.cssText = 'font-size:0.74rem;color:#64748b;line-height:1.7;';
-    pp.innerHTML = `
-      <strong style="color:#4338ca">${perPerson.toFixed(1)} kwal./mnd</strong> per persoon<br>
-      <strong style="color:#0f172a">${kwalPerMonth.toFixed(1)}</strong> kwal./mnd totaal<br>
-      <strong style="color:#0f172a">${nKwal}</strong> kwal. over ${totalMonths} mnd
-    `;
+    const sep=document.createElement('div'); sep.className='leg-sep'; legend.appendChild(sep);
+    const pp=document.createElement('div'); pp.style.cssText='font-size:0.74rem;color:#64748b;line-height:1.7;';
+    pp.innerHTML=`<strong style="color:#4338ca">${perPerson.toFixed(1)} kwal./mnd</strong> per persoon<br><strong style="color:#0f172a">${kwalPerMonth.toFixed(1)}</strong> kwal./mnd gemiddeld<br><strong style="color:#0f172a">${Math.ceil(nKwal)}</strong> kwal. totaal nodig`;
     legend.appendChild(pp);
 
-    // ── LEAD RESERVOIR ──
-    document.getElementById('res_leads').textContent = nLead;
+    // ── RESERVOIR ──
+    document.getElementById('res_leads').textContent = Math.ceil(nLead);
     document.getElementById('res_conv_desc').textContent =
-      `Bij ${val('conv_lk')}% conversie (lead → kwalificatie) heb je ${nLead} leads in je lijst nodig.`;
+      `Bij ${val('conv_lk')}% conversie (lead → kwalificatie) heb je ${Math.ceil(nLead)} leads in je outreachlijst nodig.`;
 
-    // ── QUARTERLY TIMELINE ──
-    // Q2: April–June (months 0–2 from now), closes target at end of June
-    // Q3: July–September (months 3–5)
-    // Q4: October–December (months 6–8)
-    // A kwalificatie that starts in month X closes in month X + cycle
-    // So for Q2 closes (end June = month 2): kwal started in month 2 - cycle
-    const quarters = [
-      { label: 'Q2 2026', closes: q2,  endMonth: 2,  months: 'Apr–Jun' },
-      { label: 'Q3 2026', closes: q3,  endMonth: 5,  months: 'Jul–Sep' },
-      { label: 'Q4 2026', closes: q4,  endMonth: 8,  months: 'Okt–Dec' },
-    ];
-
+    // ── MONTHLY TIMELINE ──
+    // For each month's close target: how many kwalificaties needed, and when should they have started?
+    // kwal start = close month - cycle months
+    // April = offset 0, Mei = +1, ... Dec = +8
     const tbody = document.getElementById('q_tbody');
     tbody.innerHTML = '';
 
-    quarters.forEach(q => {
-      if (q.closes === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td class="hl">${q.label}</td><td>0</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-info">overgeslagen</span></td>`;
-        tbody.appendChild(tr); return;
-      }
+    monthlyCloses.forEach((closes, i) => {
+      const closeOffset = MONTH_OFF[i]; // e.g. Mei = 1
+      const kwalStartOffset = closeOffset - cycle; // e.g. Mei close with 6m cycle → start in Nov 2025 = -5
+      const kwalNeeded = Math.ceil(closes / (cKI * cIO * cOC));
 
-      const kwalNeeded = Math.ceil(q.closes / (cKI * cIO * cOC));
-      // When should kwalificaties START for this quarter's closes?
-      // Kwal start month = endMonth - cycle (mid-quarter close, so use endMonth - cycle/2 for avg)
-      const kwalStartMonth = q.endMonth - cycle; // relative to now (April = 0)
-      const kwalStartStr   = kwalStartMonth < 0
-        ? `${monthName(Math.ceil(kwalStartMonth))} – ${monthName(Math.floor(q.endMonth - cycle/2))} (verleden)`
-        : `${monthName(Math.ceil(kwalStartMonth))} – ${monthName(Math.floor(q.endMonth - cycle/2))}`;
-
-      // Status
-      let badge, statusNote;
-      if (kwalStartMonth < -2) {
-        badge = 'badge-bad';
-        statusNote = `Kwalificaties hadden in ${monthName(kwalStartMonth)} moeten starten — hoog risico`;
-      } else if (kwalStartMonth < 0) {
-        badge = 'badge-warn';
-        statusNote = `Kwalificaties zijn al bezig of net gestart — check pipeline`;
-      } else if (kwalStartMonth < 2) {
-        badge = 'badge-ok';
-        statusNote = `Start nu — op schema`;
+      let badge, label;
+      if (closes === 0) {
+        badge = 'badge-info'; label = '○ Geen target';
+      } else if (kwalStartOffset < -3) {
+        badge = 'badge-bad'; label = '⚠ Te laat';
+      } else if (kwalStartOffset < 0) {
+        badge = 'badge-warn'; label = '⚡ Nu urgent';
+      } else if (kwalStartOffset < 2) {
+        badge = 'badge-ok'; label = '✓ Start nu';
       } else {
-        badge = 'badge-info';
-        statusNote = `Ruim op tijd`;
+        badge = 'badge-info'; label = `○ Start ${mname(kwalStartOffset)}`;
       }
+
+      const startStr = closes === 0 ? '—'
+        : kwalStartOffset < 0
+          ? `${mname(kwalStartOffset)} (verleden)`
+          : mname(kwalStartOffset);
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="hl">${q.label} <span style="color:#94a3b8;font-weight:400;font-size:0.75rem">${q.months}</span></td>
-        <td class="hl">${q.closes}</td>
-        <td>${kwalNeeded}</td>
-        <td>${kwalStartStr}</td>
-        <td style="color:#b45309">${'—'}</td>
-        <td><span class="badge ${badge}">${badge === 'badge-bad' ? '⚠ Risico' : badge === 'badge-warn' ? '⚡ Urgent' : badge === 'badge-ok' ? '✓ Start nu' : '○ Later'}</span></td>
+        <td class="hl">${MONTH_LBLS[i]} 2026</td>
+        <td>${closes > 0 ? closes : '—'}</td>
+        <td>${closes > 0 ? kwalNeeded : '—'}</td>
+        <td style="color:${kwalStartOffset<0?'#dc2626':'#475569'}">${startStr}</td>
+        <td><span class="badge ${badge}">${label}</span></td>
       `;
       tbody.appendChild(tr);
     });
