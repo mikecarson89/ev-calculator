@@ -205,7 +205,7 @@
       <div class="card-title">Conversieratio's (funnel)</div>
       <div class="input-group">
         <label>Kwalificatie → Demo <span class="unit">%</span></label>
-        <input type="number" id="conv_ki" value="40" min="1" max="100">
+        <input type="number" id="conv_ki" value="15" min="1" max="100">
       </div>
       <div class="input-group">
         <label>Demo → Intake <span class="unit">%</span></label>
@@ -471,44 +471,111 @@
     document.getElementById('res_conv_desc').textContent =
       `Bij ${val('conv_lk')}% conversie (lead → kwalificatie) heb je ${Math.ceil(nLead)} leads in je outreachlijst nodig.`;
 
-    // ── MONTHLY TIMELINE ──
-    // For each month's close target: how many kwalificaties needed, and when should they have started?
-    // kwal start = close month - cycle months
-    // April = offset 0, Mei = +1, ... Dec = +8
+    // ── MONTHLY TIMELINE (pipeline-aware) ──
+    // Stage durations (equal split of cycle across 3 stages):
+    // Kwalificatie stage: 0 → cycle/3 months
+    // Demo stage: cycle/3 → 2*cycle/3
+    // Intake stage: 2*cycle/3 → cycle
+    // Items currently in a stage will close in their remaining time window.
+    // With conversion applied, not all survive.
+    const stageDur = cycle / 3;
+
+    // Expected closes from current pipeline per month (index = MONTH_OFF-1, 0=Mei)
+    // We distribute expected closes evenly across the relevant close window.
+    const pipelineByMonth = Array(8).fill(0); // index 0 = Mei (offset +1)
+
+    function addPipelineContrib(count, expectedCloses, closeWindowStart, closeWindowEnd) {
+      // closeWindowStart/End are offsets from April (0=Apr, 1=Mei...)
+      // We distribute expectedCloses evenly across months in the window
+      const months = [];
+      for (let m = Math.ceil(closeWindowStart); m <= Math.floor(closeWindowEnd); m++) {
+        const idx = m - 1; // MONTH_OFF[0]=1 (Mei), so idx = offset-1
+        if (idx >= 0 && idx < 8) months.push(idx);
+      }
+      if (months.length === 0) return;
+      const perMonth = expectedCloses / months.length;
+      months.forEach(idx => pipelineByMonth[idx] += perMonth);
+    }
+
+    const cIntake = cur('cur_ond');
+    const cDemo   = cur('cur_intake');
+    const cKwal   = cur('cur_qual');
+
+    // Intake items: remaining time = stageDur (last stage), close in months stageDur±
+    if (cIntake !== null && cIntake > 0) {
+      const expectedCloses = cIntake * cOC;
+      addPipelineContrib(cIntake, expectedCloses, 0 + stageDur*2/3, 0 + stageDur*4/3);
+    }
+    // Demo items: remaining time = 2*stageDur, close window around that
+    if (cDemo !== null && cDemo > 0) {
+      const expectedCloses = cDemo * cIO * cOC;
+      addPipelineContrib(cDemo, expectedCloses, 0 + stageDur*4/3, 0 + stageDur*8/3);
+    }
+    // Kwalificatie items: remaining time = cycle, close window around that
+    if (cKwal !== null && cKwal > 0) {
+      const expectedCloses = cKwal * cKI * cIO * cOC;
+      addPipelineContrib(cKwal, expectedCloses, 0 + cycle*2/3, 0 + cycle*4/3);
+    }
+
+    const hasPipeline = cIntake !== null || cDemo !== null || cKwal !== null;
+
     const tbody = document.getElementById('q_tbody');
     tbody.innerHTML = '';
 
+    // Update table header if pipeline is filled
+    const thead = document.querySelector('#q_tbody').closest('table').querySelector('thead tr');
+    thead.innerHTML = hasPipeline
+      ? `<th>Maand</th><th>Close-doel</th><th>Gedekt door pipeline</th><th>Nog nodig (gap)</th><th>Kwal. starten in</th><th>Status</th>`
+      : `<th>Maand</th><th>Close-doel</th><th>Kwal. nodig</th><th>Kwal. starten in</th><th>Status</th>`;
+
     monthlyCloses.forEach((closes, i) => {
-      const closeOffset = MONTH_OFF[i]; // e.g. Mei = 1
-      const kwalStartOffset = closeOffset - cycle; // e.g. Mei close with 6m cycle → start in Nov 2025 = -5
-      const kwalNeeded = Math.ceil(closes / (cKI * cIO * cOC));
+      const closeOffset    = MONTH_OFF[i];
+      const kwalStartOff   = closeOffset - cycle;
+      const kwalNeededFull = closes / (cKI * cIO * cOC);
+      const covered        = hasPipeline ? Math.min(pipelineByMonth[i], closes) : 0;
+      const gap            = Math.max(0, closes - covered);
+      const kwalForGap     = Math.ceil(gap / (cKI * cIO * cOC));
+      const gapKwalStart   = kwalStartOff; // same lead time needed for the gap
 
       let badge, label;
       if (closes === 0) {
         badge = 'badge-info'; label = '○ Geen target';
-      } else if (kwalStartOffset < -3) {
+      } else if (gap === 0 && hasPipeline) {
+        badge = 'badge-ok'; label = '✓ Gedekt';
+      } else if (kwalStartOff < -3) {
         badge = 'badge-bad'; label = '⚠ Te laat';
-      } else if (kwalStartOffset < 0) {
-        badge = 'badge-warn'; label = '⚡ Nu urgent';
-      } else if (kwalStartOffset < 2) {
+      } else if (kwalStartOff < 0) {
+        badge = 'badge-warn'; label = '⚡ Urgent';
+      } else if (kwalStartOff < 2) {
         badge = 'badge-ok'; label = '✓ Start nu';
       } else {
-        badge = 'badge-info'; label = `○ Start ${mname(kwalStartOffset)}`;
+        badge = 'badge-info'; label = `○ Start ${mname(kwalStartOff)}`;
       }
 
       const startStr = closes === 0 ? '—'
-        : kwalStartOffset < 0
-          ? `${mname(kwalStartOffset)} (verleden)`
-          : mname(kwalStartOffset);
+        : kwalStartOff < 0 ? `${mname(kwalStartOff)} ⚠` : mname(kwalStartOff);
 
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="hl">${MONTH_LBLS[i]} 2026</td>
-        <td>${closes > 0 ? closes : '—'}</td>
-        <td>${closes > 0 ? kwalNeeded : '—'}</td>
-        <td style="color:${kwalStartOffset<0?'#dc2626':'#475569'}">${startStr}</td>
-        <td><span class="badge ${badge}">${label}</span></td>
-      `;
+      if (hasPipeline) {
+        const coveredStr  = closes > 0 ? `${covered.toFixed(1)} / ${closes}` : '—';
+        const gapDisplay  = closes > 0 ? (gap > 0 ? `<strong style="color:#dc2626">${kwalForGap} kwal.</strong>` : `<span style="color:#16a34a">✓ geen gap</span>`) : '—';
+        tr.innerHTML = `
+          <td class="hl">${MONTH_LBLS[i]} 2026</td>
+          <td>${closes > 0 ? closes : '—'}</td>
+          <td style="color:${covered>=closes?'#16a34a':'#d97706'}">${coveredStr}</td>
+          <td>${gapDisplay}</td>
+          <td style="color:${kwalStartOff<0?'#dc2626':'#475569'}">${gap > 0 ? startStr : '—'}</td>
+          <td><span class="badge ${badge}">${label}</span></td>
+        `;
+      } else {
+        tr.innerHTML = `
+          <td class="hl">${MONTH_LBLS[i]} 2026</td>
+          <td>${closes > 0 ? closes : '—'}</td>
+          <td>${closes > 0 ? Math.ceil(kwalNeededFull) : '—'}</td>
+          <td style="color:${kwalStartOff<0?'#dc2626':'#475569'}">${closes > 0 ? startStr : '—'}</td>
+          <td><span class="badge ${badge}">${label}</span></td>
+        `;
+      }
       tbody.appendChild(tr);
     });
   }
