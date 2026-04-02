@@ -6,12 +6,8 @@
 <title>Pipeline Trechter — New Business</title>
 <style>
   /*
-   * Palette: Tailwind Slate — het standaard van Linear, Vercel, Stripe
-   * bg: slate-100  #f1f5f9  — zichtbaar grijs, cards steken eruit
-   * card: #ffffff + zachte shadow
-   * text: slate-900 #0f172a — niet puur zwart
-   * secondary: slate-500 #64748b
-   * border: slate-200 #e2e8f0
+   * Palette: Tailwind Slate (Linear / Vercel / Stripe standard)
+   * bg: #f1f5f9  card: #fff  text: #0f172a  muted: #64748b  border: #e2e8f0
    */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -21,48 +17,39 @@
     padding: 24px;
     min-height: 100vh;
   }
-  h1 { font-size: 1.4rem; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
-  .subtitle { font-size: 0.85rem; color: #64748b; margin-bottom: 24px; }
+  h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 3px; }
+  .subtitle { font-size: 0.84rem; color: #64748b; margin-bottom: 22px; }
 
-  .layout {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 20px;
-    align-items: start;
+  .layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+
+  /* ── CARDS ── */
+  .card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.07);
+  }
+  .card-title {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 14px;
   }
 
   /* ── INPUTS ── */
-  .inputs-panel {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 2px 8px rgba(15,23,42,0.07);
-  }
-  .panel-title {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #94a3b8;
-    margin-bottom: 14px;
-    font-weight: 600;
-  }
-  .input-group { margin-bottom: 12px; }
-  .input-group label {
-    display: block;
-    font-size: 0.78rem;
-    color: #475569;
-    margin-bottom: 4px;
-    font-weight: 500;
-  }
+  .input-group { margin-bottom: 11px; }
+  .input-group label { display: block; font-size: 0.77rem; color: #475569; font-weight: 500; margin-bottom: 3px; }
   .input-group input[type="number"] {
     width: 100%;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 7px;
     color: #0f172a;
-    padding: 7px 10px;
-    font-size: 0.88rem;
+    padding: 6px 10px;
+    font-size: 0.87rem;
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
@@ -70,14 +57,29 @@
     border-color: #6366f1;
     box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
   }
-  .unit { font-size: 0.72rem; color: #94a3b8; }
-  hr.div { border: none; border-top: 1px solid #f1f5f9; margin: 14px 0; }
+  .unit { font-size: 0.7rem; color: #94a3b8; }
+  hr.div { border: none; border-top: 1px solid #f1f5f9; margin: 13px 0; }
 
-  /* ── MAIN ── */
+  /* Quarterly targets row */
+  .q-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .q-input { text-align: center; }
+  .q-input label { text-align: center; }
+  .q-total {
+    text-align: center;
+    background: #f1f5f9;
+    border-radius: 7px;
+    padding: 8px 4px;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 8px;
+  }
+  .q-total strong { color: #0f172a; font-size: 1rem; display: block; }
+
+  /* ── MAIN PANEL ── */
   .main-panel { display: flex; flex-direction: column; gap: 18px; }
 
-  /* ── PER PERSOON BANNER ── */
-  .person-banner {
+  /* ── KPI BANNER ── */
+  .kpi-banner {
     background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 100%);
     border: 1px solid #c7d2fe;
     border-radius: 12px;
@@ -87,490 +89,466 @@
     gap: 22px;
     box-shadow: 0 2px 8px rgba(99,102,241,0.08);
   }
-  .person-main { flex: 1; }
-  .person-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #6366f1;
-    margin-bottom: 4px;
-    font-weight: 600;
+  .kpi-main { flex: 1; }
+  .kpi-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #6366f1; margin-bottom: 3px; }
+  .kpi-value { font-size: 2.6rem; font-weight: 800; color: #4338ca; line-height: 1; }
+  .kpi-sub { font-size: 0.77rem; color: #6366f1; margin-top: 4px; opacity: 0.8; }
+  .kpi-dots { display: flex; flex-wrap: wrap; gap: 5px; max-width: 160px; align-items: center; }
+  .kpi-dot { width: 10px; height: 10px; border-radius: 50%; background: #6366f1; opacity: 0.35; }
+  .kpi-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    border-left: 1px solid #c7d2fe; padding-left: 22px;
   }
-  .person-value {
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: #4338ca;
-    line-height: 1;
-  }
-  .person-sub { font-size: 0.78rem; color: #6366f1; margin-top: 4px; opacity: 0.8; }
-  .person-dots {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    max-width: 180px;
-    align-items: center;
-  }
-  .person-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #6366f1;
-    opacity: 0.4;
-  }
-  .person-stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    border-left: 1px solid #c7d2fe;
-    padding-left: 22px;
-  }
-  .mini-stat { text-align: center; }
-  .mini-val { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
-  .mini-lbl { font-size: 0.67rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.07em; margin-top: 2px; }
+  .mini { text-align: center; }
+  .mini-v { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+  .mini-l { font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.07em; margin-top: 2px; }
 
-  /* ── FUNNEL SVG ── */
-  .funnel-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 22px 26px;
-    box-shadow: 0 2px 8px rgba(15,23,42,0.07);
-  }
-  .funnel-card h2 {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #94a3b8;
-    margin-bottom: 18px;
-    font-weight: 600;
-  }
-  .funnel-wrap { display: flex; gap: 26px; align-items: flex-start; }
+  /* ── FUNNEL + LEGEND ROW ── */
+  .funnel-row { display: flex; gap: 24px; align-items: flex-start; }
   #funnel-svg { flex-shrink: 0; }
-  .funnel-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding-top: 4px;
-    min-width: 180px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.78rem;
-    color: #475569;
-  }
-  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-  .legend-num { font-weight: 700; color: #0f172a; margin-left: auto; }
-  .legend-conv { font-size: 0.7rem; color: #94a3b8; margin-left: 18px; margin-top: -2px; margin-bottom: 2px; }
+  .funnel-legend { display: flex; flex-direction: column; gap: 5px; flex: 1; padding-top: 6px; }
+  .leg-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: #475569; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .leg-num { font-weight: 700; color: #0f172a; margin-left: auto; font-size: 0.85rem; }
+  .leg-conv { font-size: 0.68rem; color: #94a3b8; margin-left: 18px; margin-top: -2px; margin-bottom: 3px; }
+  .leg-sep { border-top: 1px solid #f1f5f9; margin: 8px 0; }
 
-  /* ── URGENCY TABLE ── */
-  .urgency-card {
-    background: #ffffff;
+  /* ── LEAD RESERVOIR ── */
+  .reservoir-card {
+    background: #fff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 20px 24px;
+    padding: 16px 20px;
     box-shadow: 0 2px 8px rgba(15,23,42,0.07);
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
-  .urgency-card h2 {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #94a3b8;
-    margin-bottom: 14px;
-    font-weight: 600;
+  .res-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: #f1f5f9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
   }
-  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+  .res-body { flex: 1; }
+  .res-title { font-size: 0.77rem; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+  .res-sub { font-size: 0.73rem; color: #64748b; }
+  .res-num { font-size: 1.6rem; font-weight: 800; color: #3b82f6; }
+
+  /* ── QUARTERLY TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
   th { text-align: left; padding: 6px 10px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9; }
   td { padding: 8px 10px; border-bottom: 1px solid #f8fafc; color: #334155; }
   tr:last-child td { border-bottom: none; }
   td.hl { color: #0f172a; font-weight: 600; }
-  .ok-txt { color: #16a34a; font-weight: 600; }
-  .warn-txt { color: #d97706; font-weight: 600; }
-  .bad-txt { color: #dc2626; font-weight: 600; }
+  .badge {
+    display: inline-block;
+    font-size: 0.7rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 99px;
+  }
+  .badge-ok   { background: #dcfce7; color: #16a34a; }
+  .badge-warn { background: #fef3c7; color: #d97706; }
+  .badge-bad  { background: #fee2e2; color: #dc2626; }
+  .badge-info { background: #ede9fe; color: #7c3aed; }
 
   @media (max-width: 860px) {
     .layout { grid-template-columns: 1fr; }
-    .person-stats-row { border-left: none; padding-left: 0; border-top: 1px solid #c7d2fe; padding-top: 12px; margin-top: 6px; }
-    .person-banner { flex-direction: column; align-items: flex-start; }
-    .funnel-wrap { flex-direction: column; }
+    .kpi-stats { border-left: none; padding-left: 0; border-top: 1px solid #c7d2fe; padding-top: 12px; }
+    .kpi-banner { flex-direction: column; align-items: flex-start; }
+    .funnel-row { flex-direction: column; }
+    .q-row { grid-template-columns: repeat(3, 1fr); }
   }
 </style>
 </head>
 <body>
 
 <h1>Pipeline Trechter — New Business</h1>
-<p class="subtitle">Reverse-engineered vanuit jaardoel · Quintor</p>
+<p class="subtitle">Quintor · reverse-engineered vanuit kwartaaldoelen</p>
 
 <div class="layout">
 
-  <!-- INPUTS -->
-  <div class="inputs-panel">
-    <div class="panel-title">Doelstelling</div>
-    <div class="input-group">
-      <label>Inzetten (closes) dit jaar</label>
-      <input type="number" id="inp_closes" value="9" min="1" max="100">
-    </div>
-    <div class="input-group">
-      <label>Resterende maanden</label>
-      <input type="number" id="inp_months" value="9" min="1" max="12">
-    </div>
-    <div class="input-group">
-      <label>Aantal mensen</label>
-      <input type="number" id="inp_people" value="4" min="1" max="50">
-    </div>
-    <div class="input-group">
-      <label>Salescyclus <span class="unit">(maanden)</span></label>
-      <input type="number" id="inp_cycle" value="6" min="1" max="24">
+  <!-- LEFT: INPUTS -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+
+    <div class="card">
+      <div class="card-title">Kwartaaldoelen (closes)</div>
+      <div class="q-row">
+        <div class="input-group q-input">
+          <label>Q2</label>
+          <input type="number" id="q2" value="2" min="0" max="20">
+        </div>
+        <div class="input-group q-input">
+          <label>Q3</label>
+          <input type="number" id="q3" value="3" min="0" max="20">
+        </div>
+        <div class="input-group q-input">
+          <label>Q4</label>
+          <input type="number" id="q4" value="4" min="0" max="20">
+        </div>
+      </div>
+      <div class="q-total">
+        Jaartotaal: <strong id="total_closes">9</strong>
+      </div>
     </div>
 
-    <hr class="div">
-    <div class="panel-title">Conversieratio's</div>
-    <div class="input-group">
-      <label>Lead → Kwalificatie <span class="unit">%</span></label>
-      <input type="number" id="conv_lq" value="50" min="1" max="100">
-    </div>
-    <div class="input-group">
-      <label>Kwalificatie → Intake/Demo <span class="unit">%</span></label>
-      <input type="number" id="conv_qi" value="40" min="1" max="100">
-    </div>
-    <div class="input-group">
-      <label>Intake → Onderhandeling <span class="unit">%</span></label>
-      <input type="number" id="conv_io" value="50" min="1" max="100">
-    </div>
-    <div class="input-group">
-      <label>Onderhandeling → Close <span class="unit">%</span></label>
-      <input type="number" id="conv_oc" value="50" min="1" max="100">
+    <div class="card">
+      <div class="card-title">Team & cyclus</div>
+      <div class="input-group">
+        <label>Aantal mensen</label>
+        <input type="number" id="inp_people" value="4" min="1" max="50">
+      </div>
+      <div class="input-group">
+        <label>Salescyclus <span class="unit">(kwalificatie → close, maanden)</span></label>
+        <input type="number" id="inp_cycle" value="6" min="1" max="24">
+      </div>
     </div>
 
-    <hr class="div">
-    <div class="panel-title">Huidige pipeline <span class="unit" style="text-transform:none;letter-spacing:0">(optioneel)</span></div>
-    <div class="input-group">
-      <label>Leads nu</label>
-      <input type="number" id="cur_lead" placeholder="—" min="0">
+    <div class="card">
+      <div class="card-title">Conversieratio's (funnel)</div>
+      <div class="input-group">
+        <label>Kwalificatie → Intake/Demo <span class="unit">%</span></label>
+        <input type="number" id="conv_ki" value="40" min="1" max="100">
+      </div>
+      <div class="input-group">
+        <label>Intake → Onderhandeling <span class="unit">%</span></label>
+        <input type="number" id="conv_io" value="50" min="1" max="100">
+      </div>
+      <div class="input-group">
+        <label>Onderhandeling → Close <span class="unit">%</span></label>
+        <input type="number" id="conv_oc" value="50" min="1" max="100">
+      </div>
+      <hr class="div">
+      <div class="input-group">
+        <label>Lead → Kwalificatie <span class="unit">% (voor reservoir)</span></label>
+        <input type="number" id="conv_lk" value="50" min="1" max="100">
+      </div>
     </div>
-    <div class="input-group">
-      <label>Kwalificaties nu</label>
-      <input type="number" id="cur_qual" placeholder="—" min="0">
+
+    <div class="card">
+      <div class="card-title">Huidige pipeline <span class="unit" style="text-transform:none;letter-spacing:0">(optioneel)</span></div>
+      <div class="input-group">
+        <label>Kwalificaties nu</label>
+        <input type="number" id="cur_qual" placeholder="—" min="0">
+      </div>
+      <div class="input-group">
+        <label>Intake/Demo nu</label>
+        <input type="number" id="cur_intake" placeholder="—" min="0">
+      </div>
+      <div class="input-group">
+        <label>Onderhandeling nu</label>
+        <input type="number" id="cur_ond" placeholder="—" min="0">
+      </div>
     </div>
-    <div class="input-group">
-      <label>Intake/Demo nu</label>
-      <input type="number" id="cur_intake" placeholder="—" min="0">
-    </div>
-    <div class="input-group">
-      <label>Onderhandeling nu</label>
-      <input type="number" id="cur_ond" placeholder="—" min="0">
-    </div>
+
   </div>
 
-  <!-- MAIN -->
+  <!-- RIGHT: MAIN -->
   <div class="main-panel">
 
-    <!-- PER PERSOON BANNER -->
-    <div class="person-banner">
-      <div class="person-main">
-        <div class="person-label">Leads per persoon per maand</div>
-        <div class="person-value" id="stat_per_person">—</div>
-        <div class="person-sub" id="person_sub">nieuwe leads toevoegen aan de pijplijn</div>
+    <!-- KPI BANNER -->
+    <div class="kpi-banner">
+      <div class="kpi-main">
+        <div class="kpi-label">Kwalificaties per persoon per maand</div>
+        <div class="kpi-value" id="kpi_per_person">—</div>
+        <div class="kpi-sub" id="kpi_sub">—</div>
       </div>
-      <div class="person-dots" id="person_dots"></div>
-      <div class="person-stats-row">
-        <div class="mini-stat">
-          <div class="mini-val" id="stat_leads_month">—</div>
-          <div class="mini-lbl">Leads/mnd totaal</div>
+      <div class="kpi-dots" id="kpi_dots"></div>
+      <div class="kpi-stats">
+        <div class="mini">
+          <div class="mini-v" id="stat_kwal_month">—</div>
+          <div class="mini-l">Kwal./mnd totaal</div>
         </div>
-        <div class="mini-stat">
-          <div class="mini-val" id="stat_total_leads">—</div>
-          <div class="mini-lbl">Totaal leads nodig</div>
+        <div class="mini">
+          <div class="mini-v" id="stat_total_kwal">—</div>
+          <div class="mini-l">Kwal. nodig</div>
         </div>
-        <div class="mini-stat">
-          <div class="mini-val" id="stat_overall_conv">—</div>
-          <div class="mini-lbl">Overall conversie</div>
+        <div class="mini">
+          <div class="mini-v" id="stat_conv">—</div>
+          <div class="mini-l">Kwal.→close</div>
         </div>
       </div>
     </div>
 
     <!-- FUNNEL -->
-    <div class="funnel-card">
-      <h2>Trechter</h2>
-      <div class="funnel-wrap">
-        <svg id="funnel-svg" width="340" height="320"></svg>
+    <div class="card">
+      <div class="card-title">Trechter (kwalificatie als instap)</div>
+      <div class="funnel-row">
+        <svg id="funnel-svg" width="320" height="260"></svg>
         <div class="funnel-legend" id="funnel-legend"></div>
       </div>
     </div>
 
-    <!-- URGENCY TABLE -->
-    <div class="urgency-card">
-      <h2>Wat moet er nú in de pijplijn zitten?</h2>
+    <!-- LEAD RESERVOIR -->
+    <div class="reservoir-card">
+      <div class="res-icon">🪣</div>
+      <div class="res-body">
+        <div class="res-title">Lead reservoir (outreachlijst)</div>
+        <div class="res-sub">Hoe groot moet je bak met potentiële contacten zijn om voldoende kwalificaties te genereren? <strong id="res_conv_desc"></strong></div>
+      </div>
+      <div class="res-num" id="res_leads">—</div>
+    </div>
+
+    <!-- QUARTERLY TIMELINE -->
+    <div class="card">
+      <div class="card-title">Kwartaalplanning — wat moet wanneer in de pijplijn</div>
       <table>
         <thead>
           <tr>
-            <th>Fase</th>
-            <th>Nodig (totaal)</th>
-            <th>Nodig nu</th>
+            <th>Kwartaal</th>
+            <th>Closes</th>
+            <th>Kwal. nodig</th>
+            <th>Kwal. starten in</th>
             <th>Huidig</th>
             <th>Status</th>
           </tr>
         </thead>
-        <tbody id="urgency_body"></tbody>
+        <tbody id="q_tbody"></tbody>
       </table>
-      <p style="font-size:0.72rem;color:#8888aa;margin-top:8px;">"Nodig nu" = het deel dat al actief in de pijplijn moet zitten gezien de resterende maanden.</p>
+      <p style="font-size:0.71rem;color:#94a3b8;margin-top:10px;">
+        "Kwal. starten in" = wanneer je kwalificatiegesprekken moeten plaatsvinden om op tijd te sluiten. Gebaseerd op salescyclus van <span id="cycle_note">6</span> maanden.
+      </p>
     </div>
 
   </div>
 </div>
 
 <script>
+  // Funnel stages (kwalificatie as entry)
   const STAGES = [
-    { label: 'Lead',           color: '#3b82f6', curId: 'cur_lead'   },
-    { label: 'Kwalificatie',   color: '#6366f1', curId: 'cur_qual'   },
-    { label: 'Intake / Demo',  color: '#8b5cf6', curId: 'cur_intake' },
-    { label: 'Onderhandeling', color: '#f59e0b', curId: 'cur_ond'    },
-    { label: 'Close',          color: '#16a34a', curId: null         },
+    { label: 'Kwalificatie',   color: '#6366f1' },
+    { label: 'Intake / Demo',  color: '#8b5cf6' },
+    { label: 'Onderhandeling', color: '#f59e0b' },
+    { label: 'Close',          color: '#16a34a' },
   ];
 
-  function val(id, fallback = 0) {
+  function val(id, fb = 0) {
     const v = parseFloat(document.getElementById(id).value);
-    return isNaN(v) ? fallback : v;
+    return isNaN(v) ? fb : v;
   }
-  function curVal(id) {
+  function cur(id) {
     const el = document.getElementById(id);
     if (!el || el.value === '') return null;
     const v = parseFloat(el.value);
     return isNaN(v) ? null : v;
   }
 
+  // Month offset from April 2026
+  function monthName(offset) {
+    const months = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+    const base = 3; // April = index 3
+    const idx = ((base + offset) % 12 + 12) % 12;
+    const yr  = 2026 + Math.floor((base + offset) / 12);
+    return `${months[idx]} ${yr !== 2026 ? yr : ''}`.trim();
+  }
+
   function recalc() {
-    const closes = val('inp_closes', 9);
-    const months = val('inp_months', 9);
+    const q2 = val('q2', 0);
+    const q3 = val('q3', 0);
+    const q4 = val('q4', 0);
+    const totalCloses = q2 + q3 + q4;
     const people = Math.max(val('inp_people', 4), 1);
     const cycle  = val('inp_cycle', 6);
-    const cLQ    = Math.max(val('conv_lq', 50), 1) / 100;
-    const cQI    = Math.max(val('conv_qi', 40), 1) / 100;
+    const cKI    = Math.max(val('conv_ki', 40), 1) / 100;
     const cIO    = Math.max(val('conv_io', 50), 1) / 100;
     const cOC    = Math.max(val('conv_oc', 50), 1) / 100;
+    const cLK    = Math.max(val('conv_lk', 50), 1) / 100;
 
-    // Backcast volumes
-    const nClose  = Math.ceil(closes);
+    document.getElementById('total_closes').textContent = totalCloses;
+    document.getElementById('cycle_note').textContent = cycle;
+
+    // Backcast from closes
+    const nClose  = totalCloses;
     const nOnd    = Math.ceil(nClose  / cOC);
     const nIntake = Math.ceil(nOnd    / cIO);
-    const nQual   = Math.ceil(nIntake / cQI);
-    const nLead   = Math.ceil(nQual   / cLQ);
-    const volumes = [nLead, nQual, nIntake, nOnd, nClose];
-    const maxVol  = nLead;
+    const nKwal   = Math.ceil(nIntake / cKI);
+    const nLead   = Math.ceil(nKwal   / cLK);
+    const volumes = [nKwal, nIntake, nOnd, nClose];
+    const maxVol  = nKwal;
 
-    // Per persoon
-    const leadsPerMonth = nLead / months;
-    const perPerson     = leadsPerMonth / people;
-    const perPersonRnd  = Math.ceil(perPerson * 10) / 10;
+    // Months remaining: April = 0, year ends Dec = 9 months
+    const totalMonths = 9;
+    const kwalPerMonth = nKwal / totalMonths;
+    const perPerson    = kwalPerMonth / people;
 
-    document.getElementById('stat_per_person').textContent = perPersonRnd.toFixed(1);
-    document.getElementById('stat_leads_month').textContent = leadsPerMonth.toFixed(1);
-    document.getElementById('stat_total_leads').textContent = nLead;
-    document.getElementById('stat_overall_conv').textContent = ((closes / nLead) * 100).toFixed(1) + '%';
-    document.getElementById('person_sub').textContent =
-      `per persoon · ${leadsPerMonth.toFixed(1)} totaal per maand voor ${people} mensen`;
+    // ── KPI BANNER ──
+    document.getElementById('kpi_per_person').textContent = perPerson.toFixed(1);
+    document.getElementById('kpi_sub').textContent =
+      `kwalificatiegesprekken per persoon · ${kwalPerMonth.toFixed(1)}/mnd totaal voor ${people} mensen`;
+    document.getElementById('stat_kwal_month').textContent = kwalPerMonth.toFixed(1);
+    document.getElementById('stat_total_kwal').textContent = nKwal;
+    document.getElementById('stat_conv').textContent = ((nClose / nKwal) * 100).toFixed(0) + '%';
 
-    // Person dots (visual: up to 20 dots representing leads per month per person)
-    const dotsContainer = document.getElementById('person_dots');
-    dotsContainer.innerHTML = '';
-    const dotCount = Math.min(Math.ceil(perPerson * months), 40);
-    const showDots = Math.min(dotCount, 30);
-    for (let i = 0; i < showDots; i++) {
-      const d = document.createElement('div');
-      d.className = 'person-dot';
-      dotsContainer.appendChild(d);
+    // KPI dots
+    const dots = document.getElementById('kpi_dots');
+    dots.innerHTML = '';
+    const dotN = Math.min(Math.ceil(perPerson * totalMonths), 35);
+    for (let i = 0; i < Math.min(dotN, 30); i++) {
+      const d = document.createElement('div'); d.className = 'kpi-dot'; dots.appendChild(d);
     }
-    if (dotCount > 30) {
-      const more = document.createElement('div');
-      more.style.cssText = 'font-size:0.75rem;color:#6666aa;';
-      more.textContent = `+${dotCount - 30}`;
-      dotsContainer.appendChild(more);
+    if (dotN > 30) {
+      const m = document.createElement('div');
+      m.style.cssText = 'font-size:0.72rem;color:#6366f1;opacity:0.7;';
+      m.textContent = `+${dotN - 30}`; dots.appendChild(m);
     }
 
     // ── FUNNEL SVG ──
     const svg = document.getElementById('funnel-svg');
     svg.innerHTML = '';
-    const svgW = 340;
-    const stageH = 52;
-    const gapH   = 6;
-    const totalH = STAGES.length * stageH + (STAGES.length - 1) * gapH + 10;
+    const svgW = 320, stageH = 52, gapH = 6;
+    const totalH = STAGES.length * stageH + (STAGES.length - 1) * gapH + 8;
     svg.setAttribute('height', totalH);
     svg.setAttribute('viewBox', `0 0 ${svgW} ${totalH}`);
+    const maxBarW = svgW - 80;
+    const cx = svgW / 2 + 20;
+    const convLabels = [`${val('conv_ki')}%`, `${val('conv_io')}%`, `${val('conv_oc')}%`];
+    const curVals = [cur('cur_qual'), cur('cur_intake'), cur('cur_ond'), null];
 
-    const maxBarW = svgW - 10;
-    const cx = svgW / 2;
-
-    const convLabels = [
-      `${val('conv_lq')}%`, `${val('conv_qi')}%`, `${val('conv_io')}%`, `${val('conv_oc')}%`
-    ];
-
-    // Draw each stage as a trapezoid
     volumes.forEach((vol, i) => {
       const topW = (volumes[i] / maxVol) * maxBarW;
       const botW = i < volumes.length - 1
-        ? (volumes[i + 1] / maxVol) * maxBarW
-        : (volumes[i] / maxVol) * maxBarW * 0.7;
-
-      const y = i * (stageH + gapH);
-
-      // Trapezoid points
-      const x0 = cx - topW / 2;
-      const x1 = cx + topW / 2;
-      const x2 = cx + botW / 2;
-      const x3 = cx - botW / 2;
-      const pts = `${x0},${y} ${x1},${y} ${x2},${y + stageH} ${x3},${y + stageH}`;
+        ? (volumes[i+1] / maxVol) * maxBarW
+        : (volumes[i] / maxVol) * maxBarW * 0.65;
+      const y   = i * (stageH + gapH);
+      const x0  = cx - topW/2, x1 = cx + topW/2;
+      const x2  = cx + botW/2, x3 = cx - botW/2;
 
       const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      poly.setAttribute('points', pts);
+      poly.setAttribute('points', `${x0},${y} ${x1},${y} ${x2},${y+stageH} ${x3},${y+stageH}`);
       poly.setAttribute('fill', STAGES[i].color);
-      poly.setAttribute('opacity', '0.82');
+      poly.setAttribute('opacity', '0.85');
       svg.appendChild(poly);
 
-      // Stage label (left side)
+      // Label left
       const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      lbl.setAttribute('x', x0 - 6);
-      lbl.setAttribute('y', y + stageH / 2 + 1);
-      lbl.setAttribute('text-anchor', 'end');
-      lbl.setAttribute('dominant-baseline', 'middle');
-      lbl.setAttribute('fill', '#475569');
-      lbl.setAttribute('font-size', '11');
+      lbl.setAttribute('x', x0 - 6); lbl.setAttribute('y', y + stageH/2 + 1);
+      lbl.setAttribute('text-anchor', 'end'); lbl.setAttribute('dominant-baseline', 'middle');
+      lbl.setAttribute('fill', '#475569'); lbl.setAttribute('font-size', '11');
       lbl.setAttribute('font-family', 'Segoe UI, sans-serif');
-      lbl.textContent = STAGES[i].label;
-      svg.appendChild(lbl);
+      lbl.textContent = STAGES[i].label; svg.appendChild(lbl);
 
-      // Volume number (center of trapezoid)
+      // Number center
       const num = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      num.setAttribute('x', cx);
-      num.setAttribute('y', y + stageH / 2 + 1);
-      num.setAttribute('text-anchor', 'middle');
-      num.setAttribute('dominant-baseline', 'middle');
-      num.setAttribute('fill', '#ffffff');
-      num.setAttribute('font-size', '14');
-      num.setAttribute('font-weight', '700');
-      num.setAttribute('font-family', 'Segoe UI, sans-serif');
-      num.textContent = vol;
-      svg.appendChild(num);
+      num.setAttribute('x', cx); num.setAttribute('y', y + stageH/2 + 1);
+      num.setAttribute('text-anchor', 'middle'); num.setAttribute('dominant-baseline', 'middle');
+      num.setAttribute('fill', '#ffffff'); num.setAttribute('font-size', '15');
+      num.setAttribute('font-weight', '700'); num.setAttribute('font-family', 'Segoe UI, sans-serif');
+      num.textContent = vol; svg.appendChild(num);
 
-      // Conversion % between stages
+      // Conversion label between stages
       if (i < STAGES.length - 1) {
-        const midY = y + stageH + gapH / 2;
-        const convTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        convTxt.setAttribute('x', cx + botW / 2 + 8);
-        convTxt.setAttribute('y', midY);
-        convTxt.setAttribute('dominant-baseline', 'middle');
-        convTxt.setAttribute('fill', '#94a3b8');
-        convTxt.setAttribute('font-size', '10');
-        convTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
-        convTxt.textContent = `↓ ${convLabels[i]}`;
-        svg.appendChild(convTxt);
+        const midY = y + stageH + gapH/2;
+        const cTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        cTxt.setAttribute('x', cx + botW/2 + 8); cTxt.setAttribute('y', midY);
+        cTxt.setAttribute('dominant-baseline', 'middle');
+        cTxt.setAttribute('fill', '#94a3b8'); cTxt.setAttribute('font-size', '10');
+        cTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
+        cTxt.textContent = `↓ ${convLabels[i]}`; svg.appendChild(cTxt);
       }
 
-      // Current pipeline overlay (dashed border if cur entered)
-      const cur = STAGES[i].curId ? curVal(STAGES[i].curId) : null;
-      if (cur !== null && i < 4) {
-        const curW = Math.min((cur / maxVol) * maxBarW, topW + 10);
-        const curX = cx - curW / 2;
-        const diff = cur - vol;
-        const color = diff >= 0 ? '#00d4aa' : '#e94560';
-
+      // Current pipeline overlay
+      const c = curVals[i];
+      if (c !== null && i < 3) {
+        const curW = Math.min((c / maxVol) * maxBarW, topW + 12);
+        const diff = c - vol;
+        const col  = diff >= 0 ? '#16a34a' : '#dc2626';
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', curX);
-        rect.setAttribute('y', y + 2);
-        rect.setAttribute('width', curW);
-        rect.setAttribute('height', stageH - 4);
-        rect.setAttribute('rx', '3');
-        rect.setAttribute('fill', 'none');
-        rect.setAttribute('stroke', color);
-        rect.setAttribute('stroke-width', '1.5');
-        rect.setAttribute('stroke-dasharray', '4 3');
-        svg.appendChild(rect);
+        rect.setAttribute('x', cx - curW/2); rect.setAttribute('y', y + 2);
+        rect.setAttribute('width', curW); rect.setAttribute('height', stageH - 4);
+        rect.setAttribute('rx', '3'); rect.setAttribute('fill', 'none');
+        rect.setAttribute('stroke', col); rect.setAttribute('stroke-width', '1.5');
+        rect.setAttribute('stroke-dasharray', '4 3'); svg.appendChild(rect);
 
-        // Gap text
-        const gapTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        gapTxt.setAttribute('x', cx - topW / 2 - 8);
-        gapTxt.setAttribute('y', y + stageH / 2 + 1);
-        gapTxt.setAttribute('text-anchor', 'end');
-        gapTxt.setAttribute('dominant-baseline', 'middle');
-        gapTxt.setAttribute('fill', diff >= 0 ? '#16a34a' : '#dc2626');
-        gapTxt.setAttribute('font-size', '10');
-        gapTxt.setAttribute('font-weight', '600');
-        gapTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
-        gapTxt.textContent = (diff >= 0 ? '+' : '') + diff;
-        svg.appendChild(gapTxt);
+        const gTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        gTxt.setAttribute('x', cx + topW/2 + 8); gTxt.setAttribute('y', y + stageH/2 + 1);
+        gTxt.setAttribute('dominant-baseline', 'middle'); gTxt.setAttribute('fill', col);
+        gTxt.setAttribute('font-size', '10'); gTxt.setAttribute('font-weight', '600');
+        gTxt.setAttribute('font-family', 'Segoe UI, sans-serif');
+        gTxt.textContent = (diff >= 0 ? '+' : '') + diff + ' nu'; svg.appendChild(gTxt);
       }
     });
 
-    // ── LEGEND ──
+    // ── FUNNEL LEGEND ──
     const legend = document.getElementById('funnel-legend');
     legend.innerHTML = '';
     volumes.forEach((vol, i) => {
-      const item = document.createElement('div');
-      item.className = 'legend-item';
-      item.innerHTML = `
-        <span class="legend-dot" style="background:${STAGES[i].color}"></span>
-        <span>${STAGES[i].label}</span>
-        <span class="legend-num">${vol}</span>
-      `;
+      const item = document.createElement('div'); item.className = 'leg-item';
+      item.innerHTML = `<span class="leg-dot" style="background:${STAGES[i].color}"></span>
+        <span>${STAGES[i].label}</span><span class="leg-num">${vol}</span>`;
       legend.appendChild(item);
-
       if (i < STAGES.length - 1) {
-        const conv = document.createElement('div');
-        conv.className = 'legend-conv';
-        conv.textContent = `↓ ${convLabels[i]} converteert`;
-        legend.appendChild(conv);
+        const c = document.createElement('div'); c.className = 'leg-conv';
+        c.textContent = `↓ ${convLabels[i]} converteert`; legend.appendChild(c);
       }
     });
-
-    // Per persoon breakdown in legend
-    const sep = document.createElement('div');
-    sep.style.cssText = 'border-top:1px solid #f1f5f9;margin:10px 0;';
-    legend.appendChild(sep);
-
+    const sep = document.createElement('div'); sep.className = 'leg-sep'; legend.appendChild(sep);
     const pp = document.createElement('div');
-    pp.style.cssText = 'font-size:0.75rem;color:#64748b;line-height:1.7;';
+    pp.style.cssText = 'font-size:0.74rem;color:#64748b;line-height:1.7;';
     pp.innerHTML = `
-      <strong style="color:#4338ca">${perPersonRnd.toFixed(1)} leads/mnd</strong> per persoon<br>
-      <strong style="color:#0f172a">${Math.ceil(nLead / months)}</strong> leads/mnd totaal<br>
-      <strong style="color:#0f172a">${nLead}</strong> leads over ${months} mnd
+      <strong style="color:#4338ca">${perPerson.toFixed(1)} kwal./mnd</strong> per persoon<br>
+      <strong style="color:#0f172a">${kwalPerMonth.toFixed(1)}</strong> kwal./mnd totaal<br>
+      <strong style="color:#0f172a">${nKwal}</strong> kwal. over ${totalMonths} mnd
     `;
     legend.appendChild(pp);
 
-    // ── URGENCY TABLE ──
-    const stageMonths = cycle / (STAGES.length - 1);
-    const tbody = document.getElementById('urgency_body');
-    tbody.innerHTML = '';
+    // ── LEAD RESERVOIR ──
+    document.getElementById('res_leads').textContent = nLead;
+    document.getElementById('res_conv_desc').textContent =
+      `Bij ${val('conv_lk')}% conversie (lead → kwalificatie) heb je ${nLead} leads in je lijst nodig.`;
 
-    const stageInfo = [
-      { label: 'Lead',           needed: nLead,   cur: curVal('cur_lead'),   closesIn: stageMonths * 4 },
-      { label: 'Kwalificatie',   needed: nQual,   cur: curVal('cur_qual'),   closesIn: stageMonths * 3 },
-      { label: 'Intake/Demo',    needed: nIntake, cur: curVal('cur_intake'), closesIn: stageMonths * 2 },
-      { label: 'Onderhandeling', needed: nOnd,    cur: curVal('cur_ond'),    closesIn: stageMonths     },
+    // ── QUARTERLY TIMELINE ──
+    // Q2: April–June (months 0–2 from now), closes target at end of June
+    // Q3: July–September (months 3–5)
+    // Q4: October–December (months 6–8)
+    // A kwalificatie that starts in month X closes in month X + cycle
+    // So for Q2 closes (end June = month 2): kwal started in month 2 - cycle
+    const quarters = [
+      { label: 'Q2 2026', closes: q2,  endMonth: 2,  months: 'Apr–Jun' },
+      { label: 'Q3 2026', closes: q3,  endMonth: 5,  months: 'Jul–Sep' },
+      { label: 'Q4 2026', closes: q4,  endMonth: 8,  months: 'Okt–Dec' },
     ];
 
-    stageInfo.forEach(s => {
-      const nowNeeded = Math.ceil(s.needed * Math.min(s.closesIn / months, 1));
-      const curDisp   = s.cur !== null ? s.cur : '—';
-      let statusHtml  = '<span style="color:#555577">—</span>';
+    const tbody = document.getElementById('q_tbody');
+    tbody.innerHTML = '';
 
-      if (s.cur !== null) {
-        const diff = s.cur - nowNeeded;
-        if (diff >= 0) {
-          statusHtml = `<span class="ok-txt">✓ +${diff} surplus</span>`;
-        } else if (diff >= -nowNeeded * 0.35) {
-          statusHtml = `<span class="warn-txt">⚠ ${diff} tekort</span>`;
-        } else {
-          statusHtml = `<span class="bad-txt">✗ ${diff} tekort</span>`;
-        }
+    quarters.forEach(q => {
+      if (q.closes === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="hl">${q.label}</td><td>0</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-info">overgeslagen</span></td>`;
+        tbody.appendChild(tr); return;
+      }
+
+      const kwalNeeded = Math.ceil(q.closes / (cKI * cIO * cOC));
+      // When should kwalificaties START for this quarter's closes?
+      // Kwal start month = endMonth - cycle (mid-quarter close, so use endMonth - cycle/2 for avg)
+      const kwalStartMonth = q.endMonth - cycle; // relative to now (April = 0)
+      const kwalStartStr   = kwalStartMonth < 0
+        ? `${monthName(Math.ceil(kwalStartMonth))} – ${monthName(Math.floor(q.endMonth - cycle/2))} (verleden)`
+        : `${monthName(Math.ceil(kwalStartMonth))} – ${monthName(Math.floor(q.endMonth - cycle/2))}`;
+
+      // Status
+      let badge, statusNote;
+      if (kwalStartMonth < -2) {
+        badge = 'badge-bad';
+        statusNote = `Kwalificaties hadden in ${monthName(kwalStartMonth)} moeten starten — hoog risico`;
+      } else if (kwalStartMonth < 0) {
+        badge = 'badge-warn';
+        statusNote = `Kwalificaties zijn al bezig of net gestart — check pipeline`;
+      } else if (kwalStartMonth < 2) {
+        badge = 'badge-ok';
+        statusNote = `Start nu — op schema`;
+      } else {
+        badge = 'badge-info';
+        statusNote = `Ruim op tijd`;
       }
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="hl">${s.label}</td>
-        <td>${s.needed}</td>
-        <td class="hl">${nowNeeded}</td>
-        <td style="color:#b45309">${curDisp}</td>
-        <td>${statusHtml}</td>
+        <td class="hl">${q.label} <span style="color:#94a3b8;font-weight:400;font-size:0.75rem">${q.months}</span></td>
+        <td class="hl">${q.closes}</td>
+        <td>${kwalNeeded}</td>
+        <td>${kwalStartStr}</td>
+        <td style="color:#b45309">${'—'}</td>
+        <td><span class="badge ${badge}">${badge === 'badge-bad' ? '⚠ Risico' : badge === 'badge-warn' ? '⚡ Urgent' : badge === 'badge-ok' ? '✓ Start nu' : '○ Later'}</span></td>
       `;
       tbody.appendChild(tr);
     });
