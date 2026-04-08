@@ -659,6 +659,10 @@
             <input type="number" id="m5_ev_subsidy" value="0" min="0" step="50">
           </div>
           <div class="input-group">
+            <label>Gift / bijdrage derden (€)</label>
+            <input type="number" id="m5_gift" value="5000" min="0" step="100">
+          </div>
+          <div class="input-group">
             <label>Verbruik EV (kWh/100km)</label>
             <input type="number" id="m5_ev_cons" value="16" min="0" step="0.5">
           </div>
@@ -885,6 +889,10 @@
         <div class="input-group">
           <label>Subsidie EV — SEPP 2026 (€)</label>
           <input type="number" id="m1_subsidy" value="0" min="0" step="50">
+        </div>
+        <div class="input-group">
+          <label>Gift / bijdrage derden (€)</label>
+          <input type="number" id="m1_gift" value="5000" min="0" step="100">
         </div>
         <div class="input-group">
           <label>Looptijd (jaar)</label>
@@ -1292,6 +1300,7 @@ function calcMod1() {
   const evPrice    = val('m1_ev_price');
   const icePrice   = val('m1_ice_price');
   const subsidy    = val('m1_subsidy');
+  const gift       = val('m1_gift');
   const years      = Math.max(1, Math.round(val('m1_years')));
   const evResale   = val('m1_ev_resale') / 100;
   const iceResale  = val('m1_ice_resale') / 100;
@@ -1322,8 +1331,8 @@ function calcMod1() {
     cumIceMRB.push(_cumIce);
   }
 
-  // Effective purchase cost (after subsidy)
-  const evNet  = evPrice - subsidy;
+  // Effective purchase cost (after subsidy + gift)
+  const evNet  = evPrice - subsidy - gift;
   const iceNet = icePrice;
 
   // Annual fuel/energy costs
@@ -1416,7 +1425,7 @@ function calcMod1() {
     <div class="kpi">
       <div class="kpi-label">EV netto aanschaf</div>
       <div class="kpi-value blue">${fmtEur(evNet)}</div>
-      <div class="kpi-sub">na subsidie ${fmtEur(subsidy)}</div>
+      <div class="kpi-sub">na subsidie ${fmtEur(subsidy)}${gift > 0 ? ` + gift ${fmtEur(gift)}` : ''}</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Brandstofbesparing/jaar</div>
@@ -2131,6 +2140,7 @@ function calcMod5() {
   const apkYr       = apkPer2yr / 2;
   const evPrice     = val('m5_ev_price');
   const evSubsidy   = val('m5_ev_subsidy');
+  const evGift      = val('m5_gift');
   const evCons      = val('m5_ev_cons');
   const evResale    = val('m5_ev_resale') / 100;
   const evMRBBase   = val('m5_ev_mrb_base');
@@ -2199,7 +2209,7 @@ function calcMod5() {
 
   // B: Focus inruilen → EV (jij rijdt EV, km) + Seat Leon blijft (km2)
   // + laadpaal eenmalig, EV onderhoud voor de EV, ICE onderhoud voor Leon
-  const evNetB = Math.max(0, evPrice - focusVal - evSubsidy);
+  const evNetB = Math.max(0, evPrice - focusVal - evSubsidy - evGift);
   const bTCO = evNetB + laadpaal + evElYr_prim * years + cumEvMRB - evResidual + maintEVTotal
              + leonVal + leonFuelYr * years + leonMRB * years - leonResidual + maintICETotal
              + insTotal_B + apkTotal
@@ -2207,7 +2217,7 @@ function calcMod5() {
 
   // C: Seat Leon inruilen → EV (tweede auto, km2) + Focus blijft (jij, km)
   // + laadpaal eenmalig, Focus onderhoud (ICE), EV onderhoud voor tweede auto
-  const evNetC = Math.max(0, evPrice - leonVal - evSubsidy);
+  const evNetC = Math.max(0, evPrice - leonVal - evSubsidy - evGift);
   const cTCO = focusVal + focusFuelYr * years + focusMRB * years - focusResidual + maintICETotal
              + evNetC  + laadpaal + evElYr_sec  * years + cumEvMRB - evResidual + maintEVTotal
              + insTotal_C + apkTotal
@@ -2853,7 +2863,7 @@ document.getElementById('m5_loan_on').addEventListener('change', function() {
 // ============================================================
 
 const allInputIds = [
-  'm1_ev_price','m1_ice_price','m1_subsidy','m1_years','m1_ev_resale','m1_ice_resale',
+  'm1_ev_price','m1_ice_price','m1_subsidy','m1_gift','m1_years','m1_ev_resale','m1_ice_resale',
   'm1_km','m1_ev_cons','m1_ice_cons','m1_el_price','m1_fuel_price',
   'm1_bij_ev','m1_bij_ice','m1_tax_rate','m1_income',
   'm2_panels','m2_wp','m2_yield','m2_own_use','m2_el_price','m2_feed_price',
@@ -2862,7 +2872,7 @@ const allInputIds = [
   'm3_el_price','m3_feed_price','m3_solar_excess',
   'm5_cur_val','m5_cur_cons','m5_cur_mrb','m5_cur_resale',
   'm5_occ_val','m5_occ_cons','m5_occ_mrb','m5_occ_resale',
-  'm5_ev_price','m5_ev_subsidy','m5_ev_cons','m5_ev_resale','m5_ev_mrb_base',
+  'm5_ev_price','m5_ev_subsidy','m5_gift','m5_ev_cons','m5_ev_resale','m5_ev_mrb_base',
   'm5_km','m5_km2','m5_years','m5_fuel_price',
   'm5_pct_home','m5_price_home','m5_pct_ac','m5_price_ac','m5_pct_dc','m5_price_dc',
   'm5_werk_pct','m5_vergoeding_km',
