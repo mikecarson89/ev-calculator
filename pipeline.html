@@ -507,10 +507,10 @@
     const cKwal   = cur('cur_qual');
 
     // Vensters: items sluiten gelijkmatig verdeeld binnen hun resterende fase-tijd
-    // Intake (laatste fase, ~stageDur mnd resterend): sluit in 0–stageDur
+    // Intake (laatste fase, ~1 mnd resterend): sluit in 0–1 mnd
     if (cIntake !== null && cIntake > 0) {
       const expectedCloses = cIntake * cOC;
-      addPipelineContrib(cIntake, expectedCloses, 0, stageDur);
+      addPipelineContrib(cIntake, expectedCloses, 0, 1);
     }
     // Demo (2 fasen resterend): sluit in stageDur–2*stageDur
     if (cDemo !== null && cDemo > 0) {
