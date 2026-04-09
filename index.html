@@ -1229,6 +1229,148 @@
     </div>
   </div>
 
+
+  <!-- ============================================================ -->
+  <!-- MODULE 6: Enyaq Bridge Strategie -->
+  <!-- ============================================================ -->
+  <div class="module" id="mod6">
+    <div class="module-header">
+      <span class="module-badge">Module 6</span>
+      <h2>Bridge Strategie — Enyaq nu, EV5 later</h2>
+    </div>
+    <div class="module-body" style="display:block;">
+
+      <!-- VERDICT + KPIs -->
+      <div style="padding:24px; border-bottom:1px solid var(--border);">
+        <div id="m6_verdict"></div>
+        <div class="output-section-title" style="margin-top:20px;">Totale kosten over looptijd (TCO)</div>
+        <div id="m6_kpis" class="kpi-grid"></div>
+
+        <div class="output-section-title" style="margin-top:16px;">Cumulatieve kosten jaar-voor-jaar</div>
+        <div class="table-wrapper">
+          <table class="data-table" id="m6_table"></table>
+        </div>
+      </div>
+
+      <!-- INPUTS: twee scenario's naast elkaar -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; border-bottom:1px solid var(--border);">
+
+        <div class="inputs-col">
+          <div class="input-section-title">Optie A — Direct EV5 kopen (nu)</div>
+
+          <div class="input-group">
+            <label>Aanschafprijs EV5 (€)</label>
+            <input type="number" id="m6_a_price" value="47861" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>Inruilwaarde Ford Focus (€)</label>
+            <input type="number" id="m6_a_inruil" value="15810" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>Gift / bijdrage derden (€)</label>
+            <input type="number" id="m6_a_gift" value="5000" min="0" step="100">
+          </div>
+          <div class="input-group">
+            <label>Restwaarde EV5 na looptijd (%)</label>
+            <input type="number" id="m6_a_resale" value="55" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Verzekering EV5 (€/jaar)</label>
+            <input type="number" id="m6_a_ins" value="1700" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>Onderhoud EV5 (€/jaar)</label>
+            <input type="number" id="m6_a_maint" value="300" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>MRB EV5 volledig tarief (€/jaar)</label>
+            <input type="number" id="m6_a_mrb" value="1008" min="0" step="10">
+          </div>
+        </div>
+
+        <div class="inputs-col" style="border-right:none;">
+          <div class="input-section-title">Optie B — Enyaq nu, EV5 later</div>
+
+          <div class="input-group">
+            <label>Aanschafprijs Enyaq occasion (€)</label>
+            <input type="number" id="m6_b_enyaq_price" value="21000" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>Inruilwaarde Ford Focus (€)</label>
+            <input type="number" id="m6_b_inruil" value="15810" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>Gift / bijdrage derden (€)</label>
+            <input type="number" id="m6_b_gift" value="5000" min="0" step="100">
+          </div>
+          <div class="input-group">
+            <label>Bridge periode (jaar)</label>
+            <input type="number" id="m6_b_bridge" value="2" min="1" max="5" step="1">
+          </div>
+          <div class="input-group">
+            <label>Verkoopwaarde Enyaq na bridge (€)</label>
+            <input type="number" id="m6_b_enyaq_resale" value="15000" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>Aanschafprijs EV5 occasion na bridge (€) <span class="info-tag">verwachte afschrijving</span></label>
+            <input type="number" id="m6_b_ev5_price" value="35000" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>Restwaarde EV5 na looptijd (%)</label>
+            <input type="number" id="m6_b_ev5_resale" value="60" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Verzekering Enyaq (€/jaar) <span class="info-tag">WA+</span></label>
+            <input type="number" id="m6_b_enyaq_ins" value="600" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>Verzekering EV5 occasion (€/jaar)</label>
+            <input type="number" id="m6_b_ev5_ins" value="1200" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>Onderhoud Enyaq (€/jaar)</label>
+            <input type="number" id="m6_b_enyaq_maint" value="400" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>Onderhoud EV5 occasion (€/jaar)</label>
+            <input type="number" id="m6_b_ev5_maint" value="400" min="0" step="50">
+          </div>
+          <div class="input-group">
+            <label>MRB EV volledig tarief (€/jaar) <span class="info-tag">beide opties</span></label>
+            <input type="number" id="m6_b_mrb" value="1008" min="0" step="10">
+          </div>
+        </div>
+      </div>
+
+      <!-- Gemeenschappelijke parameters -->
+      <div style="padding:24px;">
+        <div class="input-section-title">Gebruik &amp; Energie</div>
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:0 24px;">
+          <div class="input-group">
+            <label>Km per jaar</label>
+            <input type="number" id="m6_km" value="35000" min="0" step="1000">
+          </div>
+          <div class="input-group">
+            <label>Looptijd totaal (jaar)</label>
+            <input type="number" id="m6_years" value="5" min="2" max="10" step="1">
+          </div>
+          <div class="input-group">
+            <label>Verbruik EV (kWh/100km)</label>
+            <input type="number" id="m6_cons" value="16" min="5" step="0.5">
+          </div>
+          <div class="input-group">
+            <label>Effectieve stroomprijs (€/kWh)</label>
+            <input type="number" id="m6_el_price" value="0.28" min="0" step="0.01">
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:-8px; padding-left:4px;">
+          Laadpaal (€1.500 eenmalig) is meegenomen in beide opties. Transactiekosten en keuringskosten bridge zijn niet inbegrepen.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div><!-- end modules -->
 
 <div style="text-align:center; padding: 40px 16px 24px; color: var(--text-muted); font-size:12px; line-height:1.8;">
@@ -2772,6 +2914,169 @@ function drawM5Charts(d) {
 }
 
 // ============================================================
+// MODULE 6: Bridge Strategie — Enyaq nu, EV5 later
+// ============================================================
+
+function calcMod6() {
+  const years  = Math.max(2, Math.round(val('m6_years')));
+  const km     = val('m6_km');
+  const cons   = val('m6_cons');
+  const elPrice = val('m6_el_price');
+  const bridge = Math.min(Math.max(1, Math.round(val('m6_b_bridge'))), years - 1);
+  const laadpaal = 1500;
+  const annualEnergy = km * (cons / 100) * elPrice;
+
+  // MRB factor per calendar year (reuse getEvMRBFactor)
+  function mrbFactor(y) { return getEvMRBFactor(2026 + y - 1); }
+
+  // ── Optie A: direct EV5 ──────────────────────────────────
+  const aPrice   = val('m6_a_price');
+  const aInruil  = val('m6_a_inruil');
+  const aGift    = val('m6_a_gift');
+  const aResale  = val('m6_a_resale') / 100;
+  const aIns     = val('m6_a_ins');
+  const aMaint   = val('m6_a_maint');
+  const aMrb     = val('m6_a_mrb');
+
+  const aNetBuy    = aPrice - aInruil - aGift;
+  const aResaleVal = aPrice * aResale;
+
+  let aRunCost = [aNetBuy + laadpaal]; // index 0 = start
+  for (let y = 1; y <= years; y++) {
+    aRunCost.push(aRunCost[y-1] + annualEnergy + aIns + aMaint + aMrb * mrbFactor(y));
+  }
+  const aTCO = aRunCost[years] - aResaleVal;
+
+  // ── Optie B: Enyaq bridge + EV5 later ────────────────────
+  const bEnyaqPrice  = val('m6_b_enyaq_price');
+  const bInruil      = val('m6_b_inruil');
+  const bGift        = val('m6_b_gift');
+  const bEnyaqResale = val('m6_b_enyaq_resale');
+  const bEv5Price    = val('m6_b_ev5_price');
+  const bEv5Resale   = val('m6_b_ev5_resale') / 100;
+  const bEnyaqIns    = val('m6_b_enyaq_ins');
+  const bEv5Ins      = val('m6_b_ev5_ins');
+  const bEnyaqMaint  = val('m6_b_enyaq_maint');
+  const bEv5Maint    = val('m6_b_ev5_maint');
+  const bMrb         = val('m6_b_mrb');
+
+  const bNetBuyEnyaq = bEnyaqPrice - bInruil - bGift;
+  const bEv5ResaleVal = bEv5Price * bEv5Resale;
+
+  let bRunCost = [bNetBuyEnyaq + laadpaal]; // index 0 = start
+  for (let y = 1; y <= years; y++) {
+    let yearCost;
+    if (y <= bridge) {
+      yearCost = annualEnergy + bEnyaqIns + bEnyaqMaint + bMrb * mrbFactor(y);
+    } else {
+      yearCost = annualEnergy + bEv5Ins + bEv5Maint + bMrb * mrbFactor(y);
+    }
+    let prev = bRunCost[y-1] + yearCost;
+    if (y === bridge) prev += (bEv5Price - bEnyaqResale); // ombouw: verkoop Enyaq, koop EV5
+    bRunCost.push(prev);
+  }
+  const bTCO = bRunCost[years] - bEv5ResaleVal;
+
+  const diff = aTCO - bTCO; // positive = B goedkoper
+
+  // ── KPI kaarten ───────────────────────────────────────────
+  document.getElementById('m6_kpis').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Optie A — Direct EV5</div>
+      <div class="kpi-value ${aTCO <= bTCO ? 'green' : ''}">${fmtEur(aTCO)}</div>
+      <div class="kpi-sub">TCO ${years} jaar</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Optie B — Bridge strategie</div>
+      <div class="kpi-value ${bTCO < aTCO ? 'green' : ''}">${fmtEur(bTCO)}</div>
+      <div class="kpi-sub">TCO ${years} jaar</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Verschil</div>
+      <div class="kpi-value ${diff > 0 ? 'green' : diff < 0 ? 'red' : ''}">${diff >= 0 ? '+' : ''}${fmtEur(diff)}</div>
+      <div class="kpi-sub">${diff > 500 ? 'Bridge goedkoper' : diff < -500 ? 'Direct EV5 goedkoper' : 'Nagenoeg gelijk'}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Netto aanschaf A (nu)</div>
+      <div class="kpi-value">${fmtEur(aNetBuy)}</div>
+      <div class="kpi-sub">EV5 − inruil − gift</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Netto aanschaf B (nu)</div>
+      <div class="kpi-value">${fmtEur(bNetBuyEnyaq)}</div>
+      <div class="kpi-sub">Enyaq − inruil − gift</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Ombouw jaar ${bridge}</div>
+      <div class="kpi-value">${fmtEur(bEv5Price - bEnyaqResale)}</div>
+      <div class="kpi-sub">EV5 occasion − Enyaq opbrengst</div>
+    </div>
+  `;
+
+  // ── Jaar-voor-jaar tabel ──────────────────────────────────
+  let thead = `<thead><tr>
+    <th>Jaar</th>
+    <th>Optie A — EV5 direct (cum.)</th>
+    <th>Optie B — Bridge (cum.)</th>
+    <th>Voordeel B</th>
+  </tr></thead>`;
+
+  let tbody = '<tbody>';
+  tbody += `<tr>
+    <td>Start</td>
+    <td>${fmtEur(aRunCost[0])} <span style="font-size:11px;color:var(--text-muted)">(aankoop + laadpaal)</span></td>
+    <td>${fmtEur(bRunCost[0])} <span style="font-size:11px;color:var(--text-muted)">(Enyaq + laadpaal)</span></td>
+    <td class="${aRunCost[0] > bRunCost[0] ? 'positive' : 'negative'}">${aRunCost[0] > bRunCost[0] ? '+' : ''}${fmtEur(aRunCost[0] - bRunCost[0])}</td>
+  </tr>`;
+
+  for (let y = 1; y <= years; y++) {
+    const isBridge = y === bridge;
+    const isLast   = y === years;
+    const aVal = isLast ? aRunCost[y] - aResaleVal : aRunCost[y];
+    const bVal = isLast ? bRunCost[y] - bEv5ResaleVal : bRunCost[y];
+    const d = aVal - bVal;
+    const rwNote = isLast ? ` <span style="font-size:11px;color:var(--green)">− RW</span>` : '';
+    const bridgeNote = isBridge ? ` <span style="font-size:11px;color:var(--yellow)">↺ ombouw EV5</span>` : '';
+    tbody += `<tr class="${isBridge ? 'highlight' : isLast ? 'breakeven' : ''}">
+      <td>Jaar ${y}${isBridge ? ' ★' : ''}</td>
+      <td>${fmtEur(aVal)}${rwNote}</td>
+      <td>${fmtEur(bVal)}${bridgeNote}${rwNote}</td>
+      <td class="${d > 0 ? 'positive' : d < 0 ? 'negative' : ''}">${d > 0 ? '+' : ''}${fmtEur(d)}</td>
+    </tr>`;
+  }
+  tbody += '</tbody>';
+
+  document.getElementById('m6_table').innerHTML = thead + tbody;
+
+  // ── Verdict ────────────────────────────────────────────────
+  let vClass, vTitle, vText;
+  if (Math.abs(diff) < 1000) {
+    vClass = 'neutral-v';
+    vTitle = 'Bridge strategie: Nagenoeg gelijk';
+    vText  = `Beide opties kosten over ${years} jaar vrijwel hetzelfde (verschil ${fmtEur(Math.abs(diff))}). Keuze hangt af van risico-tolerantie: Enyaq heeft NMC-accu en onbekende garantie, EV5 heeft LFP + 8 jaar garantie.`;
+  } else if (diff > 0) {
+    vClass = 'smart';
+    vTitle = `Bridge strategie: ${fmtEur(diff)} goedkoper over ${years} jaar`;
+    vText  = `Door nu een Enyaq occasion te rijden en na ${bridge} jaar een gebruikte EV5 te kopen, profiteer je van de afschrijving die de eerste eigenaar al heeft betaald. Netto aanschaf nu: slechts ${fmtEur(bNetBuyEnyaq + laadpaal)} (vs ${fmtEur(aNetBuy + laadpaal)} direct).`;
+  } else {
+    vClass = 'wait';
+    vTitle = `Direct EV5: ${fmtEur(Math.abs(diff))} goedkoper over ${years} jaar`;
+    vText  = `De hogere restwaarde van de nieuwe EV5 plus lagere rijkosten (nieuwer, lager risico) compenseren de hogere aanschafprijs. De bridge-kosten (ombouw ${fmtEur(bEv5Price - bEnyaqResale)}, hogere verzekering) wegen niet op.`;
+  }
+
+  document.getElementById('m6_verdict').innerHTML = `
+    <div class="verdict ${vClass}">
+      <div class="verdict-icon">🔄</div>
+      <div>
+        <div class="verdict-title">${vTitle}</div>
+        <div class="verdict-text">${vText}
+          <br><span style="color:var(--text-muted);font-size:11px;">Niet meegenomen: transactiekosten ombouw (~€500), opportuniteitskosten cash, Enyaq batterijrisico.</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ============================================================
 // ORCHESTRATOR — recalculate all modules
 // ============================================================
 
@@ -2781,6 +3086,7 @@ function recalcAll() {
   const m3 = calcMod3();
   calcMod4(m1, m2, m3);
   calcMod5();
+  calcMod6();
 }
 
 // ============================================================
@@ -2879,6 +3185,11 @@ const allInputIds = [
   'm2_install_cost','m3_roundtrip','m5_maint_ev','m5_maint_ice','m5_laadpaal',
   'm5_ins_ev','m5_ins_cur','m5_ins_leon','m5_apk',
   'm5_loan_own','m5_loan_rate','m5_loan_months',
+  'm6_a_price','m6_a_inruil','m6_a_gift','m6_a_resale','m6_a_ins','m6_a_maint','m6_a_mrb',
+  'm6_b_enyaq_price','m6_b_inruil','m6_b_gift','m6_b_bridge','m6_b_enyaq_resale',
+  'm6_b_ev5_price','m6_b_ev5_resale','m6_b_enyaq_ins','m6_b_ev5_ins',
+  'm6_b_enyaq_maint','m6_b_ev5_maint','m6_b_mrb',
+  'm6_km','m6_years','m6_cons','m6_el_price',
 ];
 
 allInputIds.forEach(id => {
