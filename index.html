@@ -645,7 +645,8 @@
           <div class="input-group">
             <label>EV model kiezen</label>
             <select id="m5_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
-              <option value="enyaq">Škoda Enyaq iV 60 — €22.400 · 17,1 kWh/100km (2021, 91k km)</option>
+              <option value="enyaq">Škoda Enyaq iV 60 — €22.400 · 17,1 kWh/100km (2021, 91k km, SOH 90%)</option>
+              <option value="enyaq2">Škoda Enyaq iV 60 — €25.950 · 17,1 kWh/100km (2023, 91k km, SOH 94,6%)</option>
               <option value="ev5" selected>Kia EV5 Plus — €47.861 · 16 kWh/100km</option>
               <option value="custom">Handmatig invoeren</option>
             </select>
@@ -872,7 +873,8 @@
         <div class="input-group">
           <label>EV model kiezen</label>
           <select id="m1_ev_preset" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;width:100%;">
-            <option value="enyaq">Škoda Enyaq iV 60 — €22.400 · 17,1 kWh/100km (2021, 91k km)</option>
+            <option value="enyaq">Škoda Enyaq iV 60 — €22.400 · 17,1 kWh/100km (2021, 91k km, SOH 90%)</option>
+            <option value="enyaq2">Škoda Enyaq iV 60 — €25.950 · 17,1 kWh/100km (2023, 91k km, SOH 94,6%)</option>
             <option value="ev5" selected>Kia EV5 Plus — €47.861 · 16 kWh/100km</option>
             <option value="custom">Handmatig invoeren</option>
           </select>
@@ -3106,8 +3108,9 @@ document.getElementById('m5_loan_on').addEventListener('change', function() {
 
   // EV preset selectors
   const EV_PRESETS = {
-    enyaq: { price: 22400, cons: 17.1, subsidy: 0,  resale: 28, chem: 'NMC', initHealth: 90, degradYr: 2.5, ins: 800,  warrantyKm: 160000, warrantyYrsLeft: 4, startKm: 91287  },
-    ev5:   { price: 47861, cons: 16, subsidy: 0,    resale: 55, chem: 'LFP', initHealth: 100, degradYr: 1.2, ins: 1700, warrantyKm: 160000, warrantyYrsLeft: 8, startKm: 0     },
+    enyaq:  { price: 22400, cons: 17.1, subsidy: 0, resale: 28, chem: 'NMC', initHealth: 90,   degradYr: 2.5, ins: 800,  warrantyKm: 160000, warrantyYrsLeft: 4, startKm: 91287 },
+    enyaq2: { price: 25950, cons: 17.1, subsidy: 0, resale: 32, chem: 'NMC', initHealth: 94.6, degradYr: 2.5, ins: 850,  warrantyKm: 160000, warrantyYrsLeft: 5, startKm: 91442 },
+    ev5:    { price: 47861, cons: 16,   subsidy: 0, resale: 55, chem: 'LFP', initHealth: 100,  degradYr: 1.2, ins: 1700, warrantyKm: 160000, warrantyYrsLeft: 8, startKm: 0     },
   };
 
   function applyEvPreset(module, preset, skipSync) {
