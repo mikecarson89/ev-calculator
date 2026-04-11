@@ -659,6 +659,10 @@
           </div>
           <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s1_price" value="22400" min="0" step="500"></div>
           <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s1_cons" value="17.1" min="0" step="0.5"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px;">
+            <div class="input-group"><label>Batterij (kWh)</label><input type="number" id="m7_s1_battery" value="55" min="0" step="1"></div>
+            <div class="input-group"><label>SOH (%) <span class="info-tag">optioneel</span></label><input type="number" id="m7_s1_soh" value="90" min="0" max="100" step="0.1" placeholder="—"></div>
+          </div>
           <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s1_ins" value="800" min="0" step="50"></div>
           <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s1_maint" value="400" min="0" step="50"></div>
           <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s1_mrb" value="1008" min="0" step="10"></div>
@@ -683,6 +687,10 @@
           </div>
           <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s2_price" value="25950" min="0" step="500"></div>
           <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s2_cons" value="17.1" min="0" step="0.5"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px;">
+            <div class="input-group"><label>Batterij (kWh)</label><input type="number" id="m7_s2_battery" value="55" min="0" step="1"></div>
+            <div class="input-group"><label>SOH (%) <span class="info-tag">optioneel</span></label><input type="number" id="m7_s2_soh" value="94.6" min="0" max="100" step="0.1" placeholder="—"></div>
+          </div>
           <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s2_ins" value="850" min="0" step="50"></div>
           <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s2_maint" value="400" min="0" step="50"></div>
           <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s2_mrb" value="1008" min="0" step="10"></div>
@@ -707,6 +715,10 @@
           </div>
           <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s3_price" value="47861" min="0" step="500"></div>
           <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s3_cons" value="16" min="0" step="0.5"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px;">
+            <div class="input-group"><label>Batterij (kWh)</label><input type="number" id="m7_s3_battery" value="80.9" min="0" step="1"></div>
+            <div class="input-group"><label>SOH (%) <span class="info-tag">optioneel</span></label><input type="number" id="m7_s3_soh" value="100" min="0" max="100" step="0.1" placeholder="—"></div>
+          </div>
           <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s3_ins" value="1700" min="0" step="50"></div>
           <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s3_maint" value="300" min="0" step="50"></div>
           <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s3_mrb" value="1008" min="0" step="10"></div>
@@ -731,6 +743,10 @@
           </div>
           <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s4_price" value="0" min="0" step="500"></div>
           <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s4_cons" value="16" min="0" step="0.5"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px;">
+            <div class="input-group"><label>Batterij (kWh)</label><input type="number" id="m7_s4_battery" value="0" min="0" step="1"></div>
+            <div class="input-group"><label>SOH (%) <span class="info-tag">optioneel</span></label><input type="number" id="m7_s4_soh" value="0" min="0" max="100" step="0.1" placeholder="—"></div>
+          </div>
           <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s4_ins" value="900" min="0" step="50"></div>
           <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s4_maint" value="400" min="0" step="50"></div>
           <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s4_mrb" value="1008" min="0" step="10"></div>
@@ -3122,6 +3138,8 @@ function calcMod7() {
     if (!price) continue;
     const name        = document.getElementById(`m7_s${n}_name`)?.value || `Optie ${n}`;
     const cons        = val(`m7_s${n}_cons`);
+    const battery     = val(`m7_s${n}_battery`);
+    const soh         = val(`m7_s${n}_soh`);
     const ins         = val(`m7_s${n}_ins`);
     const maint       = val(`m7_s${n}_maint`);
     const mrb         = val(`m7_s${n}_mrb`);
@@ -3153,12 +3171,18 @@ function calcMod7() {
     const annualP1  = annualRun(1, cons, ins, maint, mrb);
     const annualP2  = bridge > 0 ? annualRun(bridge+1, EV5_CONS, EV5_INS, EV5_MAINT, EV5_MRB) : null;
 
+    // Praktijkbereik: (battery × soh%) / cons × 100
+    const rangeKm = (battery > 0 && cons > 0 && soh > 0)
+      ? Math.round(battery * (soh/100) / cons * 100)
+      : null;
+
     results.push({
       n, name, price, cashNow, bridge, ev5Buy, resaleSell, resalePct,
       cumCost, tcoByYear,
       value3: valueAt(3), value5: valueAt(YEARS),
       tco3: tcoByYear[3], tco5: tcoByYear[YEARS],
       annualP1, annualP2,
+      battery, soh, rangeKm,
       color: COLORS[n-1],
     });
   }
@@ -3217,7 +3241,7 @@ function calcMod7() {
           ${badge}
         </div>
         <div style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;">
             <div>
               <div style="font-size:10px;color:var(--text-muted);">Aankoopprijs</div>
               <div style="font-size:13px;font-weight:600;">${fmtEur(r.price)}</div>
@@ -3225,6 +3249,18 @@ function calcMod7() {
             <div>
               <div style="font-size:10px;color:var(--text-muted);">${r.bridge > 0 ? `Verkoopprijs jr ${r.bridge}` : 'Restwaarde jr 5'}</div>
               <div style="font-size:13px;font-weight:600;color:var(--green);">${r.bridge > 0 ? fmtEur(r.resaleSell) : fmtEur(r.value5)}</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            <div>
+              <div style="font-size:10px;color:var(--text-muted);">Batterij</div>
+              <div style="font-size:13px;font-weight:600;">${r.battery > 0 ? r.battery + ' kWh' : '—'}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text-muted);">Bereik (SOH ${r.soh > 0 ? r.soh + '%' : '?'})</div>
+              <div style="font-size:13px;font-weight:600;color:${r.rangeKm ? (r.rangeKm >= 350 ? 'var(--green)' : r.rangeKm >= 250 ? 'var(--yellow)' : 'var(--red)') : 'var(--text-muted)'};">
+                ${r.rangeKm ? '~' + r.rangeKm + ' km' : '<span style="font-size:11px;">SOH onbekend</span>'}
+              </div>
             </div>
           </div>
         </div>
@@ -3593,10 +3629,10 @@ const allInputIds = [
   'm6_b_enyaq_maint','m6_b_ev5_maint','m6_b_mrb',
   'm6_km','m6_years','m6_cons','m6_el_price',
   'm7_km','m7_inruil','m7_gift','m7_el_price','m7_ev5_1yr','m7_ev5_2yr',
-  'm7_s1_price','m7_s1_cons','m7_s1_ins','m7_s1_maint','m7_s1_mrb','m7_s1_resale_sell','m7_s1_resale_pct',
-  'm7_s2_price','m7_s2_cons','m7_s2_ins','m7_s2_maint','m7_s2_mrb','m7_s2_resale_sell','m7_s2_resale_pct',
-  'm7_s3_price','m7_s3_cons','m7_s3_ins','m7_s3_maint','m7_s3_mrb','m7_s3_resale_sell','m7_s3_resale_pct',
-  'm7_s4_price','m7_s4_cons','m7_s4_ins','m7_s4_maint','m7_s4_mrb','m7_s4_resale_sell','m7_s4_resale_pct',
+  'm7_s1_price','m7_s1_cons','m7_s1_battery','m7_s1_soh','m7_s1_ins','m7_s1_maint','m7_s1_mrb','m7_s1_resale_sell','m7_s1_resale_pct',
+  'm7_s2_price','m7_s2_cons','m7_s2_battery','m7_s2_soh','m7_s2_ins','m7_s2_maint','m7_s2_mrb','m7_s2_resale_sell','m7_s2_resale_pct',
+  'm7_s3_price','m7_s3_cons','m7_s3_battery','m7_s3_soh','m7_s3_ins','m7_s3_maint','m7_s3_mrb','m7_s3_resale_sell','m7_s3_resale_pct',
+  'm7_s4_price','m7_s4_cons','m7_s4_battery','m7_s4_soh','m7_s4_ins','m7_s4_maint','m7_s4_mrb','m7_s4_resale_sell','m7_s4_resale_pct',
   'm7_s1_name','m7_s2_name','m7_s3_name','m7_s4_name',
 ];
 
