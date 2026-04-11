@@ -3285,7 +3285,17 @@ function calcMod7() {
             <div style="font-size:13px;font-weight:600;">${fmtEur(r.value5)}</div>
           </div>
         </div>
-        ${r.bridge > 0 ? `<div style="margin-top:10px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:8px;">→ EV5 kopen jaar ${r.bridge} voor ${fmtEur(r.ev5Buy)}</div>` : ''}
+        ${r.bridge > 0 ? `
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">EV5 prijs jaar ${r.bridge}</div>
+            <div style="font-size:13px;font-weight:600;">${fmtEur(r.ev5Buy)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">Bijleggen jaar ${r.bridge}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--yellow);">${fmtEur(r.ev5Buy - r.resaleSell)}</div>
+          </div>
+        </div>` : ''}
       </div>`;
   }
   document.getElementById('m7_option_cards').innerHTML = cards;
