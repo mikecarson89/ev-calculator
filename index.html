@@ -769,6 +769,36 @@
           <div class="input-group"><label style="color:#00d4aa;">✓ Voordelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s3_pros" value="Grote batterij (77 kWh),Ruimere auto" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
           <div class="input-group"><label style="color:#e94560;">✗ Nadelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s3_cons" value="SOH onbekend,Hogere aanschaf" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
         </div>
+
+        <!-- SLOT 5: Tesla Model Y -->
+        <div style="padding:20px; min-width:220px;">
+          <div style="font-size:11px; font-weight:700; color:#a78bfa; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 5</div>
+          <div class="input-group">
+            <label>Naam</label>
+            <input type="text" id="m7_s5_name" value="Tesla Model Y (2023)" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
+          </div>
+          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s5_price" value="31740" min="0" step="500"></div>
+          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s5_cons" value="16.4" min="0" step="0.5"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px;">
+            <div class="input-group"><label>Batterij (kWh)</label><input type="number" id="m7_s5_battery" value="57.5" min="0" step="1"></div>
+            <div class="input-group"><label>SOH (%) <span class="info-tag">optioneel</span></label><input type="number" id="m7_s5_soh" value="0" min="0" max="100" step="0.1" placeholder="—"></div>
+          </div>
+          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s5_ins" value="1200" min="0" step="50"></div>
+          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s5_maint" value="300" min="0" step="50"></div>
+          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s5_mrb" value="1008" min="0" step="10"></div>
+          <div class="input-group">
+            <label>Bridge naar EV5</label>
+            <select id="m7_s5_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
+              <option value="0">Geen (5 jr rijden)</option>
+              <option value="1">Bridge 1 jaar</option>
+              <option value="2" selected>Bridge 2 jaar</option>
+            </select>
+          </div>
+          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s5_resale_sell" value="18000" min="0" step="500"></div>
+          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s5_resale_pct" value="35" min="0" max="100"></div>
+          <div class="input-group"><label style="color:#00d4aa;">✓ Voordelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s5_pros" value="Trekhaak,Autopilot,Supercharger netwerk" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
+          <div class="input-group"><label style="color:#e94560;">✗ Nadelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s5_cons" value="SOH onbekend,3 eigenaren,RWD (geen AWD)" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
+        </div>
       </div>
 
         </div><!-- end collapsible inputs -->
@@ -3128,7 +3158,7 @@ function calcMod7() {
   const EV5_CONS  = 16;
   const LAADPAAL  = 1500;
   const YEARS     = 5;
-  const COLORS    = ['#00d4aa', '#4fc3f7', '#f5a623', '#e94560'];
+  const COLORS    = ['#00d4aa', '#4fc3f7', '#f5a623', '#e94560', '#a78bfa'];
 
   function mrbFactor(y) { return getEvMRBFactor(2026 + y - 1); }
   function annualRun(y, cons, ins, maint, mrb) {
@@ -3143,7 +3173,7 @@ function calcMod7() {
   }
 
   const results = [];
-  for (let n = 1; n <= 4; n++) {
+  for (let n = 1; n <= 5; n++) {
     const price = val(`m7_s${n}_price`);
     if (!price) continue;
     const name        = document.getElementById(`m7_s${n}_name`)?.value || `Optie ${n}`;
@@ -3631,7 +3661,7 @@ document.getElementById('m5_loan_on').addEventListener('change', function() {
   recalcAll();
 });
 
-['m7_s1_bridge','m7_s2_bridge','m7_s3_bridge','m7_s4_bridge'].forEach(id => {
+['m7_s1_bridge','m7_s2_bridge','m7_s3_bridge','m7_s4_bridge','m7_s5_bridge'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('change', recalcAll);
 });
@@ -3728,8 +3758,9 @@ const allInputIds = [
   'm7_s2_price','m7_s2_cons','m7_s2_battery','m7_s2_soh','m7_s2_ins','m7_s2_maint','m7_s2_mrb','m7_s2_resale_sell','m7_s2_resale_pct',
   'm7_s3_price','m7_s3_cons','m7_s3_battery','m7_s3_soh','m7_s3_ins','m7_s3_maint','m7_s3_mrb','m7_s3_resale_sell','m7_s3_resale_pct',
   'm7_s4_price','m7_s4_cons','m7_s4_battery','m7_s4_soh','m7_s4_ins','m7_s4_maint','m7_s4_mrb','m7_s4_resale_sell','m7_s4_resale_pct',
-  'm7_s1_name','m7_s2_name','m7_s3_name','m7_s4_name',
-  'm7_s1_pros','m7_s1_cons','m7_s2_pros','m7_s2_cons','m7_s3_pros','m7_s3_cons','m7_s4_pros','m7_s4_cons',
+  'm7_s5_price','m7_s5_cons','m7_s5_battery','m7_s5_soh','m7_s5_ins','m7_s5_maint','m7_s5_mrb','m7_s5_resale_sell','m7_s5_resale_pct',
+  'm7_s1_name','m7_s2_name','m7_s3_name','m7_s4_name','m7_s5_name',
+  'm7_s1_pros','m7_s1_cons','m7_s2_pros','m7_s2_cons','m7_s3_pros','m7_s3_cons','m7_s4_pros','m7_s4_cons','m7_s5_pros','m7_s5_cons',
 ];
 
 allInputIds.forEach(id => {
