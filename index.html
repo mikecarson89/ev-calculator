@@ -3136,10 +3136,10 @@ function calcMod7() {
   }
   // Linear interpolation from purchase price to resale fraction over totalYrs
   function carVal(ageYr, price, resaleFrac, totalYrs) {
-    // Exponential decay: front-loads depreciation (realistic — biggest drop in year 1)
+    // Square-root (power) curve: biggest drop in year 1 (~20%), flattens after
     // At ageYr=0 → price; at ageYr=totalYrs → price * resaleFrac
     if (!totalYrs || !resaleFrac) return price;
-    return price * Math.pow(resaleFrac, ageYr / totalYrs);
+    return price * (1 - (1 - resaleFrac) * Math.sqrt(ageYr / totalYrs));
   }
 
   const results = [];
