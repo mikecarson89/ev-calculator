@@ -676,6 +676,8 @@
           </div>
           <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s1_resale_sell" value="13000" min="0" step="500"></div>
           <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s1_resale_pct" value="28" min="0" max="100"></div>
+          <div class="input-group"><label style="color:#00d4aa;">✓ Voordelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s1_pros" value="Laagste startkosten,Minder van spaarpot af" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
+          <div class="input-group"><label style="color:#e94560;">✗ Nadelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s1_cons" value="Tweedehands accu (NMC)" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
         </div>
 
         <!-- SLOT 2 -->
@@ -704,6 +706,8 @@
           </div>
           <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s2_resale_sell" value="16000" min="0" step="500"></div>
           <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s2_resale_pct" value="32" min="0" max="100"></div>
+          <div class="input-group"><label style="color:#00d4aa;">✓ Voordelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s2_pros" value="Betere SOH dan 2021,Nieuwere auto" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
+          <div class="input-group"><label style="color:#e94560;">✗ Nadelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s2_cons" value="Hogere aanschaf dan 2021" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
         </div>
 
         <!-- SLOT 3: Direct EV5 -->
@@ -732,6 +736,8 @@
           </div>
           <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s4_resale_sell" value="38000" min="0" step="500"></div>
           <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s4_resale_pct" value="55" min="0" max="100"></div>
+          <div class="input-group"><label style="color:#00d4aa;">✓ Voordelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s4_pros" value="Lange range,Ruimte voor gezin,Nieuw & betrouwbaar" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
+          <div class="input-group"><label style="color:#e94560;">✗ Nadelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s4_cons" value="Hoge voorinvestering" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
         </div>
 
         <!-- SLOT 4: Vrij -->
@@ -760,6 +766,8 @@
           </div>
           <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s3_resale_sell" value="19000" min="0" step="500"></div>
           <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s3_resale_pct" value="36" min="0" max="100"></div>
+          <div class="input-group"><label style="color:#00d4aa;">✓ Voordelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s3_pros" value="Grote batterij (77 kWh),Ruimere auto" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
+          <div class="input-group"><label style="color:#e94560;">✗ Nadelen <span class="info-tag">komma-gescheiden</span></label><input type="text" id="m7_s3_cons" value="SOH onbekend,Hogere aanschaf" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;width:100%;"></div>
         </div>
       </div>
 
@@ -3177,6 +3185,13 @@ function calcMod7() {
       ? Math.round(battery * (soh/100) / cons * 100)
       : null;
 
+    // Pros/cons — user-editable + auto-computed
+    const ZWOLLE_DH = 300; // km retour drempel
+    const prosRaw = (document.getElementById(`m7_s${n}_pros`)?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+    const consRaw = (document.getElementById(`m7_s${n}_cons`)?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (rangeKm !== null && rangeKm < ZWOLLE_DH) consRaw.push(`Range net niet Zwolle–DH retour (~${rangeKm} km)`);
+    else if (rangeKm !== null && rangeKm >= ZWOLLE_DH) prosRaw.push(`Range OK voor Zwolle–DH retour (~${rangeKm} km)`);
+
     results.push({
       n, name, price, cashNow, bridge, ev5Buy, resaleSell, resalePct,
       cumCost, tcoByYear, valueByYear,
@@ -3184,6 +3199,7 @@ function calcMod7() {
       tco3: tcoByYear[3], tco5: tcoByYear[YEARS],
       annualP1, annualP2,
       battery, soh, rangeKm,
+      pros: prosRaw, cons: consRaw,
       color: COLORS[n-1],
     });
   }
@@ -3295,6 +3311,11 @@ function calcMod7() {
             <div style="font-size:10px;color:var(--text-muted);">Bijleggen jaar ${r.bridge}</div>
             <div style="font-size:13px;font-weight:700;color:var(--yellow);">${fmtEur(r.ev5Buy - r.resaleSell)}</div>
           </div>
+        </div>` : ''}
+        ${(r.pros.length || r.cons.length) ? `
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;font-size:11px;line-height:1.6;">
+          ${r.pros.map(p => `<div style="color:#00d4aa;">✓ ${p}</div>`).join('')}
+          ${r.cons.map(c => `<div style="color:#e94560;">✗ ${c}</div>`).join('')}
         </div>` : ''}
       </div>`;
   }
@@ -3675,6 +3696,7 @@ const allInputIds = [
   'm7_s3_price','m7_s3_cons','m7_s3_battery','m7_s3_soh','m7_s3_ins','m7_s3_maint','m7_s3_mrb','m7_s3_resale_sell','m7_s3_resale_pct',
   'm7_s4_price','m7_s4_cons','m7_s4_battery','m7_s4_soh','m7_s4_ins','m7_s4_maint','m7_s4_mrb','m7_s4_resale_sell','m7_s4_resale_pct',
   'm7_s1_name','m7_s2_name','m7_s3_name','m7_s4_name',
+  'm7_s1_pros','m7_s1_cons','m7_s2_pros','m7_s2_cons','m7_s3_pros','m7_s3_cons','m7_s4_pros','m7_s4_cons',
 ];
 
 allInputIds.forEach(id => {
