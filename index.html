@@ -592,6 +592,30 @@
     </div>
     <div class="module-body" style="display:block;">
 
+      <!-- ─── AANBEVELING + OPTION CARDS (altijd zichtbaar) ─── -->
+      <div style="padding:24px; border-bottom:1px solid var(--border);">
+        <div id="m7_recommendation"></div>
+        <div id="m7_option_cards" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:12px; margin-top:16px;"></div>
+      </div>
+
+      <!-- ─── GRAFIEK + TABEL ─── -->
+      <div style="padding:24px; border-bottom:1px solid var(--border);">
+        <div class="output-section-title" style="margin-top:0;">Cumulatieve nettokosten over 5 jaar <span style="font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">(kosten − restwaarde, lager = beter)</span></div>
+        <div style="position:relative; height:260px; margin-bottom:24px;">
+          <canvas id="m7_chart"></canvas>
+        </div>
+        <div class="output-section-title">Details</div>
+        <div id="m7_comparison_table" class="table-wrapper"></div>
+      </div>
+
+      <!-- ─── INPUTS (inklapbaar) ─── -->
+      <div>
+        <div onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'" style="padding:14px 24px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); user-select:none;">
+          <span style="font-size:13px; font-weight:600; color:var(--text-muted);">Invoer aanpassen ▾</span>
+          <span style="font-size:11px; color:var(--text-muted);">klik om uit te klappen</span>
+        </div>
+        <div style="display:none;">
+
       <!-- Gedeelde parameters -->
       <div style="padding:20px 24px; border-bottom:1px solid var(--border);">
         <div class="input-section-title" style="margin-top:0;">Gedeelde parameters</div>
@@ -723,19 +747,8 @@
         </div>
       </div>
 
-      <!-- Output -->
-      <div style="padding:24px;">
-        <div class="output-section-title" style="margin-top:0;">Vergelijkingstabel</div>
-        <div id="m7_comparison_table" class="table-wrapper" style="margin-bottom:28px;"></div>
-
-        <div class="output-section-title">Cumulatieve nettokosten over 5 jaar <span style="font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">(kosten − restwaarde, lager = beter)</span></div>
-        <div style="position:relative; height:280px; margin-bottom:28px;">
-          <canvas id="m7_chart"></canvas>
-        </div>
-
-        <div class="output-section-title">Conclusie per optie</div>
-        <div id="m7_verdicts" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:12px;"></div>
-      </div>
+        </div><!-- end collapsible inputs -->
+      </div><!-- end collapsible wrapper -->
 
     </div>
   </div>
@@ -3163,19 +3176,84 @@ function calcMod7() {
     { label: 'TCO jaar 5',               sub: 'kosten − restwaarde',        get: r => r.tco5,       dir: 'low'  },
   ];
 
+  const bestIdx = results.reduce((b, r, i) => r.tco5 < results[b].tco5 ? i : b, 0);
+  const best = results[bestIdx];
+
+  // ── Aanbeveling banner ────────────────────────────────────
+  const saving = results.length > 1
+    ? results.filter((_, i) => i !== bestIdx).reduce((mx, r) => Math.max(mx, r.tco5 - best.tco5), 0)
+    : 0;
+  const bridgeLabel = best.bridge > 0 ? ` (bridge ${best.bridge} jaar → EV5)` : ' (direct EV5)';
+  document.getElementById('m7_recommendation').innerHTML = `
+    <div class="verdict smart" style="margin-bottom:0;">
+      <div class="verdict-icon">✅</div>
+      <div>
+        <div class="verdict-title">Aanbeveling: ${best.name}${bridgeLabel}</div>
+        <div class="verdict-text">
+          Laagste TCO over 5 jaar: <strong style="color:var(--green)">${fmtEur(best.tco5)}</strong>
+          ${saving > 500 ? ` · <strong style="color:var(--green)">${fmtEur(saving)} goedkoper</strong> dan duurste alternatief` : ' · vergelijkbare opties'}<br>
+          Netto cash nu: <strong>${fmtEur(best.cashNow + LAADPAAL)}</strong>
+          ${best.bridge > 0 ? ` · EV5 kopen in jaar ${best.bridge} voor ${fmtEur(best.ev5Buy)}` : ' · meteen rijden in je nieuwe EV5'}
+        </div>
+      </div>
+    </div>`;
+
+  // ── Optie score cards ─────────────────────────────────────
+  let cards = '';
+  for (let i = 0; i < results.length; i++) {
+    const r = results[i];
+    const isBest = i === bestIdx;
+    const diff = r.tco5 - best.tco5;
+    const isClose = !isBest && diff < 2000;
+    const badge = isBest
+      ? `<span style="background:#00d4aa22;color:#00d4aa;border:1px solid #00d4aa55;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;">★ BESTE</span>`
+      : isClose
+      ? `<span style="background:#f5a62322;color:#f5a623;border:1px solid #f5a62355;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;">≈ GELIJK</span>`
+      : `<span style="background:#2a2a4a;color:var(--text-muted);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;">+${fmtEur(diff)}</span>`;
+    cards += `
+      <div style="background:var(--input-bg);border:2px solid ${isBest ? r.color : 'var(--border)'};border-radius:var(--radius);padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div style="font-weight:700;color:${r.color};font-size:14px;">${r.name}</div>
+          ${badge}
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">Cashflow nu</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:10px;">${fmtEur(r.cashNow + LAADPAAL)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">Rijkosten/jr</div>
+            <div style="font-size:13px;font-weight:600;">${fmtEur(r.annualP1)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">TCO 5 jaar</div>
+            <div style="font-size:13px;font-weight:600;color:${isBest ? 'var(--green)' : 'var(--text)'};">${fmtEur(r.tco5)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">Waarde jr 3</div>
+            <div style="font-size:13px;font-weight:600;">${fmtEur(r.value3)}</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">Waarde jr 5</div>
+            <div style="font-size:13px;font-weight:600;">${fmtEur(r.value5)}</div>
+          </div>
+        </div>
+        ${r.bridge > 0 ? `<div style="margin-top:10px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:8px;">EV5 kopen jaar ${r.bridge} · ${fmtEur(r.ev5Buy)} (na verkoop ${fmtEur(r.resaleSell)})</div>` : ''}
+      </div>`;
+  }
+  document.getElementById('m7_option_cards').innerHTML = cards;
+
+  // ── Comparison table (simplified) ────────────────────────
   let tbl = '<table class="data-table"><thead><tr><th>Metric</th>';
   for (const r of results) {
     tbl += `<th style="color:${r.color}">${r.name}${r.bridge > 0 ? `<br><span style="font-size:10px;color:var(--text-muted);font-weight:400;">→ EV5 jr ${r.bridge}</span>` : ''}</th>`;
   }
   tbl += '</tr></thead><tbody>';
-
   for (const m of metrics) {
     const vals = results.map(r => m.get(r));
     const nums = vals.filter(v => v !== null && isFinite(v));
-    const best = m.dir === 'low' ? Math.min(...nums) : Math.max(...nums);
+    const bestVal = m.dir === 'low' ? Math.min(...nums) : Math.max(...nums);
     tbl += `<tr><td>${m.label}<br><span style="font-size:11px;color:var(--text-muted)">${m.sub}</span></td>`;
     for (const v of vals) {
-      const isBest = v !== null && isFinite(v) && v === best;
+      const isBest = v !== null && isFinite(v) && v === bestVal;
       tbl += `<td class="${isBest ? 'positive' : ''}">${v !== null && isFinite(v) ? fmtEur(v) : '—'}${isBest ? ' ★' : ''}</td>`;
     }
     tbl += '</tr>';
@@ -3196,7 +3274,8 @@ function calcMod7() {
         data: r.tcoByYear,
         borderColor: r.color,
         backgroundColor: r.color + '15',
-        tension: 0.3, fill: false, pointRadius: 4, borderWidth: 2,
+        tension: 0.3, fill: false, pointRadius: 4,
+        borderWidth: results[bestIdx] === r ? 3 : 1.5,
       })),
     },
     options: {
@@ -3215,28 +3294,6 @@ function calcMod7() {
       },
     },
   });
-
-  // ── Verdicts ──────────────────────────────────────────────
-  const bestIdx = results.reduce((b, r, i) => r.tco5 < results[b].tco5 ? i : b, 0);
-  let vhtml = '';
-  for (let i = 0; i < results.length; i++) {
-    const r = results[i];
-    const isBest = i === bestIdx;
-    const diff = r.tco5 - results[bestIdx].tco5;
-    let txt = isBest
-      ? `Laagste TCO over 5 jaar: ${fmtEur(r.tco5)}.`
-      : `${fmtEur(diff)} duurder dan beste optie (${fmtEur(r.tco5)} TCO).`;
-    if (r.bridge > 0) {
-      txt += ` Nu slechts ${fmtEur(r.cashNow + LAADPAAL)} cash. EV5 kopen in jaar ${r.bridge} voor ${fmtEur(r.ev5Buy)} (na verkoop voor ${fmtEur(r.resaleSell)}).`;
-    } else {
-      txt += ` Direct EV5: ${fmtEur(r.cashNow + LAADPAAL)} cash nu. Hogere waarde en lagere rijkosten op lange termijn.`;
-    }
-    vhtml += `<div style="background:var(--input-bg);border:1px solid ${r.color}44;border-radius:var(--radius-sm);padding:16px;">
-      <div style="font-weight:700;color:${r.color};margin-bottom:6px;">${r.name}${isBest ? ' ★' : ''}${r.bridge > 0 ? ` · bridge ${r.bridge}jr` : ' · direct'}</div>
-      <div style="font-size:13px;color:var(--text-muted);line-height:1.7;">${txt}</div>
-    </div>`;
-  }
-  document.getElementById('m7_verdicts').innerHTML = vhtml;
 }
 
 // ============================================================
