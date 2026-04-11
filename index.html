@@ -3192,6 +3192,8 @@ function calcMod7() {
     if (rangeKm !== null && rangeKm < ZWOLLE_DH) consRaw.push(`Range net niet Zwolle–DH retour (~${rangeKm} km)`);
     else if (rangeKm !== null && rangeKm >= ZWOLLE_DH) prosRaw.push(`Range OK voor Zwolle–DH retour (~${rangeKm} km)`);
 
+    const totalInvest = (cashNow + LAADPAAL) + (bridge > 0 ? Math.max(0, ev5Buy - resaleSell) : 0);
+
     results.push({
       n, name, price, cashNow, bridge, ev5Buy, resaleSell, resalePct,
       cumCost, tcoByYear, valueByYear,
@@ -3199,6 +3201,7 @@ function calcMod7() {
       tco3: tcoByYear[3], tco5: tcoByYear[YEARS],
       annualP1, annualP2,
       battery, soh, rangeKm,
+      totalInvest,
       pros: prosRaw, cons: consRaw,
       color: COLORS[n-1],
     });
@@ -3219,6 +3222,7 @@ function calcMod7() {
 
   const bestIdx = results.reduce((b, r, i) => r.tco5 < results[b].tco5 ? i : b, 0);
   const best = results[bestIdx];
+  const bestInvest = Math.min(...results.map(r => r.totalInvest));
 
   // ── Aanbeveling banner ────────────────────────────────────
   const saving = results.length > 1
@@ -3282,7 +3286,14 @@ function calcMod7() {
           </div>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">Cashflow nu <span style="color:var(--border)">· incl. laadpaal €1.500</span></div>
-        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:10px;">${fmtEur(r.cashNow + LAADPAAL)}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;">${fmtEur(r.cashNow + LAADPAAL)}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;background:${r.totalInvest === bestInvest ? '#00d4aa18' : 'var(--card-bg, #16163a)'};border:1px solid ${r.totalInvest === bestInvest ? '#00d4aa55' : 'var(--border)'};border-radius:6px;padding:6px 10px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">Totale investering${r.bridge > 0 ? ` (nu + bijleggen jr ${r.bridge})` : ' (alles nu)'}</div>
+            <div style="font-size:15px;font-weight:700;color:${r.totalInvest === bestInvest ? 'var(--green)' : 'var(--text)'};">${fmtEur(r.totalInvest)}${r.totalInvest === bestInvest ? ' ★' : ''}</div>
+          </div>
+          ${r.bridge > 0 ? `<div style="font-size:10px;color:var(--text-muted);text-align:right;">${fmtEur(r.cashNow + LAADPAAL)} nu<br>+ ${fmtEur(Math.max(0, r.ev5Buy - r.resaleSell))} jr ${r.bridge}</div>` : `<div style="font-size:10px;color:var(--text-muted);text-align:right;">alles<br>nu</div>`}
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
           <div>
             <div style="font-size:10px;color:var(--text-muted);">Rijkosten/jr</div>
