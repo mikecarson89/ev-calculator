@@ -583,6 +583,165 @@
 <div class="modules">
 
   <!-- ============================================================ -->
+  <!-- MODULE 7: EV Vergelijker -->
+  <!-- ============================================================ -->
+  <div class="module" id="mod7">
+    <div class="module-header">
+      <span class="module-badge">Module 7</span>
+      <h2>EV Vergelijker — Occasion vs Direct</h2>
+    </div>
+    <div class="module-body" style="display:block;">
+
+      <!-- Gedeelde parameters -->
+      <div style="padding:20px 24px; border-bottom:1px solid var(--border);">
+        <div class="input-section-title" style="margin-top:0;">Gedeelde parameters</div>
+        <div style="display:grid; grid-template-columns: repeat(6, 1fr); gap:0 20px; align-items:end;">
+          <div class="input-group">
+            <label>Km/jaar</label>
+            <input type="number" id="m7_km" value="35000" min="0" step="1000">
+          </div>
+          <div class="input-group">
+            <label>Inruilwaarde Ford (€)</label>
+            <input type="number" id="m7_inruil" value="15810" min="0" step="100">
+          </div>
+          <div class="input-group">
+            <label>Gift (€)</label>
+            <input type="number" id="m7_gift" value="5000" min="0" step="100">
+          </div>
+          <div class="input-group">
+            <label>Stroomprijs (€/kWh)</label>
+            <input type="number" id="m7_el_price" value="0.28" min="0" step="0.01">
+          </div>
+          <div class="input-group">
+            <label>EV5 occasion na 1 jr (€)</label>
+            <input type="number" id="m7_ev5_1yr" value="42000" min="0" step="500">
+          </div>
+          <div class="input-group">
+            <label>EV5 occasion na 2 jr (€)</label>
+            <input type="number" id="m7_ev5_2yr" value="35000" min="0" step="500">
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 opties naast elkaar -->
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); border-bottom:1px solid var(--border); overflow-x:auto;">
+
+        <!-- SLOT 1 -->
+        <div style="padding:20px; border-right:1px solid var(--border); min-width:220px;">
+          <div style="font-size:11px; font-weight:700; color:#00d4aa; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 1</div>
+          <div class="input-group">
+            <label>Naam</label>
+            <input type="text" id="m7_s1_name" value="Enyaq 2021" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
+          </div>
+          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s1_price" value="22400" min="0" step="500"></div>
+          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s1_cons" value="17.1" min="0" step="0.5"></div>
+          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s1_ins" value="800" min="0" step="50"></div>
+          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s1_maint" value="400" min="0" step="50"></div>
+          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s1_mrb" value="1008" min="0" step="10"></div>
+          <div class="input-group">
+            <label>Bridge naar EV5</label>
+            <select id="m7_s1_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
+              <option value="0">Geen (5 jr rijden)</option>
+              <option value="1">Bridge 1 jaar</option>
+              <option value="2" selected>Bridge 2 jaar</option>
+            </select>
+          </div>
+          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s1_resale_sell" value="13000" min="0" step="500"></div>
+          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s1_resale_pct" value="28" min="0" max="100"></div>
+        </div>
+
+        <!-- SLOT 2 -->
+        <div style="padding:20px; border-right:1px solid var(--border); min-width:220px;">
+          <div style="font-size:11px; font-weight:700; color:#4fc3f7; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 2</div>
+          <div class="input-group">
+            <label>Naam</label>
+            <input type="text" id="m7_s2_name" value="Enyaq 2023" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
+          </div>
+          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s2_price" value="25950" min="0" step="500"></div>
+          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s2_cons" value="17.1" min="0" step="0.5"></div>
+          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s2_ins" value="850" min="0" step="50"></div>
+          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s2_maint" value="400" min="0" step="50"></div>
+          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s2_mrb" value="1008" min="0" step="10"></div>
+          <div class="input-group">
+            <label>Bridge naar EV5</label>
+            <select id="m7_s2_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
+              <option value="0">Geen (5 jr rijden)</option>
+              <option value="1">Bridge 1 jaar</option>
+              <option value="2" selected>Bridge 2 jaar</option>
+            </select>
+          </div>
+          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s2_resale_sell" value="16000" min="0" step="500"></div>
+          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s2_resale_pct" value="32" min="0" max="100"></div>
+        </div>
+
+        <!-- SLOT 3: Direct EV5 -->
+        <div style="padding:20px; border-right:1px solid var(--border); min-width:220px;">
+          <div style="font-size:11px; font-weight:700; color:#f5a623; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 3</div>
+          <div class="input-group">
+            <label>Naam</label>
+            <input type="text" id="m7_s3_name" value="Direct EV5" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
+          </div>
+          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s3_price" value="47861" min="0" step="500"></div>
+          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s3_cons" value="16" min="0" step="0.5"></div>
+          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s3_ins" value="1700" min="0" step="50"></div>
+          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s3_maint" value="300" min="0" step="50"></div>
+          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s3_mrb" value="1008" min="0" step="10"></div>
+          <div class="input-group">
+            <label>Bridge naar EV5</label>
+            <select id="m7_s3_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
+              <option value="0" selected>Geen (5 jr rijden)</option>
+              <option value="1">Bridge 1 jaar</option>
+              <option value="2">Bridge 2 jaar</option>
+            </select>
+          </div>
+          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s3_resale_sell" value="38000" min="0" step="500"></div>
+          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s3_resale_pct" value="55" min="0" max="100"></div>
+        </div>
+
+        <!-- SLOT 4: Vrij -->
+        <div style="padding:20px; min-width:220px;">
+          <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 4 — Vrij</div>
+          <div class="input-group">
+            <label>Naam</label>
+            <input type="text" id="m7_s4_name" value="" placeholder="Vul een naam in" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
+          </div>
+          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s4_price" value="0" min="0" step="500"></div>
+          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s4_cons" value="16" min="0" step="0.5"></div>
+          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s4_ins" value="900" min="0" step="50"></div>
+          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s4_maint" value="400" min="0" step="50"></div>
+          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s4_mrb" value="1008" min="0" step="10"></div>
+          <div class="input-group">
+            <label>Bridge naar EV5</label>
+            <select id="m7_s4_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
+              <option value="0">Geen (5 jr rijden)</option>
+              <option value="1">Bridge 1 jaar</option>
+              <option value="2" selected>Bridge 2 jaar</option>
+            </select>
+          </div>
+          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s4_resale_sell" value="0" min="0" step="500"></div>
+          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s4_resale_pct" value="40" min="0" max="100"></div>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div style="padding:24px;">
+        <div class="output-section-title" style="margin-top:0;">Vergelijkingstabel</div>
+        <div id="m7_comparison_table" class="table-wrapper" style="margin-bottom:28px;"></div>
+
+        <div class="output-section-title">Cumulatieve nettokosten over 5 jaar <span style="font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">(kosten − restwaarde, lager = beter)</span></div>
+        <div style="position:relative; height:280px; margin-bottom:28px;">
+          <canvas id="m7_chart"></canvas>
+        </div>
+
+        <div class="output-section-title">Conclusie per optie</div>
+        <div id="m7_verdicts" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:12px;"></div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
   <!-- MODULE 1: EV vs ICE -->
   <!-- ============================================================ -->
   <div class="module" id="mod5">
@@ -1231,164 +1390,6 @@
     </div>
   </div>
 
-
-  <!-- ============================================================ -->
-  <!-- MODULE 7: EV Vergelijker -->
-  <!-- ============================================================ -->
-  <div class="module" id="mod7">
-    <div class="module-header">
-      <span class="module-badge">Module 7</span>
-      <h2>EV Vergelijker — Occasion vs Direct</h2>
-    </div>
-    <div class="module-body" style="display:block;">
-
-      <!-- Gedeelde parameters -->
-      <div style="padding:20px 24px; border-bottom:1px solid var(--border);">
-        <div class="input-section-title" style="margin-top:0;">Gedeelde parameters</div>
-        <div style="display:grid; grid-template-columns: repeat(6, 1fr); gap:0 20px; align-items:end;">
-          <div class="input-group">
-            <label>Km/jaar</label>
-            <input type="number" id="m7_km" value="35000" min="0" step="1000">
-          </div>
-          <div class="input-group">
-            <label>Inruilwaarde Ford (€)</label>
-            <input type="number" id="m7_inruil" value="15810" min="0" step="100">
-          </div>
-          <div class="input-group">
-            <label>Gift (€)</label>
-            <input type="number" id="m7_gift" value="5000" min="0" step="100">
-          </div>
-          <div class="input-group">
-            <label>Stroomprijs (€/kWh)</label>
-            <input type="number" id="m7_el_price" value="0.28" min="0" step="0.01">
-          </div>
-          <div class="input-group">
-            <label>EV5 occasion na 1 jr (€)</label>
-            <input type="number" id="m7_ev5_1yr" value="42000" min="0" step="500">
-          </div>
-          <div class="input-group">
-            <label>EV5 occasion na 2 jr (€)</label>
-            <input type="number" id="m7_ev5_2yr" value="35000" min="0" step="500">
-          </div>
-        </div>
-      </div>
-
-      <!-- 4 opties naast elkaar -->
-      <div style="display:grid; grid-template-columns: repeat(4, 1fr); border-bottom:1px solid var(--border); overflow-x:auto;">
-
-        <!-- SLOT 1 -->
-        <div style="padding:20px; border-right:1px solid var(--border); min-width:220px;">
-          <div style="font-size:11px; font-weight:700; color:#00d4aa; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 1</div>
-          <div class="input-group">
-            <label>Naam</label>
-            <input type="text" id="m7_s1_name" value="Enyaq 2021" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
-          </div>
-          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s1_price" value="22400" min="0" step="500"></div>
-          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s1_cons" value="17.1" min="0" step="0.5"></div>
-          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s1_ins" value="800" min="0" step="50"></div>
-          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s1_maint" value="400" min="0" step="50"></div>
-          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s1_mrb" value="1008" min="0" step="10"></div>
-          <div class="input-group">
-            <label>Bridge naar EV5</label>
-            <select id="m7_s1_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
-              <option value="0">Geen (5 jr rijden)</option>
-              <option value="1">Bridge 1 jaar</option>
-              <option value="2" selected>Bridge 2 jaar</option>
-            </select>
-          </div>
-          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s1_resale_sell" value="13000" min="0" step="500"></div>
-          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s1_resale_pct" value="28" min="0" max="100"></div>
-        </div>
-
-        <!-- SLOT 2 -->
-        <div style="padding:20px; border-right:1px solid var(--border); min-width:220px;">
-          <div style="font-size:11px; font-weight:700; color:#4fc3f7; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 2</div>
-          <div class="input-group">
-            <label>Naam</label>
-            <input type="text" id="m7_s2_name" value="Enyaq 2023" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
-          </div>
-          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s2_price" value="25950" min="0" step="500"></div>
-          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s2_cons" value="17.1" min="0" step="0.5"></div>
-          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s2_ins" value="850" min="0" step="50"></div>
-          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s2_maint" value="400" min="0" step="50"></div>
-          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s2_mrb" value="1008" min="0" step="10"></div>
-          <div class="input-group">
-            <label>Bridge naar EV5</label>
-            <select id="m7_s2_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
-              <option value="0">Geen (5 jr rijden)</option>
-              <option value="1">Bridge 1 jaar</option>
-              <option value="2" selected>Bridge 2 jaar</option>
-            </select>
-          </div>
-          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s2_resale_sell" value="16000" min="0" step="500"></div>
-          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s2_resale_pct" value="32" min="0" max="100"></div>
-        </div>
-
-        <!-- SLOT 3: Direct EV5 -->
-        <div style="padding:20px; border-right:1px solid var(--border); min-width:220px;">
-          <div style="font-size:11px; font-weight:700; color:#f5a623; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 3</div>
-          <div class="input-group">
-            <label>Naam</label>
-            <input type="text" id="m7_s3_name" value="Direct EV5" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
-          </div>
-          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s3_price" value="47861" min="0" step="500"></div>
-          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s3_cons" value="16" min="0" step="0.5"></div>
-          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s3_ins" value="1700" min="0" step="50"></div>
-          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s3_maint" value="300" min="0" step="50"></div>
-          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s3_mrb" value="1008" min="0" step="10"></div>
-          <div class="input-group">
-            <label>Bridge naar EV5</label>
-            <select id="m7_s3_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
-              <option value="0" selected>Geen (5 jr rijden)</option>
-              <option value="1">Bridge 1 jaar</option>
-              <option value="2">Bridge 2 jaar</option>
-            </select>
-          </div>
-          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s3_resale_sell" value="38000" min="0" step="500"></div>
-          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s3_resale_pct" value="55" min="0" max="100"></div>
-        </div>
-
-        <!-- SLOT 4: Vrij -->
-        <div style="padding:20px; min-width:220px;">
-          <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Optie 4 — Vrij</div>
-          <div class="input-group">
-            <label>Naam</label>
-            <input type="text" id="m7_s4_name" value="" placeholder="Vul een naam in" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;width:100%;">
-          </div>
-          <div class="input-group"><label>Aanschafprijs (€)</label><input type="number" id="m7_s4_price" value="0" min="0" step="500"></div>
-          <div class="input-group"><label>Verbruik (kWh/100km)</label><input type="number" id="m7_s4_cons" value="16" min="0" step="0.5"></div>
-          <div class="input-group"><label>Verzekering (€/jr)</label><input type="number" id="m7_s4_ins" value="900" min="0" step="50"></div>
-          <div class="input-group"><label>Onderhoud (€/jr)</label><input type="number" id="m7_s4_maint" value="400" min="0" step="50"></div>
-          <div class="input-group"><label>MRB volledig (€/jr)</label><input type="number" id="m7_s4_mrb" value="1008" min="0" step="10"></div>
-          <div class="input-group">
-            <label>Bridge naar EV5</label>
-            <select id="m7_s4_bridge" style="background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;width:100%;">
-              <option value="0">Geen (5 jr rijden)</option>
-              <option value="1">Bridge 1 jaar</option>
-              <option value="2" selected>Bridge 2 jaar</option>
-            </select>
-          </div>
-          <div class="input-group"><label>Restw. verkoop (€) <span class="info-tag">bridge</span></label><input type="number" id="m7_s4_resale_sell" value="0" min="0" step="500"></div>
-          <div class="input-group"><label>Restw. na 5 jr (%) <span class="info-tag">geen bridge</span></label><input type="number" id="m7_s4_resale_pct" value="40" min="0" max="100"></div>
-        </div>
-      </div>
-
-      <!-- Output -->
-      <div style="padding:24px;">
-        <div class="output-section-title" style="margin-top:0;">Vergelijkingstabel</div>
-        <div id="m7_comparison_table" class="table-wrapper" style="margin-bottom:28px;"></div>
-
-        <div class="output-section-title">Cumulatieve nettokosten over 5 jaar <span style="font-size:11px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">(kosten − restwaarde, lager = beter)</span></div>
-        <div style="position:relative; height:280px; margin-bottom:28px;">
-          <canvas id="m7_chart"></canvas>
-        </div>
-
-        <div class="output-section-title">Conclusie per optie</div>
-        <div id="m7_verdicts" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:12px;"></div>
-      </div>
-
-    </div>
-  </div>
 
   <!-- ============================================================ -->
   <!-- MODULE 6: Enyaq Bridge Strategie -->
