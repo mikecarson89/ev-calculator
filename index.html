@@ -3319,8 +3319,9 @@ function calcMod7() {
   // Two datasets per option: cumulative spending (solid) + car value (dashed)
   const datasets = [];
   for (const r of results) {
+    const routeLabel = r.bridge > 0 ? `${r.name} → EV5 jr ${r.bridge}` : r.name;
     datasets.push({
-      label: `${r.name} — uitgaven`,
+      label: `${routeLabel} — uitgaven`,
       data: r.cumCost,
       borderColor: r.color,
       backgroundColor: 'transparent',
@@ -3329,7 +3330,7 @@ function calcMod7() {
       borderDash: [],
     });
     datasets.push({
-      label: `${r.name} — autowaarde`,
+      label: `${routeLabel} — autowaarde`,
       data: r.valueByYear,
       borderColor: r.color,
       backgroundColor: 'transparent',
