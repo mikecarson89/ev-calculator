@@ -3196,6 +3196,13 @@ function calcMod7() {
 
     const totalInvest = (cashNow + LAADPAAL) + (bridge > 0 ? Math.max(0, ev5Buy - resaleSell) : 0);
 
+    // Opportunity cost: what would each cash withdrawal have grown to at 4%/yr?
+    const INVEST_RATE = 0.04;
+    const cashOutNow    = cashNow + LAADPAAL;
+    const cashOutBridge = bridge > 0 ? Math.max(0, ev5Buy - resaleSell) : 0;
+    const oppCost = cashOutNow    * (Math.pow(1 + INVEST_RATE, YEARS) - 1)
+                  + cashOutBridge * (Math.pow(1 + INVEST_RATE, YEARS - bridge) - 1);
+
     results.push({
       n, name, price, cashNow, bridge, ev5Buy, resaleSell, resalePct,
       cumCost, tcoByYear, valueByYear,
@@ -3203,7 +3210,7 @@ function calcMod7() {
       tco3: tcoByYear[3], tco5: tcoByYear[YEARS],
       annualP1, annualP2,
       battery, soh, rangeKm,
-      totalInvest,
+      totalInvest, oppCost,
       pros: prosRaw, cons: consRaw,
       color: COLORS[n-1],
     });
@@ -3218,13 +3225,16 @@ function calcMod7() {
     { label: 'Rijkosten/jr na bridge',    sub: 'EV5 occasion',               get: r => r.annualP2,   dir: 'low'  },
     { label: 'Wagenpark waarde jaar 3',   sub: 'geschatte restwaarde',       get: r => r.value3,     dir: 'high' },
     { label: 'Wagenpark waarde jaar 5',   sub: 'geschatte restwaarde',       get: r => r.value5,     dir: 'high' },
+    { label: 'Gemiste rente @ 4%/jr',     sub: 'opportunity cost over 5 jr', get: r => r.oppCost,    dir: 'low'  },
+    { label: 'TCO incl. gemiste groei',   sub: 'echte economische kosten',   get: r => r.tco5 + r.oppCost, dir: 'low' },
     { label: 'TCO jaar 3',               sub: 'kosten − restwaarde',        get: r => r.tco3,       dir: 'low'  },
     { label: 'TCO jaar 5',               sub: 'kosten − restwaarde',        get: r => r.tco5,       dir: 'low'  },
   ];
 
   const bestIdx = results.reduce((b, r, i) => r.tco5 < results[b].tco5 ? i : b, 0);
   const best = results[bestIdx];
-  const bestInvest = Math.min(...results.map(r => r.totalInvest));
+  const bestInvest  = Math.min(...results.map(r => r.totalInvest));
+  const bestOppCost = Math.min(...results.map(r => r.oppCost));
 
   // ── Aanbeveling banner ────────────────────────────────────
   const saving = results.length > 1
@@ -3312,6 +3322,16 @@ function calcMod7() {
           <div>
             <div style="font-size:10px;color:var(--text-muted);">Waarde jr 5</div>
             <div style="font-size:13px;font-weight:600;">${fmtEur(r.value5)}</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;border-top:1px dashed var(--border);padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:10px;color:var(--text-muted);">Gemiste rente @ 4%/jr (5 jr)</div>
+            <div style="font-size:13px;font-weight:600;color:${r.oppCost === bestOppCost ? 'var(--green)' : '#e94560'};">${fmtEur(Math.round(r.oppCost))}${r.oppCost === bestOppCost ? ' ★' : ''}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:var(--text-muted);">Echte kosten incl. gemiste groei</div>
+            <div style="font-size:13px;font-weight:700;">${fmtEur(Math.round(r.tco5 + r.oppCost))}</div>
           </div>
         </div>
         ${r.bridge > 0 ? `
