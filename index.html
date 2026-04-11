@@ -3216,6 +3216,18 @@ function calcMod7() {
           <div style="font-weight:700;color:${r.color};font-size:14px;">${r.name}</div>
           ${badge}
         </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+            <div>
+              <div style="font-size:10px;color:var(--text-muted);">Aankoopprijs</div>
+              <div style="font-size:13px;font-weight:600;">${fmtEur(r.price)}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text-muted);">${r.bridge > 0 ? `Verkoopprijs jr ${r.bridge}` : 'Restwaarde jr 5'}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--green);">${r.bridge > 0 ? fmtEur(r.resaleSell) : fmtEur(r.value5)}</div>
+            </div>
+          </div>
+        </div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">Cashflow nu</div>
         <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:10px;">${fmtEur(r.cashNow + LAADPAAL)}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
@@ -3236,7 +3248,7 @@ function calcMod7() {
             <div style="font-size:13px;font-weight:600;">${fmtEur(r.value5)}</div>
           </div>
         </div>
-        ${r.bridge > 0 ? `<div style="margin-top:10px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:8px;">EV5 kopen jaar ${r.bridge} · ${fmtEur(r.ev5Buy)} (na verkoop ${fmtEur(r.resaleSell)})</div>` : ''}
+        ${r.bridge > 0 ? `<div style="margin-top:10px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:8px;">→ EV5 kopen jaar ${r.bridge} voor ${fmtEur(r.ev5Buy)}</div>` : ''}
       </div>`;
   }
   document.getElementById('m7_option_cards').innerHTML = cards;
